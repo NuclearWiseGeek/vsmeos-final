@@ -27,9 +27,9 @@ export default function Dashboard() {
             <h2 className="text-3xl font-bold mb-2">ESG Compliance Hub</h2>
             <p className="text-gray-400">Complete your Scopes to generate the report for your Buyer.</p>
           </div>
-          <button className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm border border-gray-700">
+          <Link href="/dashboard/profile" className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm border border-gray-700 transition-colors">
             Run Self-Test
-          </button>
+          </Link>
         </div>
 
         {/* The 3 Scopes - Data Entry Area */}
