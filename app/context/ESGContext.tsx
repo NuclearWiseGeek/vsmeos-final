@@ -1,38 +1,40 @@
 'use client';
 import React, { createContext, useContext, useState } from 'react';
 
+// 1. Define the shape of the data
 interface ESGState {
   companyName: string;
   country: string;
   revenue: string;
   currency: string;
-  // Scope 1
   gas: number;
-  heatingOil: number; // NEW
-  propane: number;    // NEW
+  heatingOil: number;
+  propane: number;
   diesel: number;
   petrol: number;
-  r410a: number;      // NEW
-  r32: number;        // NEW
-  r134a: number;      // NEW
-  // Scope 2
+  r410a: number;
+  r32: number;
+  r134a: number;
   elec: number;
   districtHeat: number;
-  // Scope 3
   vehicleKm: number;
   flightKm: number;
   hotelNights: number;
-  // Signer
   signerName: string;
+  files: string[]; 
 }
 
-const ESGContext = createContext<{
+// 2. Define the Functions (THIS IS WHAT WAS MISSING)
+interface ESGContextType {
   data: ESGState;
   setData: React.Dispatch<React.SetStateAction<ESGState>>;
-} | null>(null);
+  resetData: () => void;
+}
+
+const ESGContext = createContext<ESGContextType | null>(null);
 
 export function ESGProvider({ children }: { children: React.ReactNode }) {
-  const [data, setData] = useState<ESGState>({
+  const initialState: ESGState = {
     companyName: '',
     country: 'France',
     revenue: '',
@@ -50,11 +52,19 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
     vehicleKm: 0,
     flightKm: 0,
     hotelNights: 0,
-    signerName: ''
-  });
+    signerName: '',
+    files: []
+  };
+
+  const [data, setData] = useState<ESGState>(initialState);
+
+  // 3. The Missing Function
+  const resetData = () => {
+    setData(initialState);
+  };
 
   return (
-    <ESGContext.Provider value={{ data, setData }}>
+    <ESGContext.Provider value={{ data, setData, resetData }}>
       {children}
     </ESGContext.Provider>
   );
