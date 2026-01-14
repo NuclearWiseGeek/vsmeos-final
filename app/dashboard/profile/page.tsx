@@ -14,7 +14,8 @@ export default function CompanyProfile() {
       alert("Company Name and Revenue are required.");
       return;
     }
-    router.push('/dashboard/assessment');
+    // FIX: Redirect to the Hub (Dashboard), NOT the deleted assessment page
+    router.push('/dashboard'); 
   };
 
   return (
@@ -67,7 +68,7 @@ export default function CompanyProfile() {
             type="submit"
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-xl hover:scale-[1.02] transition-transform"
           >
-            Start Assessment ➔
+            Save Profile & Go to Dashboard ➔
           </button>
         </form>
       </main>
