@@ -8,7 +8,7 @@ export default function ReviewPage() {
   const router = useRouter();
   const { data, setData } = useESG();
 
-  // --- Quick Math for Summary ---
+  // ... (Keep the math calculations exactly as they are) ...
   const FACTORS = {
     gas: 0.244, heatingOil: 3.2, propane: 3.1, diesel: 3.16, petrol: 2.8, r410a: 2088, r32: 675, r134a: 1430,
     elec: 0.052, districtHeat: 0.170, vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
@@ -27,15 +27,27 @@ export default function ReviewPage() {
     }
   };
 
+  // --- UPDATED VALIDATION LOGIC ---
   const handleFinalSubmit = () => {
+    // 1. Check Profile Data
+    if (!data.companyName || !data.revenue) {
+      alert("Profile Incomplete! You must provide Company Name and Revenue to generate a valid report.");
+      router.push('/dashboard/profile'); // Redirects to Step 1
+      return;
+    }
+
+    // 2. Check Signature
     if(!data.signerName) {
       alert("Please sign the report before generating.");
       return;
     }
+    
+    // 3. Go to Results
     router.push('/dashboard/results');
   };
 
   return (
+    // ... (Keep the rest of the JSX exactly the same) ...
     <div className="min-h-screen bg-black text-white p-8 font-sans">
       <nav className="max-w-3xl mx-auto mb-8 border-b border-gray-800 pb-4">
         <Link href="/dashboard" className="text-gray-500 hover:text-white text-sm">← Back to Dashboard</Link>
