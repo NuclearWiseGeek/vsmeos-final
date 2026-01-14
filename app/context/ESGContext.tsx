@@ -6,14 +6,23 @@ interface ESGState {
   country: string;
   revenue: string;
   currency: string;
+  // Scope 1
   gas: number;
+  heatingOil: number; // NEW
+  propane: number;    // NEW
   diesel: number;
   petrol: number;
+  r410a: number;      // NEW
+  r32: number;        // NEW
+  r134a: number;      // NEW
+  // Scope 2
   elec: number;
   districtHeat: number;
+  // Scope 3
   vehicleKm: number;
   flightKm: number;
   hotelNights: number;
+  // Signer
   signerName: string;
 }
 
@@ -29,8 +38,13 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
     revenue: '',
     currency: 'EUR',
     gas: 0,
+    heatingOil: 0,
+    propane: 0,
     diesel: 0,
     petrol: 0,
+    r410a: 0,
+    r32: 0,
+    r134a: 0,
     elec: 0,
     districtHeat: 0,
     vehicleKm: 0,

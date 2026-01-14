@@ -22,7 +22,7 @@ export default function Assessment() {
       <nav className="max-w-4xl mx-auto mb-12 border-b border-gray-800 pb-4 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Step 2: Activity Data</h1>
-          <p className="text-gray-400 text-sm">Enter your consumption data below.</p>
+          <p className="text-gray-400 text-sm">Full Scope 1, 2 & 3 Assessment (ADEME v23.0)</p>
         </div>
         <Link href="/dashboard/profile" className="text-gray-500 hover:text-white text-sm">← Back to Profile</Link>
       </nav>
@@ -30,29 +30,70 @@ export default function Assessment() {
       <main className="max-w-4xl mx-auto">
         <form onSubmit={handleSubmit} className="space-y-10">
           
-          {/* Scope 1 */}
+          {/* SCOPE 1: DIRECT EMISSIONS */}
           <section className="bg-gray-900/40 border border-gray-800 p-8 rounded-2xl">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-orange-400">🔥 Scope 1: Direct</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500 font-bold">Natural Gas (kWh)</label>
-                <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
-                  value={data.gas || ''} onChange={(e) => handleNumChange('gas', e.target.value)} />
+            
+            <div className="mb-6">
+              <h3 className="text-sm text-gray-400 font-bold uppercase mb-4 border-b border-gray-800 pb-2">Stationary Combustion</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">Natural Gas (kWh)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.gas || ''} onChange={(e) => handleNumChange('gas', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">Heating Oil (Liters)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.heatingOil || ''} onChange={(e) => handleNumChange('heatingOil', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">Propane (kg)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.propane || ''} onChange={(e) => handleNumChange('propane', e.target.value)} />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500 font-bold">Fleet Diesel (Liters)</label>
-                <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
-                  value={data.diesel || ''} onChange={(e) => handleNumChange('diesel', e.target.value)} />
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm text-gray-400 font-bold uppercase mb-4 border-b border-gray-800 pb-2">Mobile Combustion</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">Fleet Diesel (Liters)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.diesel || ''} onChange={(e) => handleNumChange('diesel', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">Fleet Petrol (Liters)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.petrol || ''} onChange={(e) => handleNumChange('petrol', e.target.value)} />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs text-gray-500 font-bold">Fleet Petrol (Liters)</label>
-                <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
-                  value={data.petrol || ''} onChange={(e) => handleNumChange('petrol', e.target.value)} />
+            </div>
+
+            <div>
+              <h3 className="text-sm text-gray-400 font-bold uppercase mb-4 border-b border-gray-800 pb-2">Fugitive Emissions (Refrigerants)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">R410A Refill (kg)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.r410a || ''} onChange={(e) => handleNumChange('r410a', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">R32 Refill (kg)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.r32 || ''} onChange={(e) => handleNumChange('r32', e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-gray-500 font-bold">R134a Refill (kg)</label>
+                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded-lg p-3 outline-none" 
+                    value={data.r134a || ''} onChange={(e) => handleNumChange('r134a', e.target.value)} />
+                </div>
               </div>
             </div>
           </section>
 
-          {/* Scope 2 */}
+          {/* SCOPE 2: INDIRECT ENERGY */}
           <section className="bg-gray-900/40 border border-gray-800 p-8 rounded-2xl">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">⚡ Scope 2: Energy</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -69,7 +110,7 @@ export default function Assessment() {
             </div>
           </section>
 
-          {/* Scope 3 */}
+          {/* SCOPE 3: BUSINESS TRAVEL */}
           <section className="bg-gray-900/40 border border-gray-800 p-8 rounded-2xl">
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-purple-400">✈️ Scope 3: Travel</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
