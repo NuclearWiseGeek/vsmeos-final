@@ -1,30 +1,33 @@
 'use client';
 import React, { createContext, useContext, useState } from 'react';
 
-// 1. Define the shape of the data
+// ALL numerical fields are now STRINGS to allow formatting (e.g. "1,000.00")
 interface ESGState {
   companyName: string;
   country: string;
   revenue: string;
   currency: string;
-  gas: number;
-  heatingOil: number;
-  propane: number;
-  diesel: number;
-  petrol: number;
-  r410a: number;
-  r32: number;
-  r134a: number;
-  elec: number;
-  districtHeat: number;
-  vehicleKm: number;
-  flightKm: number;
-  hotelNights: number;
+  // Scope 1 (Strings now)
+  gas: string;
+  heatingOil: string;
+  propane: string;
+  diesel: string;
+  petrol: string;
+  r410a: string;
+  r32: string;
+  r134a: string;
+  // Scope 2 (Strings now)
+  elec: string;
+  districtHeat: string;
+  // Scope 3 (Strings now)
+  vehicleKm: string;
+  flightKm: string;
+  hotelNights: string;
+  // Signer
   signerName: string;
   files: string[]; 
 }
 
-// 2. Define the Functions (THIS IS WHAT WAS MISSING)
 interface ESGContextType {
   data: ESGState;
   setData: React.Dispatch<React.SetStateAction<ESGState>>;
@@ -39,26 +42,18 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
     country: 'France',
     revenue: '',
     currency: 'EUR',
-    gas: 0,
-    heatingOil: 0,
-    propane: 0,
-    diesel: 0,
-    petrol: 0,
-    r410a: 0,
-    r32: 0,
-    r134a: 0,
-    elec: 0,
-    districtHeat: 0,
-    vehicleKm: 0,
-    flightKm: 0,
-    hotelNights: 0,
+    // Initialize as empty strings or "0"
+    gas: '', heatingOil: '', propane: '',
+    diesel: '', petrol: '',
+    r410a: '', r32: '', r134a: '',
+    elec: '', districtHeat: '',
+    vehicleKm: '', flightKm: '', hotelNights: '',
     signerName: '',
     files: []
   };
 
   const [data, setData] = useState<ESGState>(initialState);
 
-  // 3. The Missing Function
   const resetData = () => {
     setData(initialState);
   };

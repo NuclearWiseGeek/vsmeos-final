@@ -6,17 +6,23 @@ import { useESG } from '../context/ESGContext';
 export default function DashboardHub() {
   const { data } = useESG();
 
+  // Helper to safely parse strings like "1,000.00" into numbers
+  const getVal = (val: string) => {
+    if (!val) return 0;
+    return parseFloat(val.replace(/,/g, '')) || 0;
+  };
+
   // --- Quick Math for the Cards ---
   const FACTORS = {
     gas: 0.244, heatingOil: 3.2, propane: 3.1, diesel: 3.16, petrol: 2.8, r410a: 2088, r32: 675, r134a: 1430,
     elec: 0.052, districtHeat: 0.170, vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
   };
 
-  const s1 = (data.gas * FACTORS.gas) + (data.heatingOil * FACTORS.heatingOil) + (data.propane * FACTORS.propane) +
-             (data.diesel * FACTORS.diesel) + (data.petrol * FACTORS.petrol) +
-             (data.r410a * FACTORS.r410a) + (data.r32 * FACTORS.r32) + (data.r134a * FACTORS.r134a);
-  const s2 = (data.elec * FACTORS.elec) + (data.districtHeat * FACTORS.districtHeat);
-  const s3 = (data.vehicleKm * FACTORS.vehicleKm) + (data.flightKm * FACTORS.flightKm) + (data.hotelNights * FACTORS.hotelNights);
+  const s1 = (getVal(data.gas) * FACTORS.gas) + (getVal(data.heatingOil) * FACTORS.heatingOil) + (getVal(data.propane) * FACTORS.propane) +
+             (getVal(data.diesel) * FACTORS.diesel) + (getVal(data.petrol) * FACTORS.petrol) +
+             (getVal(data.r410a) * FACTORS.r410a) + (getVal(data.r32) * FACTORS.r32) + (getVal(data.r134a) * FACTORS.r134a);
+  const s2 = (getVal(data.elec) * FACTORS.elec) + (getVal(data.districtHeat) * FACTORS.districtHeat);
+  const s3 = (getVal(data.vehicleKm) * FACTORS.vehicleKm) + (getVal(data.flightKm) * FACTORS.flightKm) + (getVal(data.hotelNights) * FACTORS.hotelNights);
 
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
@@ -73,4 +79,4 @@ export default function DashboardHub() {
       </main>
     </div>
   );
-}   
+}

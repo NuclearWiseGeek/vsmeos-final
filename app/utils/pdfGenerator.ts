@@ -6,19 +6,20 @@ interface ESGData {
   country: string;
   revenue: string;
   currency: string;
-  gas: number;
-  heatingOil: number;
-  propane: number;
-  diesel: number;
-  petrol: number;
-  r410a: number;
-  r32: number;
-  r134a: number;
-  elec: number;
-  districtHeat: number;
-  vehicleKm: number;
-  flightKm: number;
-  hotelNights: number;
+  // All are strings now
+  gas: string;
+  heatingOil: string;
+  propane: string;
+  diesel: string;
+  petrol: string;
+  r410a: string;
+  r32: string;
+  r134a: string;
+  elec: string;
+  districtHeat: string;
+  vehicleKm: string;
+  flightKm: string;
+  hotelNights: string;
   signerName: string;
   files: string[];
 }
@@ -28,6 +29,12 @@ export const generateCarbonPack = (data: ESGData) => {
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
   
+  // Helper to safely parse strings like "1,000.00" into numbers
+  const getVal = (val: string) => {
+    if (!val) return 0;
+    return parseFloat(val.replace(/,/g, '')) || 0;
+  };
+
   // --- CALCULATIONS ---
   const FACTORS = {
     gas: 0.244, heatingOil: 3.2, propane: 3.1,
@@ -38,35 +45,37 @@ export const generateCarbonPack = (data: ESGData) => {
   };
 
   const rows = [];
-  // Scope 1
-  if(data.gas > 0) rows.push(['Scope 1', 'Stationary', 'Natural Gas', `${data.gas} kWh`, (data.gas * FACTORS.gas).toFixed(2)]);
-  if(data.heatingOil > 0) rows.push(['Scope 1', 'Stationary', 'Heating Oil', `${data.heatingOil} L`, (data.heatingOil * FACTORS.heatingOil).toFixed(2)]);
-  if(data.propane > 0) rows.push(['Scope 1', 'Stationary', 'Propane', `${data.propane} kg`, (data.propane * FACTORS.propane).toFixed(2)]);
-  if(data.diesel > 0) rows.push(['Scope 1', 'Mobile', 'Fleet Diesel', `${data.diesel} L`, (data.diesel * FACTORS.diesel).toFixed(2)]);
-  if(data.petrol > 0) rows.push(['Scope 1', 'Mobile', 'Fleet Petrol', `${data.petrol} L`, (data.petrol * FACTORS.petrol).toFixed(2)]);
-  if(data.r410a > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R410A', `${data.r410a} kg`, (data.r410a * FACTORS.r410a).toFixed(2)]);
-  if(data.r32 > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R32', `${data.r32} kg`, (data.r32 * FACTORS.r32).toFixed(2)]);
-  if(data.r134a > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R134a', `${data.r134a} kg`, (data.r134a * FACTORS.r134a).toFixed(2)]);
+  // Strict Order: Scope 1 -> Scope 2 -> Scope 3
+  // S1 Stationary
+  if(getVal(data.gas) > 0) rows.push(['Scope 1', 'Stationary', 'Natural Gas', `${data.gas} kWh`, (getVal(data.gas) * FACTORS.gas).toFixed(2)]);
+  if(getVal(data.heatingOil) > 0) rows.push(['Scope 1', 'Stationary', 'Heating Oil', `${data.heatingOil} L`, (getVal(data.heatingOil) * FACTORS.heatingOil).toFixed(2)]);
+  if(getVal(data.propane) > 0) rows.push(['Scope 1', 'Stationary', 'Propane', `${data.propane} kg`, (getVal(data.propane) * FACTORS.propane).toFixed(2)]);
+  // S1 Mobile
+  if(getVal(data.diesel) > 0) rows.push(['Scope 1', 'Mobile', 'Fleet Diesel', `${data.diesel} L`, (getVal(data.diesel) * FACTORS.diesel).toFixed(2)]);
+  if(getVal(data.petrol) > 0) rows.push(['Scope 1', 'Mobile', 'Fleet Petrol', `${data.petrol} L`, (getVal(data.petrol) * FACTORS.petrol).toFixed(2)]);
+  // S1 Fugitive
+  if(getVal(data.r410a) > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R410A', `${data.r410a} kg`, (getVal(data.r410a) * FACTORS.r410a).toFixed(2)]);
+  if(getVal(data.r32) > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R32', `${data.r32} kg`, (getVal(data.r32) * FACTORS.r32).toFixed(2)]);
+  if(getVal(data.r134a) > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R134a', `${data.r134a} kg`, (getVal(data.r134a) * FACTORS.r134a).toFixed(2)]);
   
-  // Scope 2
-  if(data.elec > 0) rows.push(['Scope 2', 'Energy', 'Electricity (FR)', `${data.elec} kWh`, (data.elec * FACTORS.elec).toFixed(2)]);
-  if(data.districtHeat > 0) rows.push(['Scope 2', 'Energy', 'District Heating', `${data.districtHeat} kWh`, (data.districtHeat * FACTORS.heat).toFixed(2)]);
+  // S2 Energy
+  if(getVal(data.elec) > 0) rows.push(['Scope 2', 'Energy', 'Electricity (FR)', `${data.elec} kWh`, (getVal(data.elec) * FACTORS.elec).toFixed(2)]);
+  if(getVal(data.districtHeat) > 0) rows.push(['Scope 2', 'Energy', 'District Heating', `${data.districtHeat} kWh`, (getVal(data.districtHeat) * FACTORS.heat).toFixed(2)]);
 
-  // Scope 3
-  if(data.vehicleKm > 0) rows.push(['Scope 3', 'Travel', 'Employee Commute', `${data.vehicleKm} km`, (data.vehicleKm * FACTORS.vehicle).toFixed(2)]);
-  if(data.flightKm > 0) rows.push(['Scope 3', 'Travel', 'Business Flights', `${data.flightKm} km`, (data.flightKm * FACTORS.flight).toFixed(2)]);
-  if(data.hotelNights > 0) rows.push(['Scope 3', 'Travel', 'Hotel Nights', `${data.hotelNights} nights`, (data.hotelNights * FACTORS.hotel).toFixed(2)]);
+  // S3 Travel
+  if(getVal(data.vehicleKm) > 0) rows.push(['Scope 3', 'Travel', 'Employee Commute', `${data.vehicleKm} km`, (getVal(data.vehicleKm) * FACTORS.vehicle).toFixed(2)]);
+  if(getVal(data.flightKm) > 0) rows.push(['Scope 3', 'Travel', 'Business Flights', `${data.flightKm} km`, (getVal(data.flightKm) * FACTORS.flight).toFixed(2)]);
+  if(getVal(data.hotelNights) > 0) rows.push(['Scope 3', 'Travel', 'Hotel Nights', `${data.hotelNights} nights`, (getVal(data.hotelNights) * FACTORS.hotel).toFixed(2)]);
 
   // Totals
-  const s1 = (data.gas * FACTORS.gas) + (data.heatingOil * FACTORS.heatingOil) + (data.propane * FACTORS.propane) +
-             (data.diesel * FACTORS.diesel) + (data.petrol * FACTORS.petrol) +
-             (data.r410a * FACTORS.r410a) + (data.r32 * FACTORS.r32) + (data.r134a * FACTORS.r134a);
-  const s2 = (data.elec * FACTORS.elec) + (data.districtHeat * FACTORS.heat);
-  const s3 = (data.vehicleKm * FACTORS.vehicle) + (data.flightKm * FACTORS.flight) + (data.hotelNights * FACTORS.hotel);
+  const s1 = (getVal(data.gas) * FACTORS.gas) + (getVal(data.heatingOil) * FACTORS.heatingOil) + (getVal(data.propane) * FACTORS.propane) +
+             (getVal(data.diesel) * FACTORS.diesel) + (getVal(data.petrol) * FACTORS.petrol) +
+             (getVal(data.r410a) * FACTORS.r410a) + (getVal(data.r32) * FACTORS.r32) + (getVal(data.r134a) * FACTORS.r134a);
+  const s2 = (getVal(data.elec) * FACTORS.elec) + (getVal(data.districtHeat) * FACTORS.heat);
+  const s3 = (getVal(data.vehicleKm) * FACTORS.vehicle) + (getVal(data.flightKm) * FACTORS.flight) + (getVal(data.hotelNights) * FACTORS.hotel);
   const total = s1 + s2 + s3;
   
-  // FIX: Handle commas in revenue string
-  const revenueNum = parseFloat(data.revenue.replace(/,/g, '')) || 0;
+  const revenueNum = getVal(data.revenue);
   const intensity = revenueNum > 0 ? (total / revenueNum).toFixed(2) : "0.00";
 
   // Helper for Footer
@@ -115,7 +124,6 @@ export const generateCarbonPack = (data: ESGData) => {
   doc.text(`Company Name: ${data.companyName}`, 20, 46);
   doc.text(`Site Country: ${data.country}`, 20, 52);
   doc.text(`Reporting Period: 2025`, 120, 46);
-  // Revenue Format: It might already have commas, so we just use the string directly or re-format safely
   doc.text(`Annual Revenue: ${data.revenue} ${data.currency}`, 120, 52);
 
   // Boundary Statement
@@ -198,13 +206,13 @@ export const generateCarbonPack = (data: ESGData) => {
   yPos += 6;
   doc.setFont("helvetica", "normal");
   
-  // Dynamic List
-  if(data.gas > 0) { doc.text("• Natural Gas Invoices", 20, yPos); yPos += 5; }
-  if(data.heatingOil > 0 || data.propane > 0) { doc.text("• Fuel Purchase Receipts (Heating)", 20, yPos); yPos += 5; }
-  if(data.diesel > 0 || data.petrol > 0) { doc.text("• Fuel Logs/Receipts (Vehicle Fleet)", 20, yPos); yPos += 5; }
-  if(data.r410a > 0 || data.r32 > 0 || data.r134a > 0) { doc.text("• HVAC Maintenance Logs (Refrigerants)", 20, yPos); yPos += 5; }
-  if(data.elec > 0 || data.districtHeat > 0) { doc.text("• Utility Invoices (Electricity/Heat)", 20, yPos); yPos += 5; }
-  if(data.vehicleKm > 0 || data.flightKm > 0) { doc.text("• Mileage Claims / Travel Logs", 20, yPos); yPos += 5; }
+  // Dynamic List - Strict Order
+  if(getVal(data.gas) > 0) { doc.text("• Natural Gas Invoices", 20, yPos); yPos += 5; }
+  if(getVal(data.heatingOil) > 0 || getVal(data.propane) > 0) { doc.text("• Fuel Purchase Receipts (Heating)", 20, yPos); yPos += 5; }
+  if(getVal(data.diesel) > 0 || getVal(data.petrol) > 0) { doc.text("• Fuel Logs/Receipts (Vehicle Fleet)", 20, yPos); yPos += 5; }
+  if(getVal(data.r410a) > 0 || getVal(data.r32) > 0 || getVal(data.r134a) > 0) { doc.text("• HVAC Maintenance Logs (Refrigerants)", 20, yPos); yPos += 5; }
+  if(getVal(data.elec) > 0 || getVal(data.districtHeat) > 0) { doc.text("• Utility Invoices (Electricity/Heat)", 20, yPos); yPos += 5; }
+  if(getVal(data.vehicleKm) > 0 || getVal(data.flightKm) > 0) { doc.text("• Mileage Claims / Travel Logs", 20, yPos); yPos += 5; }
   
   doc.text("Available upon buyer request (No digital files attached to this PDF)", 14, yPos);
   
@@ -246,17 +254,18 @@ export const generateCarbonPack = (data: ESGData) => {
   
   yPos += 5;
   const startExclY = yPos;
-  if(data.gas === 0) { doc.text("• Natural Gas", 20, yPos); yPos += 4; }
-  if(data.heatingOil === 0) { doc.text("• Heating Oil", 20, yPos); yPos += 4; }
-  if(data.propane === 0) { doc.text("• Propane", 20, yPos); yPos += 4; }
-  if(data.diesel === 0) { doc.text("• Fleet Diesel", 20, yPos); yPos += 4; }
-  if(data.petrol === 0) { doc.text("• Fleet Petrol", 20, yPos); yPos += 4; }
-  if(data.r410a === 0 && data.r32 === 0 && data.r134a === 0) { doc.text("• Fugitive Emissions (Refrigerants)", 20, yPos); yPos += 4; }
-  if(data.elec === 0) { doc.text("• Electricity", 20, yPos); yPos += 4; }
-  if(data.districtHeat === 0) { doc.text("• District Heating", 20, yPos); yPos += 4; }
-  if(data.vehicleKm === 0) { doc.text("• Employee Commute", 20, yPos); yPos += 4; }
-  if(data.flightKm === 0) { doc.text("• Business Flights", 20, yPos); yPos += 4; }
-  if(data.hotelNights === 0) { doc.text("• Hotel Nights", 20, yPos); yPos += 4; }
+  // Dynamic Exclusions - Strict Order S1 -> S2 -> S3
+  if(getVal(data.gas) === 0) { doc.text("• Natural Gas", 20, yPos); yPos += 4; }
+  if(getVal(data.heatingOil) === 0) { doc.text("• Heating Oil", 20, yPos); yPos += 4; }
+  if(getVal(data.propane) === 0) { doc.text("• Propane", 20, yPos); yPos += 4; }
+  if(getVal(data.diesel) === 0) { doc.text("• Fleet Diesel", 20, yPos); yPos += 4; }
+  if(getVal(data.petrol) === 0) { doc.text("• Fleet Petrol", 20, yPos); yPos += 4; }
+  if(getVal(data.r410a) === 0 && getVal(data.r32) === 0 && getVal(data.r134a) === 0) { doc.text("• Fugitive Emissions (Refrigerants)", 20, yPos); yPos += 4; }
+  if(getVal(data.elec) === 0) { doc.text("• Electricity", 20, yPos); yPos += 4; }
+  if(getVal(data.districtHeat) === 0) { doc.text("• District Heating", 20, yPos); yPos += 4; }
+  if(getVal(data.vehicleKm) === 0) { doc.text("• Employee Commute", 20, yPos); yPos += 4; }
+  if(getVal(data.flightKm) === 0) { doc.text("• Business Flights", 20, yPos); yPos += 4; }
+  if(getVal(data.hotelNights) === 0) { doc.text("• Hotel Nights", 20, yPos); yPos += 4; }
 
   if (yPos === startExclY) {
     doc.text("• None (All categories reported)", 20, yPos);
@@ -265,7 +274,6 @@ export const generateCarbonPack = (data: ESGData) => {
   
   doc.text("• Liability: Buyers must conduct due diligence for CSRD reporting compliance.", 14, yPos);
   yPos += 5;
-  // FIX: Updated Verification Text
   doc.text("• Verification: For third-party verification inquiries of the uploaded document, contact contact@vsmeos.fr", 14, yPos);
 
   addFooter(2, 2);

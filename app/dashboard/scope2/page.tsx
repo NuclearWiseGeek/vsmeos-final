@@ -13,9 +13,37 @@ export default function Scope2Page() {
     router.push('/dashboard');
   };
 
-  const handleNumChange = (field: string, value: string) => {
-    setData({ ...data, [field]: value === '' ? 0 : parseFloat(value) });
+  const formatNumber = (val: string) => {
+    if (!val) return '';
+    const clean = val.replace(/,/g, '');
+    const num = parseFloat(clean);
+    if (isNaN(num)) return val;
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
+
+  const handleChange = (field: string, val: string) => {
+    if (/^[\d,.]*$/.test(val)) setData({ ...data, [field]: val });
+  };
+
+  const handleBlur = (field: string) => {
+    // @ts-ignore
+    setData({ ...data, [field]: formatNumber(data[field]) });
+  };
+
+  const InputField = ({ label, field }: { label: string, field: string }) => (
+    <div>
+      <label className="text-xs text-gray-500 block mb-1">{label}</label>
+      <input 
+        type="text" 
+        className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-blue-500" 
+        // @ts-ignore
+        value={data[field]} 
+        onChange={(e) => handleChange(field, e.target.value)}
+        onBlur={() => handleBlur(field)}
+        placeholder="0.00"
+      />
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
@@ -30,23 +58,13 @@ export default function Scope2Page() {
         </div>
 
         <form onSubmit={handleSave} className="space-y-8 bg-gray-900/50 p-8 rounded-2xl border border-gray-800">
-          
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Purchased Energy</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div>
-                 <label className="text-xs text-gray-500 block mb-1">Electricity (kWh)</label>
-                 <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-blue-500" 
-                   value={data.elec || ''} onChange={(e) => handleNumChange('elec', e.target.value)} />
-               </div>
-               <div>
-                 <label className="text-xs text-gray-500 block mb-1">District Heating (kWh)</label>
-                 <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-blue-500" 
-                   value={data.districtHeat || ''} onChange={(e) => handleNumChange('districtHeat', e.target.value)} />
-               </div>
+               <InputField label="Electricity (kWh)" field="elec" />
+               <InputField label="District Heating (kWh)" field="districtHeat" />
             </div>
           </div>
-
           <button type="submit" className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 transition-colors">
             Save Scope 2 Data
           </button>

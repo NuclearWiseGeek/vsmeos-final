@@ -11,8 +11,13 @@ export default function Results() {
 
   const handleNewAssessment = () => {
     resetData();
-    // CHANGE: Sends you back to the Main Hub (Dashboard) instead of Step 1
-    router.push('/dashboard'); 
+    router.push('/dashboard');
+  };
+
+  // Helper to safely parse strings like "1,000.00" into numbers
+  const getVal = (val: string) => {
+    if (!val) return 0;
+    return parseFloat(val.replace(/,/g, '')) || 0;
   };
 
   // --- ADEME FACTORS ---
@@ -25,12 +30,12 @@ export default function Results() {
   };
 
   // --- CALCULATIONS ---
-  const s1 = (data.gas * FACTORS.gas) + (data.heatingOil * FACTORS.heatingOil) + (data.propane * FACTORS.propane) +
-             (data.diesel * FACTORS.diesel) + (data.petrol * FACTORS.petrol) +
-             (data.r410a * FACTORS.r410a) + (data.r32 * FACTORS.r32) + (data.r134a * FACTORS.r134a);
+  const s1 = (getVal(data.gas) * FACTORS.gas) + (getVal(data.heatingOil) * FACTORS.heatingOil) + (getVal(data.propane) * FACTORS.propane) +
+             (getVal(data.diesel) * FACTORS.diesel) + (getVal(data.petrol) * FACTORS.petrol) +
+             (getVal(data.r410a) * FACTORS.r410a) + (getVal(data.r32) * FACTORS.r32) + (getVal(data.r134a) * FACTORS.r134a);
              
-  const s2 = (data.elec * FACTORS.elec) + (data.districtHeat * FACTORS.districtHeat);
-  const s3 = (data.vehicleKm * FACTORS.vehicleKm) + (data.flightKm * FACTORS.flightKm) + (data.hotelNights * FACTORS.hotelNights);
+  const s2 = (getVal(data.elec) * FACTORS.elec) + (getVal(data.districtHeat) * FACTORS.districtHeat);
+  const s3 = (getVal(data.vehicleKm) * FACTORS.vehicleKm) + (getVal(data.flightKm) * FACTORS.flightKm) + (getVal(data.hotelNights) * FACTORS.hotelNights);
   const total = s1 + s2 + s3;
 
   return (
