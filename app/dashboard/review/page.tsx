@@ -8,7 +8,7 @@ export default function ReviewPage() {
   const router = useRouter();
   const { data, setData } = useESG();
 
-  // ... (Keep the math calculations exactly as they are) ...
+  // --- Quick Math for Summary ---
   const FACTORS = {
     gas: 0.244, heatingOil: 3.2, propane: 3.1, diesel: 3.16, petrol: 2.8, r410a: 2088, r32: 675, r134a: 1430,
     elec: 0.052, districtHeat: 0.170, vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
@@ -27,12 +27,11 @@ export default function ReviewPage() {
     }
   };
 
-  // --- UPDATED VALIDATION LOGIC ---
   const handleFinalSubmit = () => {
     // 1. Check Profile Data
     if (!data.companyName || !data.revenue) {
       alert("Profile Incomplete! You must provide Company Name and Revenue to generate a valid report.");
-      router.push('/dashboard/profile'); // Redirects to Step 1
+      router.push('/dashboard/profile');
       return;
     }
 
@@ -47,7 +46,6 @@ export default function ReviewPage() {
   };
 
   return (
-    // ... (Keep the rest of the JSX exactly the same) ...
     <div className="min-h-screen bg-black text-white p-8 font-sans">
       <nav className="max-w-3xl mx-auto mb-8 border-b border-gray-800 pb-4">
         <Link href="/dashboard" className="text-gray-500 hover:text-white text-sm">← Back to Dashboard</Link>
@@ -60,13 +58,30 @@ export default function ReviewPage() {
         <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Carbon Summary</h3>
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div><div className="text-xl font-bold text-white">{s1.toFixed(0)}</div><div className="text-xs text-gray-500">Scope 1</div></div>
-            <div><div className="text-xl font-bold text-white">{s2.toFixed(0)}</div><div className="text-xs text-gray-500">Scope 2</div></div>
-            <div><div className="text-xl font-bold text-white">{s3.toFixed(0)}</div><div className="text-xs text-gray-500">Scope 3</div></div>
+            <div>
+              <div className="text-xl font-bold text-white">
+                {s1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </div>
+              <div className="text-xs text-gray-500">Scope 1</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-white">
+                {s2.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </div>
+              <div className="text-xs text-gray-500">Scope 2</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-white">
+                {s3.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </div>
+              <div className="text-xs text-gray-500">Scope 3</div>
+            </div>
           </div>
           <div className="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center">
             <span className="text-gray-400">Total Footprint</span>
-            <span className="text-2xl font-bold text-white">{total.toLocaleString()} <span className="text-sm text-gray-500">kgCO2e</span></span>
+            <span className="text-2xl font-bold text-white">
+              {total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span className="text-sm text-gray-500">kgCO2e</span>
+            </span>
           </div>
         </section>
 
