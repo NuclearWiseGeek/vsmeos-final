@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useESG } from '../../context/ESGContext';
-import { generateCarbonPack } from '../../utils/pdfGenerator';
+import { generatePDF } from '../../utils/pdfGenerator';
 
 export default function Results() {
   const { data, resetData } = useESG();
@@ -81,7 +81,7 @@ export default function Results() {
         {/* Buttons */}
         <div className="flex flex-col items-center gap-4">
           <button 
-            onClick={() => generateCarbonPack(data)}
+            onClick={() => generatePDF(data)}
             className="bg-white text-black font-bold py-4 px-10 rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2"
           >
             Download Corporate Carbon Pack (PDF)
