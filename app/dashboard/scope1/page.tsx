@@ -10,7 +10,7 @@ export default function Scope1Page() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push('/dashboard'); // Go back to Hub
+    router.push('/dashboard');
   };
 
   const handleNumChange = (field: string, value: string) => {
@@ -31,9 +31,10 @@ export default function Scope1Page() {
 
         <form onSubmit={handleSave} className="space-y-8 bg-gray-900/50 p-8 rounded-2xl border border-gray-800">
           
+          {/* 1. Stationary Combustion */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Stationary Combustion</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                <div>
                  <label className="text-xs text-gray-500 block mb-1">Natural Gas (kWh)</label>
                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
@@ -44,21 +45,49 @@ export default function Scope1Page() {
                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
                    value={data.heatingOil || ''} onChange={(e) => handleNumChange('heatingOil', e.target.value)} />
                </div>
+               <div>
+                 <label className="text-xs text-gray-500 block mb-1">Propane (kg)</label>
+                 <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
+                   value={data.propane || ''} onChange={(e) => handleNumChange('propane', e.target.value)} />
+               </div>
             </div>
           </div>
 
+          {/* 2. Mobile Combustion */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Mobile Combustion</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                <div>
-                 <label className="text-xs text-gray-500 block mb-1">Diesel (Liters)</label>
+                 <label className="text-xs text-gray-500 block mb-1">Fleet Diesel (Liters)</label>
                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
                    value={data.diesel || ''} onChange={(e) => handleNumChange('diesel', e.target.value)} />
                </div>
                <div>
-                 <label className="text-xs text-gray-500 block mb-1">Petrol (Liters)</label>
+                 <label className="text-xs text-gray-500 block mb-1">Fleet Petrol (Liters)</label>
                  <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
                    value={data.petrol || ''} onChange={(e) => handleNumChange('petrol', e.target.value)} />
+               </div>
+            </div>
+          </div>
+
+          {/* 3. Fugitive Emissions (Refrigerants) */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Fugitive Emissions (Refrigerants)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <div>
+                 <label className="text-xs text-gray-500 block mb-1">R410A Refill (kg)</label>
+                 <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
+                   value={data.r410a || ''} onChange={(e) => handleNumChange('r410a', e.target.value)} />
+               </div>
+               <div>
+                 <label className="text-xs text-gray-500 block mb-1">R32 Refill (kg)</label>
+                 <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
+                   value={data.r32 || ''} onChange={(e) => handleNumChange('r32', e.target.value)} />
+               </div>
+               <div>
+                 <label className="text-xs text-gray-500 block mb-1">R134a Refill (kg)</label>
+                 <input type="number" step="0.01" className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
+                   value={data.r134a || ''} onChange={(e) => handleNumChange('r134a', e.target.value)} />
                </div>
             </div>
           </div>
