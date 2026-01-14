@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ESGProvider } from "./context/ESGContext";
+import { ClerkProvider } from '@clerk/nextjs';
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "VSMEOS - ESG Operating System",
-  description: "Sustainability compliance for SMEs",
+  title: "VSME ESG OS",
+  description: "Automated Carbon Footprint for French Suppliers",
 };
 
 export default function RootLayout({
@@ -13,12 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="bg-black text-white antialiased">
-        <ESGProvider>
-          {children}
-        </ESGProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={inter.className}>
+          <ESGProvider>
+            {children}
+          </ESGProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
