@@ -7,22 +7,14 @@ interface ESGState {
   country: string;
   revenue: string;
   currency: string;
-  // Scope 1 (Strings)
-  gas: string;
-  heatingOil: string;
-  propane: string;
-  diesel: string;
-  petrol: string;
-  r410a: string;
-  r32: string;
-  r134a: string;
-  // Scope 2 (Strings)
-  elec: string;
-  districtHeat: string;
-  // Scope 3 (Strings)
-  vehicleKm: string;
-  flightKm: string;
-  hotelNights: string;
+  // Scope 1
+  gas: string; heatingOil: string; propane: string;
+  diesel: string; petrol: string;
+  r410a: string; r32: string; r134a: string;
+  // Scope 2
+  elec: string; districtHeat: string;
+  // Scope 3
+  vehicleKm: string; flightKm: string; hotelNights: string;
   // Signer
   signerName: string;
   files: string[]; 
@@ -38,72 +30,64 @@ const ESGContext = createContext<ESGContextType | null>(null);
 
 export function ESGProvider({ children }: { children: React.ReactNode }) {
   const initialState: ESGState = {
-    companyName: '',
-    country: 'France',
-    revenue: '',
-    currency: 'EUR',
-    // Initialize as empty strings
-    gas: '', heatingOil: '', propane: '',
-    diesel: '', petrol: '',
-    r410a: '', r32: '', r134a: '',
-    elec: '', districtHeat: '',
-    vehicleKm: '', flightKm: '', hotelNights: '',
-    signerName: '',
-    files: []
+    companyName: '', country: 'France', revenue: '', currency: 'EUR',
+    gas: '', heatingOil: '', propane: '', diesel: '', petrol: '',
+    r410a: '', r32: '', r134a: '', elec: '', districtHeat: '',
+    vehicleKm: '', flightKm: '', hotelNights: '', signerName: '', files: []
   };
 
   const [data, setData] = useState<ESGState>(initialState);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // 1. LOAD DATA (Runs once when app starts)
+  // 1. LOAD DATA (Cloud First Strategy)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // First, try to load from LocalStorage (Fastest)
-      const savedData = localStorage.getItem('vsme_esg_data');
-      if (savedData) {
-        try {
-          setData(JSON.parse(savedData));
-        } catch (error) {
-          console.error("Error parsing saved data:", error);
+    async function loadData() {
+      // A. Try LocalStorage first (Fast preview)
+      const savedLocal = localStorage.getItem('vsme_esg_data');
+      if (savedLocal) setData(JSON.parse(savedLocal));
+
+      // B. Fetch Real Data from Cloud (The Truth)
+      try {
+        const response = await fetch('/api/sync');
+        if (response.ok) {
+          const cloudData = await response.json();
+          if (cloudData) {
+            setData(cloudData); // Update app with cloud data
+            localStorage.setItem('vsme_esg_data', JSON.stringify(cloudData)); // Sync local
+          }
         }
+      } catch (err) {
+        console.error("Failed to load cloud data", err);
       }
       setIsLoaded(true);
     }
+    loadData();
   }, []);
 
-  // 2. AUTO-SAVE (Runs every time 'data' changes)
+  // 2. AUTO-SAVE (Runs when you type)
   useEffect(() => {
     if (isLoaded) {
-      // A. Save to Local Browser Memory (Instant)
       localStorage.setItem('vsme_esg_data', JSON.stringify(data));
 
-      // B. Save to Cloud Database (Debounced - Waits 2 seconds)
       const timeoutId = setTimeout(async () => {
         try {
-          // This calls the API route we just made in Step 3
           await fetch('/api/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
           });
-          // Optional: You can uncomment this to see it working in the console
-          // console.log("☁️ Data synced to Supabase");
         } catch (err) {
           console.error("Cloud save failed", err);
         }
-      }, 2000); // Waits 2000ms (2 seconds) after you stop typing
+      }, 2000);
 
-      // Cleanup: If you type again before 2 seconds, cancel the previous save
       return () => clearTimeout(timeoutId);
     }
   }, [data, isLoaded]);
 
-  // 3. RESET DATA
   const resetData = () => {
     setData(initialState);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('vsme_esg_data');
-    }
+    if (typeof window !== 'undefined') localStorage.removeItem('vsme_esg_data');
   };
 
   return (
