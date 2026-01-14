@@ -8,13 +8,37 @@ export default function CompanyProfile() {
   const router = useRouter();
   const { data, setData } = useESG();
 
+  // Helper: formats "1000000" to "1,000,000.00"
+  const formatCurrency = (val: string) => {
+    if (!val) return '';
+    // Remove existing commas to get raw number
+    const clean = val.replace(/,/g, '');
+    const num = parseFloat(clean);
+    if (isNaN(num)) return val;
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  // When user types, save raw input
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow digits, commas, and dots
+    const val = e.target.value;
+    if (/^[\d,.]*$/.test(val)) {
+      setData({ ...data, revenue: val });
+    }
+  };
+
+  // When user leaves the field, make it look pretty
+  const handleBlur = () => {
+    const formatted = formatCurrency(data.revenue);
+    setData({ ...data, revenue: formatted });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!data.companyName || !data.revenue) {
       alert("Company Name and Revenue are required.");
       return;
     }
-    // FIX: Redirect to the Hub (Dashboard), NOT the deleted assessment page
     router.push('/dashboard'); 
   };
 
@@ -53,13 +77,13 @@ export default function CompanyProfile() {
             <div className="space-y-2">
               <label className="text-xs text-gray-400 uppercase font-bold tracking-wider">Annual Revenue (EUR)</label>
               <input 
-                type="number" 
-                step="0.01"
+                type="text" // CHANGED to TEXT to allow commas
                 required
                 className="w-full bg-black border border-gray-700 rounded-lg p-4 text-white focus:border-blue-500 outline-none"
                 placeholder="0.00"
                 value={data.revenue}
-                onChange={(e) => setData({ ...data, revenue: e.target.value })}
+                onChange={handleChange}
+                onBlur={handleBlur} // Format on exit
               />
             </div>
           </div>
