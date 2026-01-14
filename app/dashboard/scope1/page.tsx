@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useESG } from '../../context/ESGContext';
 
+// --- COMPONENT DEFINED OUTSIDE TO PREVENT FOCUS LOSS ---
+const InputField = ({ label, value, onChange, onBlur }: { 
+  label: string, 
+  value: string, 
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  onBlur: () => void 
+}) => (
+  <div>
+    <label className="text-xs text-gray-500 block mb-1">{label}</label>
+    <input 
+      type="text" 
+      className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
+      value={value} 
+      onChange={onChange}
+      onBlur={onBlur}
+      placeholder="0.00"
+    />
+  </div>
+);
+
 export default function Scope1Page() {
   const router = useRouter();
   const { data, setData } = useESG();
@@ -13,7 +33,6 @@ export default function Scope1Page() {
     router.push('/dashboard');
   };
 
-  // 1. Format Helper
   const formatNumber = (val: string) => {
     if (!val) return '';
     const clean = val.replace(/,/g, '');
@@ -22,34 +41,16 @@ export default function Scope1Page() {
     return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
-  // 2. Change Handler (Allows digits/commas/dots)
   const handleChange = (field: string, val: string) => {
     if (/^[\d,.]*$/.test(val)) {
-      setData({ ...data, [field]: val });
+      setData(prev => ({ ...prev, [field]: val }));
     }
   };
 
-  // 3. Blur Handler (Formats on exit)
   const handleBlur = (field: string) => {
     // @ts-ignore
-    const formatted = formatNumber(data[field]);
-    setData({ ...data, [field]: formatted });
+    setData(prev => ({ ...prev, [field]: formatNumber(prev[field]) }));
   };
-
-  const InputField = ({ label, field }: { label: string, field: string }) => (
-    <div>
-      <label className="text-xs text-gray-500 block mb-1">{label}</label>
-      <input 
-        type="text" 
-        className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
-        // @ts-ignore
-        value={data[field]} 
-        onChange={(e) => handleChange(field, e.target.value)}
-        onBlur={() => handleBlur(field)}
-        placeholder="0.00"
-      />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
@@ -68,26 +69,26 @@ export default function Scope1Page() {
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Stationary Combustion</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <InputField label="Natural Gas (kWh)" field="gas" />
-               <InputField label="Heating Oil (Liters)" field="heatingOil" />
-               <InputField label="Propane (kg)" field="propane" />
+               <InputField label="Natural Gas (kWh)" value={data.gas} onChange={(e) => handleChange('gas', e.target.value)} onBlur={() => handleBlur('gas')} />
+               <InputField label="Heating Oil (Liters)" value={data.heatingOil} onChange={(e) => handleChange('heatingOil', e.target.value)} onBlur={() => handleBlur('heatingOil')} />
+               <InputField label="Propane (kg)" value={data.propane} onChange={(e) => handleChange('propane', e.target.value)} onBlur={() => handleBlur('propane')} />
             </div>
           </div>
 
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Mobile Combustion</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <InputField label="Fleet Diesel (Liters)" field="diesel" />
-               <InputField label="Fleet Petrol (Liters)" field="petrol" />
+               <InputField label="Fleet Diesel (Liters)" value={data.diesel} onChange={(e) => handleChange('diesel', e.target.value)} onBlur={() => handleBlur('diesel')} />
+               <InputField label="Fleet Petrol (Liters)" value={data.petrol} onChange={(e) => handleChange('petrol', e.target.value)} onBlur={() => handleBlur('petrol')} />
             </div>
           </div>
 
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Fugitive Emissions (Refrigerants)</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <InputField label="R410A Refill (kg)" field="r410a" />
-               <InputField label="R32 Refill (kg)" field="r32" />
-               <InputField label="R134a Refill (kg)" field="r134a" />
+               <InputField label="R410A Refill (kg)" value={data.r410a} onChange={(e) => handleChange('r410a', e.target.value)} onBlur={() => handleBlur('r410a')} />
+               <InputField label="R32 Refill (kg)" value={data.r32} onChange={(e) => handleChange('r32', e.target.value)} onBlur={() => handleBlur('r32')} />
+               <InputField label="R134a Refill (kg)" value={data.r134a} onChange={(e) => handleChange('r134a', e.target.value)} onBlur={() => handleBlur('r134a')} />
             </div>
           </div>
 

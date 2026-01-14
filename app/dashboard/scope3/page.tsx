@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useESG } from '../../context/ESGContext';
 
+// --- COMPONENT DEFINED OUTSIDE ---
+const InputField = ({ label, value, onChange, onBlur }: { 
+  label: string, 
+  value: string, 
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  onBlur: () => void 
+}) => (
+  <div>
+    <label className="text-xs text-gray-500 block mb-1">{label}</label>
+    <input 
+      type="text" 
+      className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-purple-500" 
+      value={value} 
+      onChange={onChange}
+      onBlur={onBlur}
+      placeholder="0.00"
+    />
+  </div>
+);
+
 export default function Scope3Page() {
   const router = useRouter();
   const { data, setData } = useESG();
@@ -22,28 +42,13 @@ export default function Scope3Page() {
   };
 
   const handleChange = (field: string, val: string) => {
-    if (/^[\d,.]*$/.test(val)) setData({ ...data, [field]: val });
+    if (/^[\d,.]*$/.test(val)) setData(prev => ({ ...prev, [field]: val }));
   };
 
   const handleBlur = (field: string) => {
     // @ts-ignore
-    setData({ ...data, [field]: formatNumber(data[field]) });
+    setData(prev => ({ ...prev, [field]: formatNumber(prev[field]) }));
   };
-
-  const InputField = ({ label, field }: { label: string, field: string }) => (
-    <div>
-      <label className="text-xs text-gray-500 block mb-1">{label}</label>
-      <input 
-        type="text" 
-        className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-purple-500" 
-        // @ts-ignore
-        value={data[field]} 
-        onChange={(e) => handleChange(field, e.target.value)}
-        onBlur={() => handleBlur(field)}
-        placeholder="0.00"
-      />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
@@ -61,9 +66,9 @@ export default function Scope3Page() {
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Business Travel Activity</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               <InputField label="Employee Vehicles (km)" field="vehicleKm" />
-               <InputField label="Business Flights (km)" field="flightKm" />
-               <InputField label="Hotel Nights" field="hotelNights" />
+               <InputField label="Employee Vehicles (km)" value={data.vehicleKm} onChange={(e) => handleChange('vehicleKm', e.target.value)} onBlur={() => handleBlur('vehicleKm')} />
+               <InputField label="Business Flights (km)" value={data.flightKm} onChange={(e) => handleChange('flightKm', e.target.value)} onBlur={() => handleBlur('flightKm')} />
+               <InputField label="Hotel Nights" value={data.hotelNights} onChange={(e) => handleChange('hotelNights', e.target.value)} onBlur={() => handleBlur('hotelNights')} />
             </div>
           </div>
           <button type="submit" className="w-full bg-purple-600 text-white font-bold py-4 rounded-xl hover:bg-purple-500 transition-colors">

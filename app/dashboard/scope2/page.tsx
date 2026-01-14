@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useESG } from '../../context/ESGContext';
 
+// --- COMPONENT DEFINED OUTSIDE ---
+const InputField = ({ label, value, onChange, onBlur }: { 
+  label: string, 
+  value: string, 
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  onBlur: () => void 
+}) => (
+  <div>
+    <label className="text-xs text-gray-500 block mb-1">{label}</label>
+    <input 
+      type="text" 
+      className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-blue-500" 
+      value={value} 
+      onChange={onChange}
+      onBlur={onBlur}
+      placeholder="0.00"
+    />
+  </div>
+);
+
 export default function Scope2Page() {
   const router = useRouter();
   const { data, setData } = useESG();
@@ -22,28 +42,13 @@ export default function Scope2Page() {
   };
 
   const handleChange = (field: string, val: string) => {
-    if (/^[\d,.]*$/.test(val)) setData({ ...data, [field]: val });
+    if (/^[\d,.]*$/.test(val)) setData(prev => ({ ...prev, [field]: val }));
   };
 
   const handleBlur = (field: string) => {
     // @ts-ignore
-    setData({ ...data, [field]: formatNumber(data[field]) });
+    setData(prev => ({ ...prev, [field]: formatNumber(prev[field]) }));
   };
-
-  const InputField = ({ label, field }: { label: string, field: string }) => (
-    <div>
-      <label className="text-xs text-gray-500 block mb-1">{label}</label>
-      <input 
-        type="text" 
-        className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-blue-500" 
-        // @ts-ignore
-        value={data[field]} 
-        onChange={(e) => handleChange(field, e.target.value)}
-        onBlur={() => handleBlur(field)}
-        placeholder="0.00"
-      />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
@@ -61,8 +66,8 @@ export default function Scope2Page() {
           <div className="space-y-4">
             <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Purchased Energy</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <InputField label="Electricity (kWh)" field="elec" />
-               <InputField label="District Heating (kWh)" field="districtHeat" />
+               <InputField label="Electricity (kWh)" value={data.elec} onChange={(e) => handleChange('elec', e.target.value)} onBlur={() => handleBlur('elec')} />
+               <InputField label="District Heating (kWh)" value={data.districtHeat} onChange={(e) => handleChange('districtHeat', e.target.value)} onBlur={() => handleBlur('districtHeat')} />
             </div>
           </div>
           <button type="submit" className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 transition-colors">
