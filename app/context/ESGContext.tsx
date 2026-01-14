@@ -55,9 +55,10 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<ESGState>(initialState);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // 1. LOAD DATA ON MOUNT (Runs only once when app starts)
+  // 1. LOAD DATA (Runs once when app starts)
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // First, try to load from LocalStorage (Fastest)
       const savedData = localStorage.getItem('vsme_esg_data');
       if (savedData) {
         try {
@@ -70,14 +71,34 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // 2. AUTO-SAVE ON CHANGE (Runs every time 'data' changes)
+  // 2. AUTO-SAVE (Runs every time 'data' changes)
   useEffect(() => {
-    if (isLoaded) { // Only save after we have successfully loaded!
+    if (isLoaded) {
+      // A. Save to Local Browser Memory (Instant)
       localStorage.setItem('vsme_esg_data', JSON.stringify(data));
+
+      // B. Save to Cloud Database (Debounced - Waits 2 seconds)
+      const timeoutId = setTimeout(async () => {
+        try {
+          // This calls the API route we just made in Step 3
+          await fetch('/api/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          // Optional: You can uncomment this to see it working in the console
+          // console.log("☁️ Data synced to Supabase");
+        } catch (err) {
+          console.error("Cloud save failed", err);
+        }
+      }, 2000); // Waits 2000ms (2 seconds) after you stop typing
+
+      // Cleanup: If you type again before 2 seconds, cancel the previous save
+      return () => clearTimeout(timeoutId);
     }
   }, [data, isLoaded]);
 
-  // 3. RESET DATA (Wipes memory and local storage)
+  // 3. RESET DATA
   const resetData = () => {
     setData(initialState);
     if (typeof window !== 'undefined') {
