@@ -1,104 +1,61 @@
-import React from 'react';
-import Link from 'next/link';
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import Link from "next/link";
+import Methodology from "./components/Methodology"; // We import the file we just made!
 
-export default function LandingPage() {
+export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-blue-500 selection:text-white">
+    <main className="min-h-screen bg-black text-white selection:bg-blue-500/30">
       
-      {/* Navigation */}
-      <nav className="max-w-6xl mx-auto px-6 py-6 flex justify-between items-center">
-        <div className="text-xl font-bold tracking-tighter">
-          VSME <span className="text-blue-500">ESG OS</span>
-        </div>
-        <div className="flex gap-6 text-sm font-medium text-gray-400 items-center">
-          <a href="#" className="hover:text-white transition-colors">Methodology</a>
-          <a href="#" className="hover:text-white transition-colors">Pricing</a>
+      {/* 1. HERO SECTION (The Top Part) */}
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-blue-500/20 blur-[120px] rounded-full pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/30 border border-blue-800 text-blue-400 text-sm mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            Live for French SMEs
+          </div>
           
-          {/* SHOW THIS IF LOGGED OUT */}
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="text-white hover:text-blue-400 transition-colors">
-                Log In
-              </button>
-            </SignInButton>
-          </SignedOut>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+            ESG Reporting, <br />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+              Simplified.
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Generate your compliant Carbon Assessment (Scope 1, 2 & 3) in under 15 minutes. 
+            No expensive consultants. No complex spreadsheets.
+          </p>
 
-          {/* SHOW THIS IF LOGGED IN */}
-          <SignedIn>
-            <Link href="/dashboard" className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-500 transition-colors">
-              Go to Dashboard
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link 
+              href="/dashboard"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+            >
+              Start Free Assessment ⚡
             </Link>
-            <div className="ml-2">
-              <UserButton afterSignOutUrl="/" />
-            </div>
-          </SignedIn>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <main className="max-w-4xl mx-auto px-6 pt-20 pb-32 text-center">
-        <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-blue-900 bg-blue-900/20 text-blue-400 text-xs font-bold uppercase tracking-wide">
-          v1.0 Public Beta Now Live
-        </div>
-        
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8">
-          The Automated ESG Officer <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
-            for Modern Suppliers.
-          </span>
-        </h1>
-        
-        <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Generate compliant Carbon Footprint reports in minutes, not months. 
-          Aligned with GHG Protocol, ISO 14064-1, and CSRD requirements.
-        </p>
-        
-        <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-          {/* Main Call to Action - Checks if logged in or out */}
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="w-full md:w-auto bg-white text-black font-bold py-4 px-10 rounded-full hover:scale-105 transition-transform flex items-center justify-center gap-2">
-                Start Free Assessment ➔
-              </button>
-            </SignInButton>
-          </SignedOut>
-
-          <SignedIn>
-            <Link href="/dashboard" className="w-full md:w-auto bg-white text-black font-bold py-4 px-10 rounded-full hover:scale-105 transition-transform flex items-center justify-center gap-2">
-              Continue Assessment ➔
+            <Link 
+              href="#methodology"
+              className="w-full sm:w-auto px-8 py-4 bg-gray-900 text-white border border-gray-800 rounded-xl hover:bg-gray-800 transition-all"
+            >
+              How it Works
             </Link>
-          </SignedIn>
-
-          <a href="#" className="w-full md:w-auto px-10 py-4 rounded-full border border-gray-800 hover:bg-gray-900 text-gray-300 font-medium transition-colors">
-            View Sample Report
-          </a>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 text-left">
-          <div className="p-6 rounded-2xl bg-gray-900/50 border border-gray-800">
-            <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center mb-4 text-orange-500 text-xl">🔥</div>
-            <h3 className="text-lg font-bold mb-2">Scope 1 & 2</h3>
-            <p className="text-sm text-gray-400">Automated calculation of direct emissions and energy consumption using ADEME v23 factors.</p>
-          </div>
-          <div className="p-6 rounded-2xl bg-gray-900/50 border border-gray-800">
-            <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center mb-4 text-blue-500 text-xl">⚡</div>
-            <h3 className="text-lg font-bold mb-2">Instant Audit Pack</h3>
-            <p className="text-sm text-gray-400">Generate a professional 2-page PDF report with evidence tracking and attestation.</p>
-          </div>
-          <div className="p-6 rounded-2xl bg-gray-900/50 border border-gray-800">
-            <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4 text-purple-500 text-xl">🔒</div>
-            <h3 className="text-lg font-bold mb-2">Secure & Private</h3>
-            <p className="text-sm text-gray-400">Your data is stored locally in your browser. No external database tracking in this version.</p>
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-900 py-12 text-center text-gray-600 text-sm">
-        <p>&copy; 2025 VSME Solutions. Built for the French Supply Chain.</p>
+      {/* 2. METHODOLOGY SECTION (The New Part) */}
+      <Methodology />
+
+      {/* 3. FOOTER */}
+      <footer className="border-t border-gray-900 py-12 mt-20 text-center text-gray-600 text-sm">
+        <p>© 2026 VSME OS. Built for French Regulations.</p>
       </footer>
-    </div>
+
+    </main>
   );
 }
