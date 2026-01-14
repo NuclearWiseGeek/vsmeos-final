@@ -1,137 +1,112 @@
 'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useESG } from '../../context/ESGContext';
+import { generatePDF } from '../../utils/pdfGenerator'; // Import our new engine
 
 export default function ReviewPage() {
-  const router = useRouter();
-  const { data, setData } = useESG();
-
-  // Helper to safely parse strings like "1,000.00" into numbers
-  const getVal = (val: string) => {
-    if (!val) return 0;
-    return parseFloat(val.replace(/,/g, '')) || 0;
-  };
-
-  // --- Quick Math for Summary ---
-  const FACTORS = {
-    gas: 0.244, heatingOil: 3.2, propane: 3.1, diesel: 3.16, petrol: 2.8, r410a: 2088, r32: 675, r134a: 1430,
-    elec: 0.052, districtHeat: 0.170, vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
-  };
-  
-  const s1 = (getVal(data.gas) * FACTORS.gas) + (getVal(data.heatingOil) * FACTORS.heatingOil) + (getVal(data.propane) * FACTORS.propane) +
-             (getVal(data.diesel) * FACTORS.diesel) + (getVal(data.petrol) * FACTORS.petrol) +
-             (getVal(data.r410a) * FACTORS.r410a) + (getVal(data.r32) * FACTORS.r32) + (getVal(data.r134a) * FACTORS.r134a);
-  const s2 = (getVal(data.elec) * FACTORS.elec) + (getVal(data.districtHeat) * FACTORS.districtHeat);
-  const s3 = (getVal(data.vehicleKm) * FACTORS.vehicleKm) + (getVal(data.flightKm) * FACTORS.flightKm) + (getVal(data.hotelNights) * FACTORS.hotelNights);
-  const total = s1 + s2 + s3;
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files).map(f => f.name);
-      setData({ ...data, files: [...data.files, ...newFiles] });
-    }
-  };
-
-  const handleFinalSubmit = () => {
-    // 1. Check Profile Data
-    if (!data.companyName || !data.revenue) {
-      alert("Profile Incomplete! You must provide Company Name and Revenue to generate a valid report.");
-      router.push('/dashboard/profile');
-      return;
-    }
-
-    // 2. Check Signature
-    if(!data.signerName) {
-      alert("Please sign the report before generating.");
-      return;
-    }
-    
-    // 3. Go to Results
-    router.push('/dashboard/results');
-  };
+  const { data } = useESG();
 
   return (
-    <div className="min-h-screen bg-black text-white p-8 font-sans">
-      <nav className="max-w-3xl mx-auto mb-8 border-b border-gray-800 pb-4">
-        <Link href="/dashboard" className="text-gray-500 hover:text-white text-sm">← Back to Dashboard</Link>
-        <h1 className="text-2xl font-bold mt-2">Final Review & Evidence</h1>
-      </nav>
+    <div className="max-w-4xl mx-auto py-10">
+      
+      {/* 1. Header */}
+      <div className="mb-10 text-center md:text-left">
+        <h1 className="text-3xl md:text-4xl font-bold mb-3 text-white">Review & Export</h1>
+        <p className="text-gray-400">
+          Please review your data below. If everything is correct, download your official certificate.
+        </p>
+      </div>
 
-      <main className="max-w-3xl mx-auto space-y-8">
+      {/* 2. The Data Summary Card */}
+      <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8 mb-8 shadow-2xl">
         
-        {/* 1. Summary Card */}
-        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Carbon Summary</h3>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-xl font-bold text-white">
-                {s1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </div>
-              <div className="text-xs text-gray-500">Scope 1</div>
-            </div>
-            <div>
-              <div className="text-xl font-bold text-white">
-                {s2.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </div>
-              <div className="text-xs text-gray-500">Scope 2</div>
-            </div>
-            <div>
-              <div className="text-xl font-bold text-white">
-                {s3.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </div>
-              <div className="text-xs text-gray-500">Scope 3</div>
-            </div>
+        {/* Company Header */}
+        <div className="border-b border-gray-800 pb-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white">{data.companyName || 'Your Company Name'}</h2>
+            <p className="text-blue-400">{data.country} • {data.revenue} {data.currency}</p>
           </div>
-          <div className="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center">
-            <span className="text-gray-400">Total Footprint</span>
-            <span className="text-2xl font-bold text-white">
-              {total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span className="text-sm text-gray-500">kgCO2e</span>
-            </span>
+          <div className="px-4 py-1 rounded-full bg-green-900/30 border border-green-800 text-green-400 text-xs font-bold uppercase tracking-wider">
+            Ready to Sign
           </div>
-        </section>
+        </div>
 
-        {/* 2. File Upload */}
-        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Evidence Upload</h3>
-          <p className="text-sm text-gray-500 mb-4">Please upload invoices or logs that support the numbers above.</p>
+        {/* Data Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
           
-          <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-gray-500 transition-colors cursor-pointer relative">
-            <input type="file" multiple onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
-            <p className="text-gray-300 font-medium">Click to attach files</p>
-            <p className="text-xs text-gray-600 mt-2">PDF, JPG, PNG supported</p>
-          </div>
-          
-          {data.files.length > 0 && (
-            <div className="mt-4 space-y-2">
-              {data.files.map((f, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-green-400">
-                  <span>✓</span> {f}
-                </div>
-              ))}
+          {/* Scope 1 Column */}
+          <div className="space-y-3">
+            <h3 className="font-bold text-gray-500 uppercase tracking-widest text-xs">Scope 1 (Direct)</h3>
+            <div className="flex justify-between border-b border-gray-800 pb-1">
+              <span className="text-gray-400">Gas</span>
+              <span className="text-white">{data.gas || '0'} kWh</span>
             </div>
-          )}
-        </section>
-
-        {/* 3. Signature */}
-        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Attestation</h3>
-          <div className="space-y-4">
-             <div className="space-y-2">
-                <label className="text-xs text-gray-500 font-bold">Authorized Signer Name</label>
-                <input type="text" required value={data.signerName} onChange={(e) => setData({...data, signerName: e.target.value})} 
-                  className="w-full bg-black border border-gray-700 rounded p-3 text-white focus:border-white outline-none" placeholder="Enter Full Legal Name" />
-              </div>
-              <p className="text-xs text-gray-600 italic">By clicking "Create Report", I certify that the data provided is accurate to the best of my knowledge.</p>
+            <div className="flex justify-between border-b border-gray-800 pb-1">
+              <span className="text-gray-400">Diesel</span>
+              <span className="text-white">{data.diesel || '0'} L</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-800 pb-1">
+              <span className="text-gray-400">Refrigerants</span>
+              <span className="text-white">{data.r410a || '0'} kg</span>
+            </div>
           </div>
-        </section>
 
-        <button onClick={handleFinalSubmit} className="w-full bg-white text-black font-extrabold py-4 rounded-xl hover:scale-[1.02] transition-transform">
-          Create Report ➔
+          {/* Scope 2 Column */}
+          <div className="space-y-3">
+            <h3 className="font-bold text-gray-500 uppercase tracking-widest text-xs">Scope 2 (Indirect)</h3>
+            <div className="flex justify-between border-b border-gray-800 pb-1">
+              <span className="text-gray-400">Electricity</span>
+              <span className="text-white">{data.elec || '0'} kWh</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-800 pb-1">
+              <span className="text-gray-400">Heating</span>
+              <span className="text-white">{data.districtHeat || '0'} kWh</span>
+            </div>
+          </div>
+
+          {/* Scope 3 Column */}
+          <div className="space-y-3">
+            <h3 className="font-bold text-gray-500 uppercase tracking-widest text-xs">Scope 3 (Travel)</h3>
+            <div className="flex justify-between border-b border-gray-800 pb-1">
+              <span className="text-gray-400">Flights</span>
+              <span className="text-white">{data.flightKm || '0'} km</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-800 pb-1">
+              <span className="text-gray-400">Hotels</span>
+              <span className="text-white">{data.hotelNights || '0'} nights</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Signer Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-800 text-right">
+          <p className="text-gray-500 text-xs uppercase mb-1">Digitally Signed By</p>
+          <p className="text-lg font-bold text-white">{data.signerName || 'Pending Signature'}</p>
+        </div>
+
+      </div>
+
+      {/* 3. Action Buttons */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <Link 
+          href="/dashboard/scope3"
+          className="w-full md:w-auto px-6 py-4 rounded-xl border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white transition-all text-center"
+        >
+          ← Go Back
+        </Link>
+        
+        <button 
+          onClick={() => generatePDF(data)}
+          className="flex-1 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group"
+        >
+          <span>📄</span>
+          <span>Download Official PDF Report</span>
+          <span className="group-hover:translate-x-1 transition-transform">→</span>
         </button>
+      </div>
 
-      </main>
     </div>
   );
 }

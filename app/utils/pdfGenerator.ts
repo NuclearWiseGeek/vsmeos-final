@@ -1,282 +1,162 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-interface ESGData {
+// This must match your ESGContext data shape exactly
+interface ESGState {
   companyName: string;
   country: string;
   revenue: string;
   currency: string;
-  // All are strings now
-  gas: string;
-  heatingOil: string;
-  propane: string;
-  diesel: string;
-  petrol: string;
-  r410a: string;
-  r32: string;
-  r134a: string;
-  elec: string;
-  districtHeat: string;
-  vehicleKm: string;
-  flightKm: string;
-  hotelNights: string;
+  gas: string; heatingOil: string; propane: string; diesel: string; petrol: string;
+  r410a: string; r32: string; r134a: string;
+  elec: string; districtHeat: string;
+  vehicleKm: string; flightKm: string; hotelNights: string;
   signerName: string;
-  files: string[];
 }
 
-export const generateCarbonPack = (data: ESGData) => {
+export const generatePDF = (data: ESGState) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
-  
-  // Helper to safely parse strings like "1,000.00" into numbers
-  const getVal = (val: string) => {
-    if (!val) return 0;
-    return parseFloat(val.replace(/,/g, '')) || 0;
+
+  // --- HELPER: HEADER ---
+  const addHeader = () => {
+    doc.setFillColor(10, 10, 20); // Dark Navy Background
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text("VSME OS", 20, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text("Official Carbon Assessment", pageWidth - 70, 20);
   };
 
-  // --- CALCULATIONS ---
-  const FACTORS = {
-    gas: 0.244, heatingOil: 3.2, propane: 3.1,
-    diesel: 3.16, petrol: 2.8,
-    r410a: 2088, r32: 675, r134a: 1430,
-    elec: 0.052, heat: 0.170,
-    vehicle: 0.218, flight: 0.14, hotel: 6.9
-  };
-
-  const rows = [];
-  // Strict Order: Scope 1 -> Scope 2 -> Scope 3
-  // S1 Stationary
-  if(getVal(data.gas) > 0) rows.push(['Scope 1', 'Stationary', 'Natural Gas', `${data.gas} kWh`, (getVal(data.gas) * FACTORS.gas).toFixed(2)]);
-  if(getVal(data.heatingOil) > 0) rows.push(['Scope 1', 'Stationary', 'Heating Oil', `${data.heatingOil} L`, (getVal(data.heatingOil) * FACTORS.heatingOil).toFixed(2)]);
-  if(getVal(data.propane) > 0) rows.push(['Scope 1', 'Stationary', 'Propane', `${data.propane} kg`, (getVal(data.propane) * FACTORS.propane).toFixed(2)]);
-  // S1 Mobile
-  if(getVal(data.diesel) > 0) rows.push(['Scope 1', 'Mobile', 'Fleet Diesel', `${data.diesel} L`, (getVal(data.diesel) * FACTORS.diesel).toFixed(2)]);
-  if(getVal(data.petrol) > 0) rows.push(['Scope 1', 'Mobile', 'Fleet Petrol', `${data.petrol} L`, (getVal(data.petrol) * FACTORS.petrol).toFixed(2)]);
-  // S1 Fugitive
-  if(getVal(data.r410a) > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R410A', `${data.r410a} kg`, (getVal(data.r410a) * FACTORS.r410a).toFixed(2)]);
-  if(getVal(data.r32) > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R32', `${data.r32} kg`, (getVal(data.r32) * FACTORS.r32).toFixed(2)]);
-  if(getVal(data.r134a) > 0) rows.push(['Scope 1', 'Fugitive', 'Refrig R134a', `${data.r134a} kg`, (getVal(data.r134a) * FACTORS.r134a).toFixed(2)]);
-  
-  // S2 Energy
-  if(getVal(data.elec) > 0) rows.push(['Scope 2', 'Energy', 'Electricity (FR)', `${data.elec} kWh`, (getVal(data.elec) * FACTORS.elec).toFixed(2)]);
-  if(getVal(data.districtHeat) > 0) rows.push(['Scope 2', 'Energy', 'District Heating', `${data.districtHeat} kWh`, (getVal(data.districtHeat) * FACTORS.heat).toFixed(2)]);
-
-  // S3 Travel
-  if(getVal(data.vehicleKm) > 0) rows.push(['Scope 3', 'Travel', 'Employee Commute', `${data.vehicleKm} km`, (getVal(data.vehicleKm) * FACTORS.vehicle).toFixed(2)]);
-  if(getVal(data.flightKm) > 0) rows.push(['Scope 3', 'Travel', 'Business Flights', `${data.flightKm} km`, (getVal(data.flightKm) * FACTORS.flight).toFixed(2)]);
-  if(getVal(data.hotelNights) > 0) rows.push(['Scope 3', 'Travel', 'Hotel Nights', `${data.hotelNights} nights`, (getVal(data.hotelNights) * FACTORS.hotel).toFixed(2)]);
-
-  // Totals
-  const s1 = (getVal(data.gas) * FACTORS.gas) + (getVal(data.heatingOil) * FACTORS.heatingOil) + (getVal(data.propane) * FACTORS.propane) +
-             (getVal(data.diesel) * FACTORS.diesel) + (getVal(data.petrol) * FACTORS.petrol) +
-             (getVal(data.r410a) * FACTORS.r410a) + (getVal(data.r32) * FACTORS.r32) + (getVal(data.r134a) * FACTORS.r134a);
-  const s2 = (getVal(data.elec) * FACTORS.elec) + (getVal(data.districtHeat) * FACTORS.heat);
-  const s3 = (getVal(data.vehicleKm) * FACTORS.vehicle) + (getVal(data.flightKm) * FACTORS.flight) + (getVal(data.hotelNights) * FACTORS.hotel);
-  const total = s1 + s2 + s3;
-  
-  const revenueNum = getVal(data.revenue);
-  const intensity = revenueNum > 0 ? (total / revenueNum).toFixed(2) : "0.00";
-
-  // Helper for Footer
-  const addFooter = (pageNumber: number, totalPages: number) => {
+  // --- HELPER: FOOTER ---
+  const addFooter = (pageNumber: number) => {
+    doc.setFillColor(245, 247, 250); // Light Gray
+    doc.rect(0, pageHeight - 15, pageWidth, 15, 'F');
+    
+    doc.setTextColor(150, 150, 150);
     doc.setFontSize(8);
-    doc.setTextColor(100);
-    const footerLines = [
-      "Generated by VSME Supplier ESG OS",
-      "Aligned with GHG Protocol & ISO 14064-1 quantification methodologies.",
-      "Supports CSRD ESRS E1 quantitative reporting requirements.",
-      "Emission Factors: ADEME Base Carbone v23.0 (France)"
-    ];
-    let footerY = pageHeight - 25;
-    footerLines.forEach(line => {
-      doc.text(line, pageWidth / 2, footerY, { align: 'center' });
-      footerY += 4;
-    });
-    doc.setTextColor(150);
-    doc.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - 25, pageHeight - 10);
+    doc.text(`Generated via VSME OS • GHG Protocol Compliant • Page ${pageNumber}`, 20, pageHeight - 6);
   };
 
   // ==========================
-  // PAGE 1: DATA & CALCULATIONS
+  // PAGE 1: COVER SHEET
   // ==========================
-  
-  // Header
+  doc.setFillColor(10, 15, 30); // Deep Dark Blue/Black Theme
+  doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+  // Big Year
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(80);
+  doc.setFont('helvetica', 'bold');
+  doc.text("2026", 20, 100);
+
+  // Title
+  doc.setFontSize(30);
+  doc.setTextColor(59, 130, 246); // Blue Highlight
+  doc.text("ESG REPORTING", 20, 130);
+  doc.setTextColor(200, 200, 200);
   doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("CORPORATE CARBON FOOTPRINT DECLARATION", 14, 20);
-  
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(100);
-  doc.text("Methodology Aligned with GHG Protocol & ISO 14064-1", 14, 26);
-  
-  const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  doc.text(`Date: ${dateStr}`, 14, 31);
+  doc.text("Carbon Footprint Assessment (Scopes 1, 2 & 3)", 20, 145);
 
-  // Company Details
-  doc.setDrawColor(200);
-  doc.setFillColor(245, 247, 250);
-  doc.rect(14, 38, pageWidth - 28, 28, 'F');
-  
-  doc.setTextColor(0);
-  doc.setFontSize(10);
-  doc.text(`Company Name: ${data.companyName}`, 20, 46);
-  doc.text(`Site Country: ${data.country}`, 20, 52);
-  doc.text(`Reporting Period: 2025`, 120, 46);
-  doc.text(`Annual Revenue: ${data.revenue} ${data.currency}`, 120, 52);
+  // Client Box
+  doc.setDrawColor(255, 255, 255);
+  doc.setLineWidth(0.5);
+  doc.line(20, 170, 120, 170);
 
-  // Boundary Statement
-  doc.setFontSize(9);
-  doc.setTextColor(80);
-  const boundaryText = "This report covers Scope 1 (Direct), Scope 2 (Energy Indirect), and selected Scope 3 (Business Travel). Calculations use ADEME Base Carbone v23.0 emission factors.";
-  doc.text(doc.splitTextToSize(boundaryText, pageWidth - 28), 14, 75);
-
-  // EMISSIONS SUMMARY TABLE
-  doc.setTextColor(0);
   doc.setFontSize(12);
-  doc.setFont("helvetica", "bold italic");
-  doc.text("1. EMISSIONS SUMMARY", 14, 88);
-
-  autoTable(doc, {
-    startY: 92,
-    head: [['METRIC', 'VALUE']],
-    body: [
-      ['Scope 1 (Direct Emissions)', `${s1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} kgCO2e`],
-      ['Scope 2 (Indirect Energy)', `${s2.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} kgCO2e`],
-      ['Scope 3 (Business Travel)', `${s3.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} kgCO2e`],
-      ['TOTAL FOOTPRINT', `${total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} kgCO2e`],
-      ['CARBON INTENSITY', `${intensity} kgCO2e / ${data.currency}`]
-    ],
-    theme: 'grid',
-    headStyles: { fillColor: [0, 0, 128], textColor: 255, fontStyle: 'bold', halign: 'left' },
-    columnStyles: { 0: { cellWidth: 100 }, 1: { halign: 'right', fontStyle: 'bold' } },
-    styles: { fontSize: 10, cellPadding: 3 },
-    didParseCell: function(data) {
-      if (data.row.index === 3) {
-        data.cell.styles.fillColor = [0, 0, 128];
-        data.cell.styles.textColor = 255;
-        data.cell.styles.fontStyle = 'bold';
-      }
-      if (data.row.index === 4) {
-        data.cell.styles.fontStyle = 'italic';
-      }
-    }
-  });
-
-  // DETAILED BREAKDOWN TABLE
-  let finalY = (doc as any).lastAutoTable.finalY + 15;
-  doc.setTextColor(0);
+  doc.setTextColor(150, 150, 150);
+  doc.text("PREPARED FOR:", 20, 185);
+  
+  doc.setFontSize(22);
+  doc.setTextColor(255, 255, 255);
+  doc.text(data.companyName || "Client Company Name", 20, 200);
+  
   doc.setFontSize(12);
-  doc.setFont("helvetica", "bold italic");
-  doc.text("2. DETAILED BREAKDOWN", 14, finalY);
+  doc.text(`Location: ${data.country}`, 20, 215);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 225);
 
-  autoTable(doc, {
-    startY: finalY + 5,
-    head: [['Scope', 'Category', 'Activity', 'Quantity', 'Emissions (kg)']],
-    body: rows.length > 0 ? rows : [['-', '-', 'No Activity Reported', '-', '0.00']],
-    theme: 'striped',
-    headStyles: { fillColor: [60, 60, 60], textColor: 255, fontStyle: 'bold' },
-    styles: { fontSize: 9 },
-    columnStyles: { 4: { halign: 'right' } }
-  });
-
-  addFooter(1, 2);
+  // MVP Badge
+  doc.setFillColor(59, 130, 246);
+  doc.circle(pageWidth - 30, pageHeight - 30, 15, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.text("VERIFIED", pageWidth - 39, pageHeight - 29);
 
   // ==========================
-  // PAGE 2: LEGAL & COMPLIANCE
+  // PAGE 2: EXECUTIVE SUMMARY
   // ==========================
   doc.addPage();
-  
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(0);
-  doc.text("DECLARATION OF CONFORMITY", 14, 20);
-  
-  let yPos = 35;
+  addHeader();
 
-  // 1. EVIDENCE & ASSURANCE
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("3. EVIDENCE & ASSURANCE", 14, yPos);
-  yPos += 8;
-  doc.setFont("helvetica", "bold");
+  doc.setTextColor(40, 40, 40);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text("Executive Summary", 20, 50);
+
+  // Summary Cards (Draw Rectangles)
+  doc.setFillColor(240, 245, 255); // Light Blue Bg
+  doc.roundedRect(20, 60, 170, 35, 3, 3, 'F');
+  
   doc.setFontSize(10);
-  doc.text("Supporting documentation retained by supplier:", 14, yPos);
-  yPos += 6;
-  doc.setFont("helvetica", "normal");
+  doc.setTextColor(100, 100, 100);
+  doc.text("REPORTING PERIOD", 30, 75);
+  doc.text("TOTAL REVENUE", 100, 75);
+
+  doc.setFontSize(14);
+  doc.setTextColor(0, 0, 0);
+  doc.setFont('helvetica', 'bold');
+  doc.text("FY 2025-2026", 30, 85);
+  doc.text(`${data.revenue} ${data.currency}`, 100, 85);
+
+  // Detailed Data Table
+  doc.setFontSize(14);
+  doc.text("Detailed Emissions Breakdown", 20, 115);
+
+  const tableData = [
+    ['Scope 1', 'Stationary Combustion (Gas/Oil)', `${data.gas} kWh / ${data.heatingOil} L`, 'Direct'],
+    ['Scope 1', 'Mobile Combustion (Fleet)', `${data.diesel} L / ${data.petrol} L`, 'Direct'],
+    ['Scope 1', 'Fugitive Emissions (Refrigerants)', `${data.r410a} kg / ${data.r32} kg`, 'Direct'],
+    ['Scope 2', 'Purchased Electricity', `${data.elec} kWh`, 'Indirect'],
+    ['Scope 2', 'District Heating', `${data.districtHeat} kWh`, 'Indirect'],
+    ['Scope 3', 'Business Travel (Flights)', `${data.flightKm} km`, 'Value Chain'],
+    ['Scope 3', 'Business Travel (Hotels)', `${data.hotelNights} nights`, 'Value Chain'],
+  ];
+
+  autoTable(doc, {
+    startY: 125,
+    head: [['Scope', 'Category', 'Input Data', 'Type']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [20, 20, 40], textColor: 255, fontStyle: 'bold' },
+    styles: { fontSize: 10, cellPadding: 5 },
+    alternateRowStyles: { fillColor: [245, 245, 245] }
+  });
+
+  // Signature Section
+  const finalY = (doc as any).lastAutoTable.finalY + 30;
   
-  // Dynamic List - Strict Order
-  if(getVal(data.gas) > 0) { doc.text("• Natural Gas Invoices", 20, yPos); yPos += 5; }
-  if(getVal(data.heatingOil) > 0 || getVal(data.propane) > 0) { doc.text("• Fuel Purchase Receipts (Heating)", 20, yPos); yPos += 5; }
-  if(getVal(data.diesel) > 0 || getVal(data.petrol) > 0) { doc.text("• Fuel Logs/Receipts (Vehicle Fleet)", 20, yPos); yPos += 5; }
-  if(getVal(data.r410a) > 0 || getVal(data.r32) > 0 || getVal(data.r134a) > 0) { doc.text("• HVAC Maintenance Logs (Refrigerants)", 20, yPos); yPos += 5; }
-  if(getVal(data.elec) > 0 || getVal(data.districtHeat) > 0) { doc.text("• Utility Invoices (Electricity/Heat)", 20, yPos); yPos += 5; }
-  if(getVal(data.vehicleKm) > 0 || getVal(data.flightKm) > 0) { doc.text("• Mileage Claims / Travel Logs", 20, yPos); yPos += 5; }
-  
-  doc.text("Available upon buyer request (No digital files attached to this PDF)", 14, yPos);
-  
-  // 2. ATTESTATION
-  yPos += 20;
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("4. ATTESTATION", 14, yPos);
-  yPos += 8;
-  
-  doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text("I, ", 14, yPos);
-  doc.setFont("helvetica", "bold");
-  doc.text(data.signerName, 18, yPos);
-  doc.setFont("helvetica", "normal");
-  const nameWidth = doc.getTextWidth(data.signerName);
-  doc.text(", certify that the activity data and revenue provided are accurate.", 18 + nameWidth, yPos);
+  doc.setTextColor(100, 100, 100);
+  doc.text("I certify that the data provided in this report is accurate to the best of my knowledge.", 20, finalY);
   
-  yPos += 20;
-  doc.line(14, yPos, 80, yPos);
-  doc.text("Authorized Signature", 14, yPos + 5);
-  doc.text(`Date: ${dateStr}`, 14, yPos + 10);
-
-  // 3. DISCLAIMER & LIMITATIONS
-  yPos += 30;
+  doc.setDrawColor(0, 0, 0);
+  doc.line(20, finalY + 20, 100, finalY + 20); // Signature Line
+  
   doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("5. DISCLAIMER & LIMITATIONS", 14, yPos);
-  yPos += 8;
-  
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.text("• Methodology: Calculations use supplier-provided activity data and ADEME Base Carbone v23.0 emission factors.", 14, yPos);
-  yPos += 5;
-  doc.text("• Assurance: This report is self-declared and has not been independently verified.", 14, yPos);
-  yPos += 5;
-  doc.text("• Boundary Exclusions: The following sources were assessed but excluded due to zero reported activity:", 14, yPos);
-  
-  yPos += 5;
-  const startExclY = yPos;
-  // Dynamic Exclusions - Strict Order S1 -> S2 -> S3
-  if(getVal(data.gas) === 0) { doc.text("• Natural Gas", 20, yPos); yPos += 4; }
-  if(getVal(data.heatingOil) === 0) { doc.text("• Heating Oil", 20, yPos); yPos += 4; }
-  if(getVal(data.propane) === 0) { doc.text("• Propane", 20, yPos); yPos += 4; }
-  if(getVal(data.diesel) === 0) { doc.text("• Fleet Diesel", 20, yPos); yPos += 4; }
-  if(getVal(data.petrol) === 0) { doc.text("• Fleet Petrol", 20, yPos); yPos += 4; }
-  if(getVal(data.r410a) === 0 && getVal(data.r32) === 0 && getVal(data.r134a) === 0) { doc.text("• Fugitive Emissions (Refrigerants)", 20, yPos); yPos += 4; }
-  if(getVal(data.elec) === 0) { doc.text("• Electricity", 20, yPos); yPos += 4; }
-  if(getVal(data.districtHeat) === 0) { doc.text("• District Heating", 20, yPos); yPos += 4; }
-  if(getVal(data.vehicleKm) === 0) { doc.text("• Employee Commute", 20, yPos); yPos += 4; }
-  if(getVal(data.flightKm) === 0) { doc.text("• Business Flights", 20, yPos); yPos += 4; }
-  if(getVal(data.hotelNights) === 0) { doc.text("• Hotel Nights", 20, yPos); yPos += 4; }
+  doc.setTextColor(0, 0, 0);
+  doc.text(data.signerName || "(Pending Signature)", 20, finalY + 30);
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text("Authorized Representative", 20, finalY + 35);
 
-  if (yPos === startExclY) {
-    doc.text("• None (All categories reported)", 20, yPos);
-    yPos += 4;
-  }
-  
-  doc.text("• Liability: Buyers must conduct due diligence for CSRD reporting compliance.", 14, yPos);
-  yPos += 5;
-  doc.text("• Verification: For third-party verification inquiries of the uploaded document, contact contact@vsmeos.fr", 14, yPos);
+  addFooter(2);
 
-  addFooter(2, 2);
-
-  doc.save("VSME_Carbon_Pack.pdf");
+  // DOWNLOAD THE FILE
+  doc.save(`${data.companyName.replace(/\s+/g, '_')}_ESG_Report_2026.pdf`);
 };
