@@ -1,52 +1,37 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useESG } from '../../context/ESGContext';
 import { generateCarbonPack } from '../../utils/pdfGenerator';
 
 export default function Results() {
-  const { data } = useESG();
+  const { data, resetData } = useESG();
+  const router = useRouter();
 
-  // --- 1. ADEME Emission Factors (Scope 100% Aligned with Python) ---
-  const FACTORS = {
-    gas: 0.244,         // kgCO2e/kWh
-    heatingOil: 3.2,    // kgCO2e/L
-    propane: 3.1,       // kgCO2e/kg
-    diesel: 3.16,       // kgCO2e/L
-    petrol: 2.8,        // kgCO2e/L
-    r410a: 2088,        // kgCO2e/kg (GWP)
-    r32: 675,           // kgCO2e/kg (GWP)
-    r134a: 1430,        // kgCO2e/kg (GWP)
-    elec: 0.052,        // kgCO2e/kWh (France)
-    districtHeat: 0.170,// kgCO2e/kWh
-    vehicleKm: 0.218,   // kgCO2e/km
-    flightKm: 0.14,     // kgCO2e/km
-    hotelNights: 6.9    // kgCO2e/night
+  const handleNewAssessment = () => {
+    resetData();
+    // CHANGE: Sends you back to the Main Hub (Dashboard) instead of Step 1
+    router.push('/dashboard'); 
   };
 
-  // --- 2. Calculate Totals ---
-  // Scope 1
-  const s1_gas = data.gas * FACTORS.gas;
-  const s1_oil = data.heatingOil * FACTORS.heatingOil;
-  const s1_prop = data.propane * FACTORS.propane;
-  const s1_diesel = data.diesel * FACTORS.diesel;
-  const s1_petrol = data.petrol * FACTORS.petrol;
-  const s1_refrig = (data.r410a * FACTORS.r410a) + (data.r32 * FACTORS.r32) + (data.r134a * FACTORS.r134a);
-  
-  const scope1 = s1_gas + s1_oil + s1_prop + s1_diesel + s1_petrol + s1_refrig;
+  // --- ADEME FACTORS ---
+  const FACTORS = {
+    gas: 0.244, heatingOil: 3.2, propane: 3.1,
+    diesel: 3.16, petrol: 2.8,
+    r410a: 2088, r32: 675, r134a: 1430,
+    elec: 0.052, districtHeat: 0.170,
+    vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
+  };
 
-  // Scope 2
-  const s2_elec = data.elec * FACTORS.elec;
-  const s2_heat = data.districtHeat * FACTORS.districtHeat;
-  const scope2 = s2_elec + s2_heat;
-
-  // Scope 3
-  const s3_car = data.vehicleKm * FACTORS.vehicleKm;
-  const s3_flight = data.flightKm * FACTORS.flightKm;
-  const s3_hotel = data.hotelNights * FACTORS.hotelNights;
-  const scope3 = s3_car + s3_flight + s3_hotel;
-
-  const total = scope1 + scope2 + scope3;
+  // --- CALCULATIONS ---
+  const s1 = (data.gas * FACTORS.gas) + (data.heatingOil * FACTORS.heatingOil) + (data.propane * FACTORS.propane) +
+             (data.diesel * FACTORS.diesel) + (data.petrol * FACTORS.petrol) +
+             (data.r410a * FACTORS.r410a) + (data.r32 * FACTORS.r32) + (data.r134a * FACTORS.r134a);
+             
+  const s2 = (data.elec * FACTORS.elec) + (data.districtHeat * FACTORS.districtHeat);
+  const s3 = (data.vehicleKm * FACTORS.vehicleKm) + (data.flightKm * FACTORS.flightKm) + (data.hotelNights * FACTORS.hotelNights);
+  const total = s1 + s2 + s3;
 
   return (
     <div className="min-h-screen bg-black text-white p-8 font-sans">
@@ -55,7 +40,6 @@ export default function Results() {
           <h1 className="text-2xl font-bold">Step 3: Validated Results</h1>
           <p className="text-gray-400 text-sm">Calculated for: <span className="text-white font-bold">{data.companyName || 'Unknown Company'}</span></p>
         </div>
-        <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 text-sm">Dashboard</Link>
       </nav>
 
       <main className="max-w-4xl mx-auto text-center">
@@ -63,17 +47,17 @@ export default function Results() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
             <p className="text-gray-500 text-xs uppercase font-bold mb-2">Scope 1</p>
-            <p className="text-4xl font-bold mb-1">{scope1.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
+            <p className="text-4xl font-bold mb-1">{s1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             <p className="text-green-400 text-xs font-medium px-2 py-1 bg-green-900/20 inline-block rounded">kgCO2e</p>
           </div>
           <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
             <p className="text-gray-500 text-xs uppercase font-bold mb-2">Scope 2</p>
-            <p className="text-4xl font-bold mb-1">{scope2.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
+            <p className="text-4xl font-bold mb-1">{s2.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             <p className="text-green-400 text-xs font-medium px-2 py-1 bg-green-900/20 inline-block rounded">kgCO2e</p>
           </div>
           <div className="p-6 bg-gray-900 rounded-xl border border-gray-800">
             <p className="text-gray-500 text-xs uppercase font-bold mb-2">Scope 3</p>
-            <p className="text-4xl font-bold mb-1">{scope3.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
+            <p className="text-4xl font-bold mb-1">{s3.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
             <p className="text-green-400 text-xs font-medium px-2 py-1 bg-green-900/20 inline-block rounded">kgCO2e</p>
           </div>
         </div>
@@ -82,7 +66,7 @@ export default function Results() {
         <div className="mb-12">
           <p className="text-gray-400 mb-2">Total Carbon Footprint</p>
           <p className="text-6xl font-extrabold text-white mb-8">
-            {total.toLocaleString(undefined, {maximumFractionDigits: 2})} <span className="text-2xl font-normal text-gray-500">kgCO2e</span>
+            {total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span className="text-2xl font-normal text-gray-500">kgCO2e</span>
           </p>
           <div className="inline-block border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-400">
              Authorized Signer: <span className="text-white font-bold">{data.signerName || 'Pending Signature'}</span>
@@ -97,9 +81,10 @@ export default function Results() {
           >
             Download Corporate Carbon Pack (PDF)
           </button>
-          <Link href="/dashboard/profile" className="text-gray-500 hover:text-white text-sm">
-            Start New Assessment
-          </Link>
+          
+          <button onClick={handleNewAssessment} className="text-gray-500 hover:text-white text-sm underline">
+            Start New Assessment (Reset)
+          </button>
         </div>
       </main>
     </div>

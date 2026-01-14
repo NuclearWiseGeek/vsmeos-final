@@ -50,9 +50,10 @@ export default function CompanyProfile() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs text-gray-400 uppercase font-bold tracking-wider">Annual Revenue</label>
+              <label className="text-xs text-gray-400 uppercase font-bold tracking-wider">Annual Revenue (EUR)</label>
               <input 
                 type="number" 
+                step="0.01"
                 required
                 className="w-full bg-black border border-gray-700 rounded-lg p-4 text-white focus:border-blue-500 outline-none"
                 placeholder="0.00"
