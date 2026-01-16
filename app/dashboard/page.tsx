@@ -1,82 +1,109 @@
 'use client';
-import React from 'react';
+import { useESG } from '@/context/ESGContext';
 import Link from 'next/link';
-import { useESG } from '../context/ESGContext';
+import { ArrowRight, LayoutDashboard } from 'lucide-react';
+import { useState } from 'react';
 
-export default function DashboardHub() {
-  const { data } = useESG();
+export default function DashboardHome() {
+  const { companyData, setCompanyData, activityData } = useESG();
+  const [isRevenueFocused, setIsRevenueFocused] = useState(false);
 
-  // Helper to safely parse strings like "1,000.00" into numbers
-  const getVal = (val: string) => {
-    if (!val) return 0;
-    return parseFloat(val.replace(/,/g, '')) || 0;
+  // Check if user has started
+  const hasData = Object.keys(activityData).length > 0;
+
+  const formatCurrency = (val: number) => {
+    if (!val) return '';
+    return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
   };
-
-  // --- Quick Math for the Cards ---
-  const FACTORS = {
-    gas: 0.244, heatingOil: 3.2, propane: 3.1, diesel: 3.16, petrol: 2.8, r410a: 2088, r32: 675, r134a: 1430,
-    elec: 0.052, districtHeat: 0.170, vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
-  };
-
-  const s1 = (getVal(data.gas) * FACTORS.gas) + (getVal(data.heatingOil) * FACTORS.heatingOil) + (getVal(data.propane) * FACTORS.propane) +
-             (getVal(data.diesel) * FACTORS.diesel) + (getVal(data.petrol) * FACTORS.petrol) +
-             (getVal(data.r410a) * FACTORS.r410a) + (getVal(data.r32) * FACTORS.r32) + (getVal(data.r134a) * FACTORS.r134a);
-  const s2 = (getVal(data.elec) * FACTORS.elec) + (getVal(data.districtHeat) * FACTORS.districtHeat);
-  const s3 = (getVal(data.vehicleKm) * FACTORS.vehicleKm) + (getVal(data.flightKm) * FACTORS.flightKm) + (getVal(data.hotelNights) * FACTORS.hotelNights);
 
   return (
-    <div className="min-h-screen bg-black text-white p-8 font-sans">
-      <nav className="max-w-5xl mx-auto mb-12 flex justify-between items-center border-b border-gray-800 pb-4">
-        <div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-            ESG Command Center
-          </h1>
-          <p className="text-gray-400 text-sm mt-1">{data.companyName || "No Company Selected"}</p>
+    <div className="max-w-3xl mx-auto py-12 px-6">
+      <div className="mb-12">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Company Profile</h1>
+        <p className="text-gray-500 mt-2">
+            Let's start with the basics. This information will appear in the header of your final ESG Declaration.
+        </p>
+      </div>
+
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Legal Company Name</label>
+                <input 
+                    type="text" 
+                    value={companyData.name}
+                    onChange={(e) => setCompanyData({...companyData, name: e.target.value.toUpperCase()})}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all"
+                    placeholder="e.g., ACME INDUSTRIES SAS"
+                />
+            </div>
+            
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Headquarters / Site Country</label>
+                <input 
+                    type="text" 
+                    value={companyData.country}
+                    onChange={(e) => setCompanyData({...companyData, country: e.target.value})}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all"
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Reporting Calendar Year</label>
+                <input 
+                    type="text" 
+                    value={companyData.year}
+                    onChange={(e) => setCompanyData({...companyData, year: e.target.value})}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all"
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Financial Year (FY)</label>
+                <input 
+                    type="text" 
+                    value={companyData.financialYear || ''}
+                    onChange={(e) => setCompanyData({...companyData, financialYear: e.target.value})}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all"
+                    placeholder="e.g. FY 2024-2025"
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Reporting Currency</label>
+                <select 
+                    value={companyData.currency}
+                    onChange={(e) => setCompanyData({...companyData, currency: e.target.value})}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black outline-none bg-white transition-all"
+                >
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="GBP">GBP (£)</option>
+                </select>
+            </div>
+
+            <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Annual Revenue ({companyData.currency})</label>
+                <input 
+                    type={isRevenueFocused ? "number" : "text"}
+                    value={isRevenueFocused ? (companyData.revenue === 0 ? '' : companyData.revenue) : (companyData.revenue ? formatCurrency(companyData.revenue) : '')}
+                    onFocus={() => setIsRevenueFocused(true)}
+                    onBlur={() => setIsRevenueFocused(false)}
+                    onChange={(e) => setCompanyData({...companyData, revenue: parseFloat(e.target.value) || 0})}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all"
+                    placeholder="0.00"
+                />
+            </div>
         </div>
-        <Link href="/dashboard/profile" className="text-gray-500 hover:text-white text-sm">Edit Profile</Link>
-      </nav>
+      </div>
 
-      <main className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          
-          {/* Scope 1 Card */}
-          <Link href="/dashboard/scope1" className="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-orange-500 transition-all cursor-pointer relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 text-9xl font-bold text-orange-500">1</div>
-            <h2 className="text-xl font-bold text-orange-400 mb-2">Scope 1</h2>
-            <p className="text-gray-400 text-xs uppercase tracking-wider mb-6">Direct Emissions</p>
-            <div className="text-3xl font-bold text-white mb-1">{s1.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
-            <p className="text-xs text-gray-500">kgCO2e</p>
-            <div className="mt-6 text-orange-400 text-sm font-bold group-hover:translate-x-2 transition-transform">Edit Data ➔</div>
-          </Link>
-
-          {/* Scope 2 Card */}
-          <Link href="/dashboard/scope2" className="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-500 transition-all cursor-pointer relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 text-9xl font-bold text-blue-500">2</div>
-            <h2 className="text-xl font-bold text-blue-400 mb-2">Scope 2</h2>
-            <p className="text-gray-400 text-xs uppercase tracking-wider mb-6">Indirect Energy</p>
-            <div className="text-3xl font-bold text-white mb-1">{s2.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
-            <p className="text-xs text-gray-500">kgCO2e</p>
-            <div className="mt-6 text-blue-400 text-sm font-bold group-hover:translate-x-2 transition-transform">Edit Data ➔</div>
-          </Link>
-
-          {/* Scope 3 Card */}
-          <Link href="/dashboard/scope3" className="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-purple-500 transition-all cursor-pointer relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 text-9xl font-bold text-purple-500">3</div>
-            <h2 className="text-xl font-bold text-purple-400 mb-2">Scope 3</h2>
-            <p className="text-gray-400 text-xs uppercase tracking-wider mb-6">Value Chain (Optional)</p>
-            <div className="text-3xl font-bold text-white mb-1">{s3.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
-            <p className="text-xs text-gray-500">kgCO2e</p>
-            <div className="mt-6 text-purple-400 text-sm font-bold group-hover:translate-x-2 transition-transform">Edit Data ➔</div>
-          </Link>
-        </div>
-
-        {/* Action Bar */}
-        <div className="flex justify-center border-t border-gray-800 pt-12">
-          <Link href="/dashboard/review" className="bg-white text-black font-extrabold py-4 px-16 rounded-full hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-            Proceed to Review & Sign ➔
-          </Link>
-        </div>
-      </main>
+      <div className="mt-8 flex justify-end">
+        <Link href="/dashboard/hub">
+            <button className="bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition-transform hover:scale-[1.02] flex items-center gap-3 shadow-lg">
+                {hasData ? 'Go to Assessment Hub' : 'Save & Continue'} <ArrowRight size={18} />
+            </button>
+        </Link>
+      </div>
     </div>
   );
 }

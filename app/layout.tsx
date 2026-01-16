@@ -1,29 +1,24 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { ESGProvider } from "./context/ESGContext";
 import { ClerkProvider } from '@clerk/nextjs';
+import './globals.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "VSME ESG OS",
-  description: "Automated Carbon Footprint for French Suppliers",
+  title: 'VSME OS',
+  description: 'Enterprise ESG Operating System',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
-          <ESGProvider>
-            {children}
-          </ESGProvider>
-        </body>
+        <body className={inter.className}>{children}</body>
       </html>
     </ClerkProvider>
   );

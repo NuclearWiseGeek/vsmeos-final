@@ -1,80 +1,45 @@
 'use client';
-import React from 'react';
+import { useESG } from '@/context/ESGContext';
+import { NumberInput } from '@/components/ui/Input';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useESG } from '../../context/ESGContext';
+import { ArrowLeft, Check } from 'lucide-react';
 
-// --- COMPONENT DEFINED OUTSIDE ---
-const InputField = ({ label, value, onChange, onBlur }: { 
-  label: string, 
-  value: string, 
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
-  onBlur: () => void 
-}) => (
-  <div>
-    <label className="text-xs text-gray-500 block mb-1">{label}</label>
-    <input 
-      type="text" 
-      className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-blue-500" 
-      value={value} 
-      onChange={onChange}
-      onBlur={onBlur}
-      placeholder="0.00"
-    />
-  </div>
-);
-
-export default function Scope2Page() {
-  const router = useRouter();
-  const { data, setData } = useESG();
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push('/dashboard');
-  };
-
-  const formatNumber = (val: string) => {
-    if (!val) return '';
-    const clean = val.replace(/,/g, '');
-    const num = parseFloat(clean);
-    if (isNaN(num)) return val;
-    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  const handleChange = (field: string, val: string) => {
-    if (/^[\d,.]*$/.test(val)) setData(prev => ({ ...prev, [field]: val }));
-  };
-
-  const handleBlur = (field: string) => {
-    // @ts-ignore
-    setData(prev => ({ ...prev, [field]: formatNumber(prev[field]) }));
-  };
+export default function Scope2() {
+  const { activityData, updateActivity, isSaving } = useESG();
 
   return (
-    <div className="min-h-screen bg-black text-white p-8 font-sans">
-      <nav className="max-w-2xl mx-auto mb-8">
-        <Link href="/dashboard" className="text-gray-500 hover:text-white text-sm">← Back to Dashboard</Link>
-      </nav>
+    <div className="max-w-3xl mx-auto py-12 px-6">
+       <div className="flex justify-between items-center mb-8">
+        <Link href="/dashboard/hub" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 font-medium transition-colors">
+            <ArrowLeft size={14}/> Back to Hub
+        </Link>
+        {isSaving && <span className="text-xs text-green-600 font-bold animate-pulse uppercase tracking-wider">Saving...</span>}
+      </div>
 
-      <main className="max-w-2xl mx-auto">
-        <div className="border-l-4 border-blue-500 pl-6 mb-8">
-          <h1 className="text-3xl font-bold text-blue-500">Scope 2</h1>
-          <p className="text-gray-400">Indirect emissions from purchased energy.</p>
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-2">
+            <span className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-sm">2</span>
+            <h1 className="text-3xl font-bold text-gray-900">Indirect Energy</h1>
         </div>
+        <p className="text-gray-500 ml-11 text-lg">
+            Electricity and heating purchased from utility providers.
+        </p>
+      </div>
 
-        <form onSubmit={handleSave} className="space-y-8 bg-gray-900/50 p-8 rounded-2xl border border-gray-800">
-          <div className="space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Purchased Energy</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <InputField label="Electricity (kWh)" value={data.elec} onChange={(e) => handleChange('elec', e.target.value)} onBlur={() => handleBlur('elec')} />
-               <InputField label="District Heating (kWh)" value={data.districtHeat} onChange={(e) => handleChange('districtHeat', e.target.value)} onBlur={() => handleBlur('districtHeat')} />
-            </div>
-          </div>
-          <button type="submit" className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-500 transition-colors">
-            Save Scope 2 Data
-          </button>
-        </form>
-      </main>
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <NumberInput label="Purchased Electricity" unit="kWh" value={activityData['electricity_fr'] || 0} onChange={(v) => updateActivity('electricity_fr', v)} />
+            <NumberInput label="District Heating" unit="kWh" value={activityData['district_heat'] || 0} onChange={(v) => updateActivity('district_heat', v)} />
+        </div>
+      </div>
+
+      <div className="mt-8 flex justify-end">
+        <Link href="/dashboard/hub">
+            <button className="bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition-transform hover:scale-[1.02] flex items-center gap-2 shadow-lg">
+                <Check size={18} /> Save & Return to Hub
+            </button>
+        </Link>
+      </div>
     </div>
   );
 }

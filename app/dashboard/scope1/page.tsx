@@ -1,102 +1,67 @@
 'use client';
-import React from 'react';
+import { useESG } from '@/context/ESGContext';
+import { NumberInput } from '@/components/ui/Input';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useESG } from '../../context/ESGContext';
+import { ArrowLeft, Check } from 'lucide-react';
 
-// --- COMPONENT DEFINED OUTSIDE TO PREVENT FOCUS LOSS ---
-const InputField = ({ label, value, onChange, onBlur }: { 
-  label: string, 
-  value: string, 
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
-  onBlur: () => void 
-}) => (
-  <div>
-    <label className="text-xs text-gray-500 block mb-1">{label}</label>
-    <input 
-      type="text" 
-      className="w-full bg-black border border-gray-700 rounded p-3 outline-none focus:border-orange-500" 
-      value={value} 
-      onChange={onChange}
-      onBlur={onBlur}
-      placeholder="0.00"
-    />
-  </div>
-);
-
-export default function Scope1Page() {
-  const router = useRouter();
-  const { data, setData } = useESG();
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push('/dashboard');
-  };
-
-  const formatNumber = (val: string) => {
-    if (!val) return '';
-    const clean = val.replace(/,/g, '');
-    const num = parseFloat(clean);
-    if (isNaN(num)) return val;
-    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  const handleChange = (field: string, val: string) => {
-    if (/^[\d,.]*$/.test(val)) {
-      setData(prev => ({ ...prev, [field]: val }));
-    }
-  };
-
-  const handleBlur = (field: string) => {
-    // @ts-ignore
-    setData(prev => ({ ...prev, [field]: formatNumber(prev[field]) }));
-  };
+export default function Scope1() {
+  const { activityData, updateActivity, isSaving } = useESG();
 
   return (
-    <div className="min-h-screen bg-black text-white p-8 font-sans">
-      <nav className="max-w-2xl mx-auto mb-8">
-        <Link href="/dashboard" className="text-gray-500 hover:text-white text-sm">← Back to Dashboard</Link>
-      </nav>
+    <div className="max-w-3xl mx-auto py-12 px-6">
+      {/* Nav */}
+      <div className="flex justify-between items-center mb-8">
+        <Link href="/dashboard/hub" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 font-medium transition-colors">
+            <ArrowLeft size={14}/> Back to Hub
+        </Link>
+        {isSaving && <span className="text-xs text-green-600 font-bold animate-pulse uppercase tracking-wider">Saving...</span>}
+      </div>
 
-      <main className="max-w-2xl mx-auto">
-        <div className="border-l-4 border-orange-500 pl-6 mb-8">
-          <h1 className="text-3xl font-bold text-orange-500">Scope 1</h1>
-          <p className="text-gray-400">Direct emissions from owned or controlled sources.</p>
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-2">
+            <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">1</span>
+            <h1 className="text-3xl font-bold text-gray-900">Direct Emissions</h1>
         </div>
+        <p className="text-gray-500 ml-11 text-lg">
+            Enter the fuel consumed directly by your company's facilities and owned vehicles.
+        </p>
+      </div>
 
-        <form onSubmit={handleSave} className="space-y-8 bg-gray-900/50 p-8 rounded-2xl border border-gray-800">
-          
-          <div className="space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Stationary Combustion</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <InputField label="Natural Gas (kWh)" value={data.gas} onChange={(e) => handleChange('gas', e.target.value)} onBlur={() => handleBlur('gas')} />
-               <InputField label="Heating Oil (Liters)" value={data.heatingOil} onChange={(e) => handleChange('heatingOil', e.target.value)} onBlur={() => handleBlur('heatingOil')} />
-               <InputField label="Propane (kg)" value={data.propane} onChange={(e) => handleChange('propane', e.target.value)} onBlur={() => handleBlur('propane')} />
-            </div>
-          </div>
+      {/* Inputs */}
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
+        <h3 className="font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4 text-lg">Stationary Combustion</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <NumberInput label="Natural Gas" unit="kWh" value={activityData['natural_gas'] || 0} onChange={(v) => updateActivity('natural_gas', v)} />
+            <NumberInput label="Heating Oil" unit="Liters" value={activityData['heating_oil'] || 0} onChange={(v) => updateActivity('heating_oil', v)} />
+            <NumberInput label="Propane" unit="kg" value={activityData['propane'] || 0} onChange={(v) => updateActivity('propane', v)} />
+        </div>
+      </div>
 
-          <div className="space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Mobile Combustion</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <InputField label="Fleet Diesel (Liters)" value={data.diesel} onChange={(e) => handleChange('diesel', e.target.value)} onBlur={() => handleBlur('diesel')} />
-               <InputField label="Fleet Petrol (Liters)" value={data.petrol} onChange={(e) => handleChange('petrol', e.target.value)} onBlur={() => handleBlur('petrol')} />
-            </div>
-          </div>
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-8">
+        <h3 className="font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4 text-lg">Mobile Combustion</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <NumberInput label="Diesel Fuel" unit="Liters" value={activityData['diesel'] || 0} onChange={(v) => updateActivity('diesel', v)} />
+            <NumberInput label="Petrol / Gasoline" unit="Liters" value={activityData['petrol'] || 0} onChange={(v) => updateActivity('petrol', v)} />
+        </div>
+      </div>
 
-          <div className="space-y-4">
-            <h3 className="text-sm font-bold text-white uppercase border-b border-gray-800 pb-2">Fugitive Emissions (Refrigerants)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <InputField label="R410A Refill (kg)" value={data.r410a} onChange={(e) => handleChange('r410a', e.target.value)} onBlur={() => handleBlur('r410a')} />
-               <InputField label="R32 Refill (kg)" value={data.r32} onChange={(e) => handleChange('r32', e.target.value)} onBlur={() => handleBlur('r32')} />
-               <InputField label="R134a Refill (kg)" value={data.r134a} onChange={(e) => handleChange('r134a', e.target.value)} onBlur={() => handleBlur('r134a')} />
-            </div>
-          </div>
+       <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+        <h3 className="font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4 text-lg">Refrigerants</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <NumberInput label="R410A" unit="kg" value={activityData['ref_R410A'] || 0} onChange={(v) => updateActivity('ref_R410A', v)} />
+            <NumberInput label="R32" unit="kg" value={activityData['ref_R32'] || 0} onChange={(v) => updateActivity('ref_R32', v)} />
+            <NumberInput label="R134a" unit="kg" value={activityData['ref_R134a'] || 0} onChange={(v) => updateActivity('ref_R134a', v)} />
+        </div>
+      </div>
 
-          <button type="submit" className="w-full bg-orange-500 text-black font-bold py-4 rounded-xl hover:bg-orange-400 transition-colors">
-            Save Scope 1 Data
-          </button>
-        </form>
-      </main>
+      {/* Action */}
+      <div className="mt-8 flex justify-end">
+        <Link href="/dashboard/hub">
+            <button className="bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition-transform hover:scale-[1.02] flex items-center gap-2 shadow-lg">
+                <Check size={18} /> Save & Return to Hub
+            </button>
+        </Link>
+      </div>
     </div>
   );
 }
