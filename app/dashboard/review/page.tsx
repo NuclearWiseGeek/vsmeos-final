@@ -14,7 +14,7 @@ export default function ReviewPage() {
     return parseFloat(val.replace(/,/g, '')) || 0;
   };
 
-  // --- Quick Math for Summary ---
+  // --- 1. Quick Math for Summary ---
   const FACTORS = {
     gas: 0.244, heatingOil: 3.2, propane: 3.1, diesel: 3.16, petrol: 2.8, r410a: 2088, r32: 675, r134a: 1430,
     elec: 0.052, districtHeat: 0.170, vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
@@ -25,7 +25,23 @@ export default function ReviewPage() {
              (getVal(data.r410a) * FACTORS.r410a) + (getVal(data.r32) * FACTORS.r32) + (getVal(data.r134a) * FACTORS.r134a);
   const s2 = (getVal(data.elec) * FACTORS.elec) + (getVal(data.districtHeat) * FACTORS.districtHeat);
   const s3 = (getVal(data.vehicleKm) * FACTORS.vehicleKm) + (getVal(data.flightKm) * FACTORS.flightKm) + (getVal(data.hotelNights) * FACTORS.hotelNights);
+  
   const total = s1 + s2 + s3;
+
+  // --- 2. Chart Logic (Percentages) ---
+  const p1 = total > 0 ? (s1 / total) * 100 : 0;
+  const p2 = total > 0 ? (s2 / total) * 100 : 0;
+  const p3 = total > 0 ? (s3 / total) * 100 : 0;
+
+  // CSS Conic Gradient for the Chart
+  // Scope 1: Red/Orange (#ef4444)
+  // Scope 2: Blue (#3b82f6)
+  // Scope 3: Green (#10b981)
+  const chartStyle = {
+    background: total > 0 
+      ? `conic-gradient(#ef4444 0% ${p1}%, #3b82f6 ${p1}% ${p1 + p2}%, #10b981 ${p1 + p2}% 100%)`
+      : '#374151', // Grey if empty
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -35,20 +51,15 @@ export default function ReviewPage() {
   };
 
   const handleFinalSubmit = () => {
-    // 1. Check Profile Data
     if (!data.companyName || !data.revenue) {
-      alert("Profile Incomplete! You must provide Company Name and Revenue to generate a valid report.");
+      alert("Profile Incomplete! Please fill in Company Name and Revenue.");
       router.push('/dashboard/profile');
       return;
     }
-
-    // 2. Check Signature
     if(!data.signerName) {
       alert("Please sign the report before generating.");
       return;
     }
-    
-    // 3. Go to Results
     router.push('/dashboard/results');
   };
 
@@ -61,52 +72,77 @@ export default function ReviewPage() {
 
       <main className="max-w-3xl mx-auto space-y-8">
         
-        {/* 1. Summary Card */}
+        {/* --- 1. VISUAL SUMMARY (Chart & Numbers) --- */}
         <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Carbon Summary</h3>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-xl font-bold text-white">
-                {s1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </div>
-              <div className="text-xs text-gray-500">Scope 1</div>
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            
+            {/* The Pie Chart */}
+            <div className="relative w-40 h-40 rounded-full flex items-center justify-center shadow-xl" style={chartStyle}>
+               {/* Inner Circle (Hole) */}
+               <div className="w-28 h-28 bg-gray-900 rounded-full flex flex-col items-center justify-center">
+                  <span className="text-xs text-gray-400">Total</span>
+                  <span className="text-sm font-bold text-white">{total > 1000 ? (total/1000).toFixed(1) + 't' : Math.round(total)}</span>
+               </div>
             </div>
-            <div>
-              <div className="text-xl font-bold text-white">
-                {s2.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </div>
-              <div className="text-xs text-gray-500">Scope 2</div>
+
+            {/* The Legend & Data */}
+            <div className="flex-1 grid grid-cols-1 gap-4 w-full">
+               {/* Scope 1 */}
+               <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border-l-4 border-red-500">
+                  <div>
+                    <div className="text-gray-400 text-xs font-bold uppercase">Scope 1 (Direct)</div>
+                    <div className="text-xs text-gray-500">Fuel, Gas, Refrigerants</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-white">{s1.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                    <div className="text-xs text-gray-500">{p1.toFixed(1)}%</div>
+                  </div>
+               </div>
+
+               {/* Scope 2 */}
+               <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border-l-4 border-blue-500">
+                  <div>
+                    <div className="text-gray-400 text-xs font-bold uppercase">Scope 2 (Energy)</div>
+                    <div className="text-xs text-gray-500">Electricity, Heating</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-white">{s2.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                    <div className="text-xs text-gray-500">{p2.toFixed(1)}%</div>
+                  </div>
+               </div>
+
+               {/* Scope 3 */}
+               <div className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border-l-4 border-green-500">
+                  <div>
+                    <div className="text-gray-400 text-xs font-bold uppercase">Scope 3 (Indirect)</div>
+                    <div className="text-xs text-gray-500">Business Travel</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-white">{s3.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                    <div className="text-xs text-gray-500">{p3.toFixed(1)}%</div>
+                  </div>
+               </div>
             </div>
-            <div>
-              <div className="text-xl font-bold text-white">
-                {s3.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </div>
-              <div className="text-xs text-gray-500">Scope 3</div>
-            </div>
-          </div>
-          <div className="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center">
-            <span className="text-gray-400">Total Footprint</span>
-            <span className="text-2xl font-bold text-white">
-              {total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span className="text-sm text-gray-500">kgCO2e</span>
-            </span>
+
           </div>
         </section>
 
-        {/* 2. File Upload */}
+        {/* --- 2. EVIDENCE UPLOAD --- */}
         <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
           <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Evidence Upload</h3>
-          <p className="text-sm text-gray-500 mb-4">Please upload invoices or logs that support the numbers above.</p>
+          <p className="text-sm text-gray-500 mb-4">Upload invoices to support your data (Optional).</p>
           
-          <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-gray-500 transition-colors cursor-pointer relative">
+          <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer relative">
             <input type="file" multiple onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+            <span className="text-2xl block mb-2">📎</span>
             <p className="text-gray-300 font-medium">Click to attach files</p>
-            <p className="text-xs text-gray-600 mt-2">PDF, JPG, PNG supported</p>
+            <p className="text-xs text-gray-600 mt-2">Supported: PDF, JPG, PNG</p>
           </div>
           
           {data.files.length > 0 && (
             <div className="mt-4 space-y-2">
               {data.files.map((f, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-green-400">
+                <div key={i} className="flex items-center gap-2 text-xs text-green-400 bg-green-900/20 p-2 rounded">
                   <span>✓</span> {f}
                 </div>
               ))}
@@ -114,21 +150,21 @@ export default function ReviewPage() {
           )}
         </section>
 
-        {/* 3. Signature */}
+        {/* --- 3. ATTESTATION --- */}
         <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Attestation</h3>
+          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Legal Attestation</h3>
           <div className="space-y-4">
              <div className="space-y-2">
-                <label className="text-xs text-gray-500 font-bold">Authorized Signer Name</label>
+                <label className="text-xs text-gray-500 font-bold">Authorized Signatory</label>
                 <input type="text" required value={data.signerName} onChange={(e) => setData({...data, signerName: e.target.value})} 
-                  className="w-full bg-black border border-gray-700 rounded p-3 text-white focus:border-white outline-none" placeholder="Enter Full Legal Name" />
-              </div>
-              <p className="text-xs text-gray-600 italic">By clicking "Create Report", I certify that the data provided is accurate to the best of my knowledge.</p>
+                  className="w-full bg-black border border-gray-700 rounded p-3 text-white focus:border-blue-500 outline-none" placeholder="e.g., John Doe, CEO" />
+             </div>
+             <p className="text-xs text-gray-600 italic">I certify that this data is accurate and aligns with the GHG Protocol corporate standards.</p>
           </div>
         </section>
 
-        <button onClick={handleFinalSubmit} className="w-full bg-white text-black font-extrabold py-4 rounded-xl hover:scale-[1.02] transition-transform">
-          Create Report ➔
+        <button onClick={handleFinalSubmit} className="w-full bg-white text-black font-extrabold py-4 rounded-xl hover:bg-gray-200 hover:scale-[1.01] transition-all shadow-lg">
+          Generate Official Report ➔
         </button>
 
       </main>
