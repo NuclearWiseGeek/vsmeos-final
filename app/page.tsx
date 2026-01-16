@@ -37,7 +37,7 @@ export default function LandingPage() {
         <div className="max-w-5xl">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-10">
             <Globe size={12} className="text-blue-500" />
-            Standardized Supply Chain Infrastructure
+            Standardizing Supply Chain Infrastructure
           </div>
 
           <h1 className="text-7xl md:text-[115px] font-bold tracking-[-0.06em] text-black leading-[0.82] mb-12">
