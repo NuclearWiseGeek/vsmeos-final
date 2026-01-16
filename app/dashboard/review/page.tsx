@@ -1,176 +1,130 @@
 'use client';
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useESG } from '../../context/ESGContext';
 
 export default function ReviewPage() {
-  const { data, setData } = useESG();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  const { data, setData } = useESG();
 
-  // Fix hydration issues by waiting for client load
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // --- Quick Math for Summary ---
+  const FACTORS = {
+    gas: 0.244, heatingOil: 3.2, propane: 3.1, diesel: 3.16, petrol: 2.8, r410a: 2088, r32: 675, r134a: 1430,
+    elec: 0.052, districtHeat: 0.170, vehicleKm: 0.218, flightKm: 0.14, hotelNights: 6.9
+  };
+  const s1 = (data.gas * FACTORS.gas) + (data.heatingOil * FACTORS.heatingOil) + (data.propane * FACTORS.propane) +
+             (data.diesel * FACTORS.diesel) + (data.petrol * FACTORS.petrol) +
+             (data.r410a * FACTORS.r410a) + (data.r32 * FACTORS.r32) + (data.r134a * FACTORS.r134a);
+  const s2 = (data.elec * FACTORS.elec) + (data.districtHeat * FACTORS.districtHeat);
+  const s3 = (data.vehicleKm * FACTORS.vehicleKm) + (data.flightKm * FACTORS.flightKm) + (data.hotelNights * FACTORS.hotelNights);
+  const total = s1 + s2 + s3;
 
-  if (!isClient) return null; // Prevent flash of empty content
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files).map(f => f.name);
+      setData({ ...data, files: [...data.files, ...newFiles] });
+    }
+  };
 
-  // 1. DYNAMIC CALCULATIONS (The "Brain" 🧠)
-  // We check if the user actually typed a number greater than 0
-  const s1_gas = Number(data.gas) || 0;
-  const s1_fuel = (Number(data.diesel) || 0) + (Number(data.petrol) || 0);
-  const s1_total = s1_gas + s1_fuel + (Number(data.heatingOil) || 0);
+  const handleFinalSubmit = () => {
+    // 1. Check Profile Data
+    if (!data.companyName || !data.revenue) {
+      alert("Profile Incomplete! You must provide Company Name and Revenue to generate a valid report.");
+      router.push('/dashboard/profile');
+      return;
+    }
 
-  const s2_elec = Number(data.elec) || 0;
-  const s2_heat = Number(data.districtHeat) || 0;
-  const s2_total = s2_elec + s2_heat;
-
-  const s3_travel = (Number(data.flightKm) || 0) + (Number(data.vehicleKm) || 0);
-  
-  // Status Checkers
-  const hasScope1 = s1_total > 0;
-  const hasScope2 = s2_total > 0;
-  const hasScope3 = s3_travel > 0; // Scope 3 is often optional, but we track it
-
-  const handleContinue = () => {
-    if (!data.signerName || data.signerName.trim() === "") {
-      alert("⚠️ Please sign the declaration (enter your name) to generate the certificate.");
+    // 2. Check Signature
+    if(!data.signerName) {
+      alert("Please sign the report before generating.");
       return;
     }
     
-    setLoading(true);
-    // Simulate a secure "Saving..." delay
-    setTimeout(() => {
-      router.push('/dashboard/results');
-    }, 1500);
+    // 3. Go to Results
+    router.push('/dashboard/results');
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-6">
-      
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold text-white mb-2">Review & Certify</h1>
-        <p className="text-gray-400">Step 4 of 5: Verify your data before generating the legal PDF.</p>
-      </div>
+    <div className="min-h-screen bg-black text-white p-8 font-sans">
+      <nav className="max-w-3xl mx-auto mb-8 border-b border-gray-800 pb-4">
+        <Link href="/dashboard" className="text-gray-500 hover:text-white text-sm">← Back to Dashboard</Link>
+        <h1 className="text-2xl font-bold mt-2">Final Review & Evidence</h1>
+      </nav>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <main className="max-w-3xl mx-auto space-y-8">
         
-        {/* --- LEFT COLUMN: LIVE DATA SUMMARY --- */}
-        <div className="space-y-6">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-xl">
-            <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-              <span>📊</span> Live Data Summary
-            </h3>
-            
-            <div className="space-y-4">
-              
-              {/* Scope 1 Status */}
-              <div className="flex items-center justify-between p-3 bg-black/40 rounded-lg border border-gray-800">
-                <div>
-                  <div className="text-gray-400 text-xs uppercase font-bold">Scope 1: Direct</div>
-                  <div className="text-white text-sm">Gas, Fuel, Heating</div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-bold border ${hasScope1 ? 'bg-green-900/30 border-green-500 text-green-400' : 'bg-red-900/20 border-red-900 text-red-500'}`}>
-                  {hasScope1 ? '✅ Data Present' : '❌ Empty'}
-                </div>
-              </div>
-
-              {/* Scope 2 Status */}
-              <div className="flex items-center justify-between p-3 bg-black/40 rounded-lg border border-gray-800">
-                <div>
-                  <div className="text-gray-400 text-xs uppercase font-bold">Scope 2: Energy</div>
-                  <div className="text-white text-sm">Electricity (Grid)</div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-bold border ${hasScope2 ? 'bg-green-900/30 border-green-500 text-green-400' : 'bg-red-900/20 border-red-900 text-red-500'}`}>
-                  {hasScope2 ? '✅ Data Present' : '❌ Empty'}
-                </div>
-              </div>
-
-              {/* Scope 3 Status */}
-              <div className="flex items-center justify-between p-3 bg-black/40 rounded-lg border border-gray-800">
-                <div>
-                  <div className="text-gray-400 text-xs uppercase font-bold">Scope 3: Indirect</div>
-                  <div className="text-white text-sm">Travel, Commute</div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-bold border ${hasScope3 ? 'bg-blue-900/30 border-blue-500 text-blue-400' : 'bg-gray-800 border-gray-700 text-gray-500'}`}>
-                  {hasScope3 ? '✅ Data Present' : '⚪ Optional'}
-                </div>
-              </div>
-
-            </div>
-            
-            <button 
-               onClick={() => router.push('/dashboard/scope1')}
-               className="mt-6 w-full py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm rounded-lg transition-all"
-            >
-              ✏️ Edit Activity Data
-            </button>
-          </div>
-
-          {/* UPLOAD BOX (Restored) */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <h3 className="text-white font-bold mb-2">📎 Evidence Upload</h3>
-            <p className="text-xs text-gray-500 mb-4">Attach invoices (PDF/JPG) for audit trail.</p>
-            <div className="border-2 border-dashed border-gray-700 hover:border-blue-500 hover:bg-gray-800/50 rounded-lg p-8 text-center cursor-pointer transition-all">
-               <span className="text-2xl block mb-2">📂</span>
-               <span className="text-sm text-gray-400">Click to Select Files</span>
-            </div>
-          </div>
-        </div>
-
-        {/* --- RIGHT COLUMN: CERTIFICATION --- */}
-        <div className="space-y-6">
-          <div className="bg-blue-900/10 border border-blue-500/30 rounded-xl p-8 h-full flex flex-col justify-between">
+        {/* 1. Summary Card */}
+        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Carbon Summary</h3>
+          <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <h3 className="text-blue-400 font-bold mb-6 text-xl">Legal Declaration</h3>
-              
-              <div className="prose prose-invert text-sm text-gray-300 space-y-4 mb-8">
-                <p>
-                  By signing below, I certify that the data provided in this assessment:
-                </p>
-                <ul className="list-disc pl-4 space-y-2">
-                  <li>Accurately reflects the operational activities of <strong>{data.companyName || '[Company Name]'}</strong>.</li>
-                  <li>Is based on valid internal documentation (invoices, meters).</li>
-                  <li>Follows the reporting period of <strong>2025</strong>.</li>
-                </ul>
+              <div className="text-xl font-bold text-white">
+                {s1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
               </div>
-
-              <div className="space-y-2 mb-8">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Authorized Signatory</label>
-                <input 
-                  type="text" 
-                  value={data.signerName}
-                  onChange={(e) => setData({ ...data, signerName: e.target.value })}
-                  placeholder="e.g. Jean Dupont"
-                  className="w-full bg-black border border-gray-600 rounded-lg px-4 py-4 text-white placeholder-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                />
-                {!data.signerName && (
-                  <p className="text-xs text-red-500 mt-1">* Required to generate PDF</p>
-                )}
-              </div>
+              <div className="text-xs text-gray-500">Scope 1</div>
             </div>
-
-            <button 
-              onClick={handleContinue}
-              disabled={loading}
-              className={`w-full py-4 font-bold text-lg rounded-xl shadow-lg transition-all flex items-center justify-center gap-2
-                ${loading 
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed' 
-                  : 'bg-green-600 hover:bg-green-500 text-white hover:shadow-green-500/25'
-                }`}
-            >
-              {loading ? (
-                <span>🔄 Processing...</span>
-              ) : (
-                <span>✅ Certify & Generate PDF</span>
-              )}
-            </button>
+            <div>
+              <div className="text-xl font-bold text-white">
+                {s2.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </div>
+              <div className="text-xs text-gray-500">Scope 2</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold text-white">
+                {s3.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              </div>
+              <div className="text-xs text-gray-500">Scope 3</div>
+            </div>
           </div>
-        </div>
+          <div className="mt-6 pt-4 border-t border-gray-800 flex justify-between items-center">
+            <span className="text-gray-400">Total Footprint</span>
+            <span className="text-2xl font-bold text-white">
+              {total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} <span className="text-sm text-gray-500">kgCO2e</span>
+            </span>
+          </div>
+        </section>
 
-      </div>
+        {/* 2. File Upload */}
+        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Evidence Upload</h3>
+          <p className="text-sm text-gray-500 mb-4">Please upload invoices or logs that support the numbers above.</p>
+          
+          <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-gray-500 transition-colors cursor-pointer relative">
+            <input type="file" multiple onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+            <p className="text-gray-300 font-medium">Click to attach files</p>
+            <p className="text-xs text-gray-600 mt-2">PDF, JPG, PNG supported</p>
+          </div>
+          
+          {data.files.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {data.files.map((f, i) => (
+                <div key={i} className="flex items-center gap-2 text-xs text-green-400">
+                  <span>✓</span> {f}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 3. Signature */}
+        <section className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <h3 className="text-gray-400 text-xs font-bold uppercase mb-4">Attestation</h3>
+          <div className="space-y-4">
+             <div className="space-y-2">
+                <label className="text-xs text-gray-500 font-bold">Authorized Signer Name</label>
+                <input type="text" required value={data.signerName} onChange={(e) => setData({...data, signerName: e.target.value})} 
+                  className="w-full bg-black border border-gray-700 rounded p-3 text-white focus:border-white outline-none" placeholder="Enter Full Legal Name" />
+              </div>
+              <p className="text-xs text-gray-600 italic">By clicking "Create Report", I certify that the data provided is accurate to the best of my knowledge.</p>
+          </div>
+        </section>
+
+        <button onClick={handleFinalSubmit} className="w-full bg-white text-black font-extrabold py-4 rounded-xl hover:scale-[1.02] transition-transform">
+          Create Report ➔
+        </button>
+
+      </main>
     </div>
   );
 }
