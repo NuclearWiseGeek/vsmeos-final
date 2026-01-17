@@ -22,21 +22,20 @@ export const NumberInput = ({ label, value, onChange, unit }: InputProps) => {
 
     return (
         <div className="flex flex-col gap-2 mb-4 group">
-            <label className="text-sm font-bold text-gray-700 group-focus-within:text-black transition-colors">
+            {/* UPDATED LABEL: Matches the Dashboard's "Institutional" uppercase style */}
+            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-focus-within:text-black transition-colors">
                 {label}
             </label>
             <div className="relative">
                 <input
-                    // SWITCH LOGIC: If clicking, use 'number' input. If looking, use 'text' input.
+                    // SWITCH LOGIC: Keeps your smart formatting engine
                     type={isFocused ? "number" : "text"}
                     min="0"
                     step="0.01"
                     
-                    // VALUE LOGIC: If clicking, show raw data (1234.5). If looking, show pretty data (1,234.50)
                     value={isFocused ? (value === 0 ? '' : value) : formatNumber(value || 0)}
                     
                     onChange={(e) => {
-                        // This ensures the calculation engine always gets a valid NUMBER
                         const val = parseFloat(e.target.value);
                         onChange(isNaN(val) ? 0 : val);
                     }}
@@ -44,10 +43,11 @@ export const NumberInput = ({ label, value, onChange, unit }: InputProps) => {
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     
-                    className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all text-gray-900 placeholder-gray-300 font-mono text-base shadow-sm"
+                    // UPDATED STYLING: Zinc borders, rounded-xl, and tabular numbers
+                    className="w-full p-4 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all text-zinc-900 placeholder-zinc-300 font-mono text-base shadow-sm"
                     placeholder="0.00"
                 />
-                <span className="absolute right-4 top-4 text-xs font-bold text-gray-400 bg-white pl-2">
+                <span className="absolute right-4 top-4 text-xs font-bold text-zinc-400 bg-white pl-2">
                     {unit}
                 </span>
             </div>
