@@ -3,9 +3,8 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
 /**
- * PREMIUM HIGH-DENSITY ARCHITECTURAL STYLING
- * Optimized for a strict 3-page A4 output to prevent data density fatigue.
- * Line heights and margins are tightened for a "pitch-perfect" elite look.
+ * PREMIUM "APPLE-CLASS" INSTITUTIONAL STYLING
+ * Matches the VSME OS Dashboard Palette: Pure Black, Zinc Greys, White, and Emerald.
  */
 const styles = StyleSheet.create({
   page: { 
@@ -14,7 +13,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50, 
     fontSize: 8.5, 
     fontFamily: 'Helvetica', 
-    color: '#1a1a1a', 
+    color: '#18181b', // Zinc-900 (Almost Black)
     lineHeight: 1.25, 
     position: 'relative',
     backgroundColor: '#FFFFFF'
@@ -22,24 +21,24 @@ const styles = StyleSheet.create({
   
   // --- HEADER ARCHITECTURE ---
   header: { 
-    marginBottom: 35, // INCREASED SPACE: Fixed the "suffocating" gap
-    borderBottomWidth: 0.8, 
+    marginBottom: 35, 
+    borderBottomWidth: 0.5, 
     borderBottomStyle: 'solid', 
-    borderBottomColor: '#F3F4F6', 
+    borderBottomColor: '#e4e4e7', // Zinc-200
     paddingBottom: 15 
   },
   title: { 
     fontSize: 16, 
     fontWeight: 'bold', 
-    color: '#000000', 
+    color: '#000000', // Pure Black
     textTransform: 'uppercase', 
     letterSpacing: -0.5,
     textAlign: 'left'
   },
   reportMeta: { 
     fontSize: 7.5, 
-    color: '#9CA3AF', 
-    marginTop: 12 // Slight increase for better vertical rhythm
+    color: '#71717a', // Zinc-500
+    marginTop: 12 
   },
 
   // --- CONTENT SECTIONING ---
@@ -50,49 +49,49 @@ const styles = StyleSheet.create({
   sectionHeader: { 
     fontSize: 9.5, 
     fontWeight: 'bold', 
-    color: '#111827', 
+    color: '#000000', // Pure Black
     textTransform: 'uppercase', 
     letterSpacing: 0.6, 
     marginBottom: 6, 
     borderLeftWidth: 2, 
     borderLeftStyle: 'solid', 
-    borderLeftColor: '#000080', 
+    borderLeftColor: '#000000', // Pure Black Border
     paddingLeft: 8 
   },
   bodyText: { 
     marginBottom: 5, 
-    color: '#374151',
+    color: '#3f3f46', // Zinc-700
     textAlign: 'justify' 
   },
   
-  // COMPLIANCE BLOCK: Centralized under Boundary Statement
+  // COMPLIANCE BLOCK: Zinc Background with Emerald Accent
   complianceBlock: {
     marginTop: 8,
     marginBottom: 12,
     padding: 10,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#f4f4f5', // Zinc-100
     borderLeftWidth: 1.5,
-    borderLeftColor: '#000080',
+    borderLeftColor: '#10b981', // Emerald-500 (Verified Green)
     fontSize: 7.8,
-    color: '#4B5563',
+    color: '#52525b', // Zinc-600
     lineHeight: 1.4
   },
   bold: { 
     fontWeight: 'bold', 
-    color: '#111827' 
+    color: '#000000' 
   },
 
-  // --- PROFILE CARD (APPLE-STYLE COMPACT) ---
+  // --- PROFILE CARD (MINIMALIST ZINC) ---
   profileContainer: { 
     flexDirection: 'row', 
     flexWrap: 'wrap', 
     marginBottom: 15, 
-    backgroundColor: '#FAFAFA', 
+    backgroundColor: '#fafafa', // Zinc-50
     padding: 12, 
     borderRadius: 8, 
-    borderWidth: 0.8, 
+    borderWidth: 0.5, 
     borderStyle: 'solid', 
-    borderColor: '#F3F4F6' 
+    borderColor: '#e4e4e7' // Zinc-200
   },
   profileItem: { 
     width: '50%', 
@@ -100,18 +99,18 @@ const styles = StyleSheet.create({
   },
   profileLabel: { 
     fontSize: 6.5, 
-    color: '#9CA3AF', 
+    color: '#a1a1aa', // Zinc-400
     textTransform: 'uppercase', 
-    marginBottom: 1, 
-    letterSpacing: 0.3 
+    marginBottom: 2, 
+    letterSpacing: 0.5 
   },
   profileValue: { 
     fontSize: 9, 
     fontWeight: 'bold', 
-    color: '#111827' 
+    color: '#18181b' // Zinc-900
   },
 
-  // --- COMPACT EMISSIONS DATA TABLES ---
+  // --- DATA TABLES (BLACK HEADERS) ---
   table: { 
     width: '100%', 
     marginTop: 2 
@@ -122,10 +121,10 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     borderBottomWidth: 0.5, 
     borderBottomStyle: 'solid', 
-    borderBottomColor: '#F3F4F6' 
+    borderBottomColor: '#f4f4f5' // Zinc-100
   },
   tableHeader: { 
-    backgroundColor: '#000080', 
+    backgroundColor: '#000000', // Pure Black Header
     color: '#FFFFFF', 
     borderRadius: 2,
     minHeight: 24
@@ -137,24 +136,24 @@ const styles = StyleSheet.create({
   
   // Table Modifiers
   summaryTotal: { 
-    backgroundColor: '#000080', 
+    backgroundColor: '#000000', // Pure Black Total
     color: '#FFFFFF', 
     fontWeight: 'bold', 
     minHeight: 26, 
     marginTop: 2 
   },
   intensityRow: { 
-    backgroundColor: '#F0F7FF', 
-    color: '#1E40AF',
+    backgroundColor: '#f4f4f5', // Zinc-100
+    color: '#18181b', // Zinc-900
     borderBottomWidth: 0
   },
 
   // --- LEGAL COMPONENTS (PAGE 3) ---
   legalContainer: { 
     padding: 12, 
-    borderWidth: 0.8, 
+    borderWidth: 0.5, 
     borderStyle: 'solid', 
-    borderColor: '#F3F4F6', 
+    borderColor: '#e4e4e7', // Zinc-200
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     marginBottom: 10
@@ -166,32 +165,32 @@ const styles = StyleSheet.create({
   bulletRow: { 
     marginBottom: 4, 
     fontSize: 8, 
-    color: '#374151', 
+    color: '#52525b', // Zinc-600
     flexDirection: 'row' 
   },
   bulletPoint: { 
     width: 12, 
-    color: '#9CA3AF',
+    color: '#a1a1aa', // Zinc-400
     fontWeight: 'bold'
   },
   signatureWrapper: { 
     marginTop: 35, 
     width: 220, 
-    borderTopWidth: 1.2, 
+    borderTopWidth: 1, 
     borderTopStyle: 'solid', 
     borderTopColor: '#000000', 
     paddingTop: 6 
   },
 
-  // --- CLEAN 2-LINE FOOTER PER REQUEST ---
+  // --- FOOTER ---
   footerFixedContainer: { 
     position: 'absolute', 
     bottom: 30, 
     left: 50, 
     right: 50, 
-    borderTopWidth: 0.8, 
+    borderTopWidth: 0.5, 
     borderTopStyle: 'solid', 
-    borderTopColor: '#F3F4F6', 
+    borderTopColor: '#e4e4e7', // Zinc-200
     paddingTop: 10 
   },
   footerRow: { 
@@ -210,7 +209,7 @@ const styles = StyleSheet.create({
   },
   footerText: { 
     fontSize: 6.5, 
-    color: '#9CA3AF', 
+    color: '#a1a1aa', // Zinc-400
     marginBottom: 1,
     letterSpacing: 0.1
   }
@@ -320,7 +319,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>1. Emissions Summary</Text>
           <View style={styles.table}>
-            <View style={[styles.tableRow, { backgroundColor: '#F9FAFB' }]}>
+            <View style={[styles.tableRow, { backgroundColor: '#f4f4f5' }]}>
               <Text style={[styles.tableCell, styles.bold]}>Metric Category</Text>
               <Text style={[styles.tableCell, { textAlign: 'right', fontWeight: 'bold' }]}>Value (kgCO2e)</Text>
             </View>
@@ -400,7 +399,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
           </Text>
           <View style={styles.signatureWrapper}>
             <Text style={styles.bold}>Authorized Signature</Text>
-            <Text style={{ fontSize: 7.5, color: '#9CA3AF', marginTop: 2 }}>Certification Date: {dateStr}</Text>
+            <Text style={{ fontSize: 7.5, color: '#a1a1aa', marginTop: 2 }}>Certification Date: {dateStr}</Text>
           </View>
         </View>
 
@@ -417,7 +416,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
                 <Text><Text style={styles.bold}>Boundary Exclusions:</Text> assessed but reported as zero activity:</Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
                   {activeExclusions.map((item, i) => (
-                    <Text key={i} style={{ width: '33%', fontSize: 7, color: '#6B7280', marginBottom: 2 }}>- {item}</Text>
+                    <Text key={i} style={{ width: '33%', fontSize: 7, color: '#71717a', marginBottom: 2 }}>- {item}</Text>
                   ))}
                 </View>
               </View>
