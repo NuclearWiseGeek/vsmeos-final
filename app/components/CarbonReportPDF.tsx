@@ -408,7 +408,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
           <Text style={styles.sectionHeader}>5. Disclaimer & Limitations</Text>
           <View style={styles.bulletList}>
             <View style={styles.bulletRow}><Text style={styles.bulletPoint}>1.</Text><Text><Text style={styles.bold}>Methodology:</Text> Calculations use supplier data and ADEME Base Carbone factors.</Text></View>
-            <View style={styles.bulletRow}><Text style={styles.bulletPoint}>2.</Text><Text><Text style={styles.bold}>Assurance:</Text> This report is self-declared and has not undergone third-party verification.</Text></View>
+            <View style={styles.bulletRow}><Text style={styles.bulletPoint}>2.</Text><Text><Text style={styles.bold}>Assurance:</Text> This report is self-declared and has not been independently verified.</Text></View>
             {/* Pt 3: DYNAMIC BOUNDARY EXCLUSIONS */}
             <View style={styles.bulletRow}>
               <Text style={styles.bulletPoint}>3.</Text>
@@ -422,7 +422,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               </View>
             </View>
             <View style={styles.bulletRow}><Text style={styles.bulletPoint}>4.</Text><Text><Text style={styles.bold}>Liability:</Text> Buyers must conduct independent due diligence for CSRD reporting compliance.</Text></View>
-            <View style={styles.bulletRow}><Text style={styles.bulletPoint}>5.</Text><Text><Text style={styles.bold}>Verification:</Text> For inquiries, contact <Text style={styles.bold}>contact@vsmeos.fr</Text>.</Text></View>
+            <View style={styles.bulletRow}><Text style={styles.bulletPoint}>5.</Text><Text><Text style={styles.bold}>Verification:</Text> For third-party verification inquiries of the uploaded document, contact <Text style={styles.bold}>contact@vsmeos.fr</Text>.</Text></View>
           </View>
         </View>
 
