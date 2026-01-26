@@ -92,25 +92,67 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* 3. TRUST & FRAMEWORK BAR */}
+      {/* 3. TRUST & FRAMEWORK BAR (Stable & Premium) */}
         <div className="mt-24 md:mt-32 pt-10 border-t border-gray-100 overflow-x-auto no-scrollbar">
-          <div className="flex flex-nowrap md:flex-wrap items-center gap-x-12 md:gap-x-16 gap-y-8 opacity-30 grayscale hover:opacity-50 transition-opacity min-w-max md:min-w-0">
-            <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest mb-1 text-gray-500">Standard</span>
-              <span className="text-lg md:text-xl font-bold tracking-tighter italic text-black">GHG Protocol</span>
+          <div className="flex flex-nowrap md:flex-wrap items-start gap-x-12 md:gap-x-20 gap-y-10 min-w-max md:min-w-0">
+            
+            {/* 1. GHG PROTOCOL */}
+            <div className="flex flex-col space-y-2 cursor-default">
+              {/* LABEL: Static Gray-400 (No flickering) */}
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400 select-none">
+                Standard
+              </span>
+              {/* VALUE: Bold & Black */}
+              <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">
+                GHG Protocol
+              </span>
+              {/* SUBTEXT: Upright & Clean */}
+              <span className="text-[10px] font-medium text-gray-500 border border-gray-200 px-2 py-0.5 rounded-md w-fit">
+                Corporate Standard
+              </span>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest mb-1 text-gray-500">Quantification Methodo</span>
-              <span className="text-lg md:text-xl font-bold tracking-tighter text-black">ISO 14064-1</span>
+
+            {/* 2. ISO 14064-1 */}
+            <div className="flex flex-col space-y-2 cursor-default">
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400 select-none">
+                Methodology Alignment
+              </span>
+              <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">
+                ISO 14064-1
+              </span>
+              <span className="text-[10px] font-medium text-gray-500 border border-gray-200 px-2 py-0.5 rounded-md w-fit">
+                2018 Edition Aligned
+              </span>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest mb-1 text-gray-500">Reporting Framework</span>
-              <span className="text-lg md:text-xl font-bold tracking-tighter text-black">CSRD ESRS E1</span>
+
+            {/* 3. CSRD ESRS E1 */}
+            <div className="flex flex-col space-y-2 cursor-default">
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400 select-none">
+                Quantitative Data Alignment
+              </span>
+              <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">
+                CSRD ESRS E1
+              </span>
+              <span className="text-[10px] font-medium text-gray-500 border border-gray-200 px-2 py-0.5 rounded-md w-fit flex items-center gap-1.5">
+                {/* The "Swiss Design" Green Dot */}
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Climate Data Points
+              </span>
             </div>
-            <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest mb-1 text-gray-500">Validated Database</span>
-              <span className="text-lg md:text-xl font-bold tracking-tighter text-blue-900">ADEME Base Carbone</span>
+
+            {/* 4. ADEME */}
+            <div className="flex flex-col space-y-2 cursor-default">
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400 select-none">
+                Validated Database
+              </span>
+              <span className="text-xl md:text-2xl font-bold tracking-tight text-gray-900">
+                ADEME Base Carbone
+              </span>
+              <span className="text-[10px] font-medium text-gray-500 border border-gray-200 px-2 py-0.5 rounded-md w-fit">
+                v2024 Release
+              </span>
             </div>
+
           </div>
         </div>
       </main>
