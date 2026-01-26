@@ -229,21 +229,32 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
   const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const footprintIntensity = (parseFloat(totals?.total) / (parseFloat(company?.revenue) || 1)) || 0;
 
-  // --- THE 13 FIELDS MASTER LOGIC MAP ---
+  // --- THE 17 FIELDS MASTER LOGIC MAP (REFINED) ---
   const ALL_FIELDS = [
-    { key: "natural_gas", label: "Natural Gas", evidence: "Natural Gas Invoices", exclusion: "Natural Gas" },
-    { key: "heating_oil", label: "Heating Oil", evidence: "Heating Oil Purchase Receipts", exclusion: "Heating Oil" },
-    { key: "propane", label: "Propane", evidence: "Propane Purchase Receipts", exclusion: "Propane" },
-    { key: "diesel", label: "Fleet Diesel", evidence: "Fuel Logs/Receipts (Diesel)", exclusion: "Fleet Diesel" },
-    { key: "petrol", label: "Fleet Petrol", evidence: "Fuel Logs/Receipts (Petrol)", exclusion: "Fleet Petrol" },
-    { key: "ref_R410A", label: "Refrigerants (R410A)", evidence: "HVAC Maintenance Logs", exclusion: "Fugitive Emissions (R410A)" },
-    { key: "ref_R32", label: "Refrigerants (R32)", evidence: "HVAC Maintenance Logs", exclusion: "Fugitive Emissions (R32)" },
-    { key: "ref_R134a", label: "Refrigerants (R134a)", evidence: "HVAC Maintenance Logs", exclusion: "Fugitive Emissions (R134a)" },
-    { key: "electricity_fr", label: "Electricity (FR)", evidence: "Electricity Utility Invoices", exclusion: "Electricity" },
-    { key: "district_heat", label: "District Heating", evidence: "District Heating Invoices", exclusion: "District Heating" },
-    { key: "grey_fleet_avg", label: "Employee Vehicles", evidence: "Mileage Claims / Travel Logs", exclusion: "Employee Vehicles (Grey Fleet)" },
-    { key: "flight_avg", label: "Business Flights", evidence: "Flight Agency Reports", exclusion: "Business Flights" },
-    { key: "hotel_night_avg", label: "Hotel Nights", evidence: "Hotel Expense Reports", exclusion: "Hotel Nights" }
+    // SCOPE 1
+    { key: "natural_gas", label: "Natural Gas", evidence: "Natural Gas Invoices", exclusion: "Natural Gas (Scope 1)" },
+    { key: "heating_oil", label: "Heating Oil", evidence: "Heating Oil Purchase Receipts", exclusion: "Heating Oil (Scope 1)" },
+    { key: "propane", label: "Propane", evidence: "Propane Purchase Receipts", exclusion: "Propane (Scope 1)" },
+    { key: "diesel", label: "Diesel Fuel", evidence: "Fuel Logs/Receipts (Diesel)", exclusion: "Diesel Fuel (Scope 1)" },
+    { key: "petrol", label: "Petrol / Gasoline", evidence: "Fuel Logs/Receipts (Petrol)", exclusion: "Petrol / Gasoline (Scope 1)" },
+    // SPLIT HVAC LOGS:
+    { key: "ref_R410A", label: "R410A", evidence: "HVAC Log (R410A)", exclusion: "R410A (Scope 1)" },
+    { key: "ref_R32", label: "R32", evidence: "HVAC Log (R32)", exclusion: "R32 (Scope 1)" },
+    { key: "ref_R134a", label: "R134a", evidence: "HVAC Log (R134a)", exclusion: "R134a (Scope 1)" },
+    { key: "ref_R404A", label: "R404A", evidence: "Refrigeration Log (R404A)", exclusion: "R404A (Scope 1)" },
+
+    // SCOPE 2
+    // RENAMED ELECTRICITY LABELS:
+    { key: "electricity_fr", label: "Electricity", evidence: "Electricity Utility Invoices", exclusion: "Electricity (Scope 2)" },
+    { key: "electricity_green", label: "Green Electricity/Renewable", evidence: "Green Energy Certificates (GoO/RECs)", exclusion: "Green Electricity (Scope 2)" },
+    { key: "district_heat", label: "District Heating", evidence: "District Heating Invoices", exclusion: "District Heating (Scope 2)" },
+    { key: "district_cool", label: "District Cooling", evidence: "District Cooling Bills", exclusion: "District Cooling (Scope 2)" },
+
+    // SCOPE 3
+    { key: "grey_fleet", label: "Employee Vehicles (Grey Fleet)", evidence: "Mileage Claims / Travel Logs", exclusion: "Employee Vehicles (Scope 3)" },
+    { key: "rail_travel", label: "Rail / Train Travel", evidence: "Train/Rail Ticket Summary", exclusion: "Rail Travel (Scope 3)" },
+    { key: "air_travel", label: "Business Flights", evidence: "Flight Agency Reports", exclusion: "Business Flights (Scope 3)" },
+    { key: "hotel_nights", label: "Hotel Stays", evidence: "Hotel Expense Reports", exclusion: "Hotel Stays (Scope 3)" }
   ];
 
   // Logic: Only show evidence labels if activity > 0
@@ -258,7 +269,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
     }
   });
 
-  // Logic: Show all 13 fields as exclusions if activity is 0
+  // Logic: Show all 17 fields as exclusions if activity is 0
   const activeExclusions: string[] = [];
   ALL_FIELDS.forEach(field => {
     const val = parseFloat(activityData?.[field.key]);
@@ -344,7 +355,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <Text style={styles.title}>Emissions Breakdown</Text>
-          <Text style={styles.reportMeta}>Full granularity across 13 monitored activity sources</Text>
+          <Text style={styles.reportMeta}>Full granularity across 17 monitored activity sources</Text>
         </View>
 
         <View style={styles.section}>
@@ -355,13 +366,19 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               <Text style={[styles.tableCell, { flex: 1.8 }]}>Activity Source</Text>
               <Text style={[styles.tableCell, { textAlign: 'right' }]}>Emissions (kg)</Text>
             </View>
-            {breakdown && breakdown.map((item: any, i: number) => (
-              <View key={i} style={styles.tableRow} wrap={false}>
-                <Text style={[styles.tableCell, { flex: 0.6 }]}>{st(item.scope)}</Text>
-                <Text style={[styles.tableCell, { flex: 1.8 }]}>{st(item.activity)}</Text>
-                <Text style={[styles.tableCell, { textAlign: 'right' }]}>{fmtNum(item.emissions)}</Text>
-              </View>
-            ))}
+            {/* FORCE ORDERED RENDER USING ALL_FIELDS MASTER LIST */}
+            {breakdown && breakdown.map((item: any, i: number) => {
+                const matchedField = ALL_FIELDS.find(f => f.key === item.id || f.label === item.activity);
+                // Use the perfect label from ALL_FIELDS, or fallback to the activity name
+                const displayLabel = matchedField ? matchedField.label : item.activity;
+                return (
+                  <View key={i} style={styles.tableRow} wrap={false}>
+                    <Text style={[styles.tableCell, { flex: 0.6 }]}>{st(item.scope)}</Text>
+                    <Text style={[styles.tableCell, { flex: 1.8 }]}>{st(displayLabel)}</Text>
+                    <Text style={[styles.tableCell, { textAlign: 'right' }]}>{fmtNum(item.emissions)}</Text>
+                  </View>
+                );
+            })}
           </View>
         </View>
 
@@ -403,20 +420,20 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
           </View>
         </View>
 
-        {/* 5. Disclaimer & Limitations --- Point 3 is dynamic across 13 fields */}
+        {/* 5. Disclaimer & Limitations */}
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>5. Disclaimer & Limitations</Text>
           <View style={styles.bulletList}>
             <View style={styles.bulletRow}><Text style={styles.bulletPoint}>1.</Text><Text><Text style={styles.bold}>Methodology:</Text> Calculations use supplier data and ADEME Base Carbone factors.</Text></View>
             <View style={styles.bulletRow}><Text style={styles.bulletPoint}>2.</Text><Text><Text style={styles.bold}>Assurance:</Text> This report is self-declared and has not been independently verified.</Text></View>
-            {/* Pt 3: DYNAMIC BOUNDARY EXCLUSIONS */}
+            {/* Pt 3: DYNAMIC BOUNDARY EXCLUSIONS WITH SCOPE TAGS */}
             <View style={styles.bulletRow}>
               <Text style={styles.bulletPoint}>3.</Text>
               <View>
                 <Text><Text style={styles.bold}>Boundary Exclusions:</Text> assessed but reported as zero activity:</Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 4 }}>
                   {activeExclusions.map((item, i) => (
-                    <Text key={i} style={{ width: '33%', fontSize: 7, color: '#71717a', marginBottom: 2 }}>- {item}</Text>
+                    <Text key={i} style={{ width: '50%', fontSize: 7, color: '#71717a', marginBottom: 2 }}>- {item}</Text>
                   ))}
                 </View>
               </View>

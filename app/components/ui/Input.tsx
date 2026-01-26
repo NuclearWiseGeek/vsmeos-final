@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { HelpCircle } from 'lucide-react';
 
 interface InputProps {
     label: string;
     value: number;
     onChange: (val: number) => void;
     unit: string;
+    helpText?: string; // <--- NEW: Optional instruction text
 }
 
-export const NumberInput = ({ label, value, onChange, unit }: InputProps) => {
+export const NumberInput = ({ label, value, onChange, unit, helpText }: InputProps) => {
     // State to track if the user is currently typing in this specific box
     const [isFocused, setIsFocused] = useState(false);
 
@@ -22,10 +24,29 @@ export const NumberInput = ({ label, value, onChange, unit }: InputProps) => {
 
     return (
         <div className="flex flex-col gap-2 mb-4 group">
-            {/* UPDATED LABEL: Matches the Dashboard's "Institutional" uppercase style */}
-            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-focus-within:text-black transition-colors">
-                {label}
-            </label>
+            {/* LABEL + TOOLTIP AREA */}
+            <div className="flex items-center gap-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-focus-within:text-black transition-colors">
+                    {label}
+                </label>
+
+                {/* NEW: Tooltip Logic (Only renders if helpText exists) */}
+                {helpText && (
+                    <div className="group/tooltip relative">
+                        <HelpCircle 
+                            size={12} 
+                            className="text-zinc-300 cursor-help hover:text-zinc-500 transition-colors" 
+                        />
+                        {/* The Popup Card */}
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-5 w-48 bg-zinc-900 text-white text-[10px] p-2 rounded-lg shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-20 leading-relaxed font-sans normal-case tracking-normal">
+                            {helpText}
+                            {/* Little arrow pointing down */}
+                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-900 rotate-45"></div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             <div className="relative">
                 <input
                     // SWITCH LOGIC: Keeps your smart formatting engine
@@ -43,7 +64,7 @@ export const NumberInput = ({ label, value, onChange, unit }: InputProps) => {
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     
-                    // UPDATED STYLING: Zinc borders, rounded-xl, and tabular numbers
+                    // STYLING: Preserved your exact Zinc/Mono styling
                     className="w-full p-4 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all text-zinc-900 placeholder-zinc-300 font-mono text-base shadow-sm"
                     placeholder="0.00"
                 />

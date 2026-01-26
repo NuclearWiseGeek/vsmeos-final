@@ -29,19 +29,32 @@ export interface Totals {
 
 // --- Data ---
 export const FACTORS: Record<string, EmissionFactor> = {
+  // SCOPE 1: Stationary
   natural_gas: { key: "natural_gas", value: 0.244, unit: "kgCO2e/kWh", source: "ADEME", id: "GAS-NAT" },
   heating_oil: { key: "heating_oil", value: 3.2, unit: "kgCO2e/L", source: "ADEME", id: "OIL-HEAT" },
   propane: { key: "propane", value: 3.1, unit: "kgCO2e/kg", source: "ADEME", id: "LPG-PROP" },
+  
+  // SCOPE 1: Mobile
   diesel: { key: "diesel", value: 3.16, unit: "kgCO2e/L", source: "ADEME", id: "FUEL-DSL" },
   petrol: { key: "petrol", value: 2.8, unit: "kgCO2e/L", source: "ADEME", id: "FUEL-PET" },
+  
+  // SCOPE 1: Fugitive (Refrigerants)
   ref_R410A: { key: "ref_R410A", value: 2088, unit: "kgCO2e/kg", source: "ADEME", id: "REF-R410A" },
   ref_R32: { key: "ref_R32", value: 675, unit: "kgCO2e/kg", source: "ADEME", id: "REF-R32" },
   ref_R134a: { key: "ref_R134a", value: 1430, unit: "kgCO2e/kg", source: "ADEME", id: "REF-R134a" },
+  ref_R404A: { key: "ref_R404A", value: 3922, unit: "kgCO2e/kg", source: "ADEME", id: "REF-R404A" },
+
+  // SCOPE 2: Purchased Energy
   electricity_fr: { key: "electricity_fr", value: 0.052, unit: "kgCO2e/kWh", source: "ADEME", id: "ELEC-FR" },
+  electricity_green: { key: "electricity_green", value: 0.00, unit: "kgCO2e/kWh", source: "Market-Based", id: "ELEC-GREEN" },
   district_heat: { key: "district_heat", value: 0.170, unit: "kgCO2e/kWh", source: "ADEME", id: "HEAT-NET" },
-  grey_fleet_avg: { key: "grey_fleet_avg", value: 0.218, unit: "kgCO2e/km", source: "ADEME", id: "TRAVEL-CAR-AVG" },
-  flight_avg: { key: "flight_avg", value: 0.14, unit: "kgCO2e/km", source: "ADEME", id: "FLIGHT-AVG" },
-  hotel_night_avg: { key: "hotel_night_avg", value: 6.9, unit: "kgCO2e/night", source: "ADEME", id: "HOTEL-FR-AVG" },
+  district_cool: { key: "district_cool", value: 0.040, unit: "kgCO2e/kWh", source: "ADEME", id: "COOL-NET" },
+
+  // SCOPE 3: Business Travel
+  grey_fleet: { key: "grey_fleet", value: 0.218, unit: "kgCO2e/km", source: "ADEME", id: "TRAVEL-CAR-AVG" },
+  rail_travel: { key: "rail_travel", value: 0.004, unit: "kgCO2e/km", source: "ADEME", id: "TRAVEL-RAIL" },
+  air_travel: { key: "air_travel", value: 0.230, unit: "kgCO2e/km", source: "ADEME", id: "FLIGHT-AVG" },
+  hotel_nights: { key: "hotel_nights", value: 20.0, unit: "kgCO2e/night", source: "ADEME", id: "HOTEL-AVG" },
 };
 
 // --- Labels Dictionary for UI ---
@@ -54,11 +67,15 @@ export const LABELS: Record<string, string> = {
   ref_R410A: "R410A Refill",
   ref_R32: "R32 Refill",
   ref_R134a: "R134a Refill",
-  electricity_fr: "Electricity",
+  ref_R404A: "R404A Refill",
+  electricity_fr: "Grid Electricity",
+  electricity_green: "Green Electricity",
   district_heat: "District Heating",
-  grey_fleet_avg: "Employee Vehicles",
-  flight_avg: "Business Flights",
-  hotel_night_avg: "Hotel Nights",
+  district_cool: "District Cooling",
+  grey_fleet: "Employee Vehicles",
+  rail_travel: "Rail Travel",
+  air_travel: "Business Flights",
+  hotel_nights: "Hotel Nights",
 };
 
 // --- Helper Functions ---
@@ -66,13 +83,13 @@ function getCategory(key: string): string {
     if (["natural_gas", "heating_oil", "propane"].includes(key)) return "Stationary Combustion";
     if (["diesel", "petrol"].includes(key)) return "Mobile Combustion";
     if (key.startsWith("ref_")) return "Fugitive Emissions";
-    if (["electricity_fr", "district_heat"].includes(key)) return "Purchased Energy";
+    if (["electricity_fr", "electricity_green", "district_heat", "district_cool"].includes(key)) return "Purchased Energy";
     return "Business Travel";
 }
 
 function getScope(key: string): "Scope 1" | "Scope 2" | "Scope 3" {
-  if (["natural_gas", "heating_oil", "propane", "diesel", "petrol", "ref_R410A", "ref_R32", "ref_R134a"].includes(key)) return "Scope 1";
-  if (["electricity_fr", "district_heat"].includes(key)) return "Scope 2";
+  if (["natural_gas", "heating_oil", "propane", "diesel", "petrol"].includes(key) || key.startsWith("ref_")) return "Scope 1";
+  if (["electricity_fr", "electricity_green", "district_heat", "district_cool"].includes(key)) return "Scope 2";
   return "Scope 3";
 }
 
@@ -82,10 +99,17 @@ export function calculateEmissions(inputs: Record<string, number>): ActivityResu
   
   // Strict Order: S1 -> S2 -> S3 to match PDF requirements
   const order = [
-    "natural_gas", "heating_oil", "propane", "diesel", "petrol", 
-    "ref_R410A", "ref_R32", "ref_R134a",
-    "electricity_fr", "district_heat", 
-    "grey_fleet_avg", "flight_avg", "hotel_night_avg"
+    // Scope 1
+    "natural_gas", "heating_oil", "propane", 
+    "diesel", "petrol", 
+    "ref_R410A", "ref_R32", "ref_R134a", "ref_R404A",
+    
+    // Scope 2
+    "electricity_fr", "electricity_green", 
+    "district_heat", "district_cool",
+    
+    // Scope 3
+    "grey_fleet", "rail_travel", "air_travel", "hotel_nights"
   ];
 
   order.forEach((key) => {

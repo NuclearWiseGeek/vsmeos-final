@@ -46,6 +46,7 @@ export default function ResultsPage() {
 
   // --- CONFIGURATION MAPS ---
   const EVIDENCE_MAP: Record<string, string> = {
+    // SCOPE 1
     natural_gas: "Natural Gas Invoices",
     heating_oil: "Heating Oil Receipts",
     propane: "Propane Purchase Logs",
@@ -54,14 +55,23 @@ export default function ResultsPage() {
     ref_R410A: "HVAC Log (R410A)",
     ref_R32: "HVAC Log (R32)",
     ref_R134a: "HVAC Log (R134a)",
-    electricity_fr: "Electricity Bills",
-    district_heat: "District Heating",
-    grey_fleet_avg: "Mileage Claims",
-    flight_avg: "Flight Records",
-    hotel_night_avg: "Hotel Expenses"
+    ref_R404A: "Refrigeration Log (R404A)",
+
+    // SCOPE 2
+    electricity_fr: "Grid Electricity Bills",
+    electricity_green: "Green Energy Certificates (GoO/RECs)",
+    district_heat: "District Heating Bills",
+    district_cool: "District Cooling Bills",
+
+    // SCOPE 3
+    grey_fleet: "Mileage Claims (Car)",
+    rail_travel: "Train/Rail Ticket Summary",
+    air_travel: "Flight Records",
+    hotel_nights: "Hotel Expenses"
   };
 
   const ACTIVITY_LABELS: Record<string, string> = {
+    // SCOPE 1
     natural_gas: "Natural Gas",
     heating_oil: "Heating Oil",
     propane: "Propane",
@@ -70,14 +80,35 @@ export default function ResultsPage() {
     ref_R410A: "Fugitive Emissions (R410A)",
     ref_R32: "Fugitive Emissions (R32)",
     ref_R134a: "Fugitive Emissions (R134a)",
-    electricity_fr: "Electricity (France Mix)",
+    ref_R404A: "Fugitive Emissions (R404A)",
+
+    // SCOPE 2
+    electricity_fr: "Grid Electricity",
+    electricity_green: "Green Electricity (Market-Based)",
     district_heat: "District Heating",
-    grey_fleet_avg: "Employee Commuting / Grey Fleet",
-    flight_avg: "Business Flights",
-    hotel_night_avg: "Hotel Stays"
+    district_cool: "District Cooling",
+
+    // SCOPE 3
+    grey_fleet: "Employee Vehicles (Grey Fleet)",
+    rail_travel: "Rail Travel",
+    air_travel: "Business Flights",
+    hotel_nights: "Hotel Stays"
   };
 
-  const requiredEvidence = Object.keys(activityData).filter(key => {
+  // --- ORDER ENFORCEMENT ---
+  // This array ensures the evidence list appears in the exact same order as the Hub/Inputs
+  const PRESCRIBED_ORDER = [
+    // Scope 1
+    "natural_gas", "heating_oil", "propane", "diesel", "petrol", 
+    "ref_R410A", "ref_R32", "ref_R134a", "ref_R404A",
+    // Scope 2
+    "electricity_fr", "electricity_green", "district_heat", "district_cool",
+    // Scope 3
+    "grey_fleet", "rail_travel", "air_travel", "hotel_nights"
+  ];
+
+  // Logic: Iterate through our ORDER array, not the random activityData keys
+  const requiredEvidence = PRESCRIBED_ORDER.filter(key => {
     // @ts-ignore
     return (activityData[key] && parseFloat(activityData[key]) > 0) && EVIDENCE_MAP[key];
   });
@@ -141,6 +172,7 @@ export default function ResultsPage() {
         if (!file) return;
 
         setIsUploading(true);
+        setIsSaving(false); // Reset save status on new upload
         try {
             // Path: UserID/Year/Field/Timestamp_Filename
             const filePath = `${userId}/${companyData.year || 'general'}/${key}/${Date.now()}_${file.name}`;
@@ -308,15 +340,15 @@ export default function ResultsPage() {
                </div>
                
                <div className="mt-4">
-                    {/* INTEGRATED DOWNLOAD TRIGGER WITH CLEAN DATA */}
-                    <DownloadTrigger 
-                      companyData={companyData} 
-                      totals={totals}
-                      breakdown={prettyBreakdown} // Passed the pretty labels here
-                      activityData={activityData}
-                      fileVault={simpleFileVault} // Passed the simple {key: [names]} object here
-                      debouncedSigner={debouncedSigner}
-                    />
+                   {/* INTEGRATED DOWNLOAD TRIGGER WITH CLEAN DATA */}
+                   <DownloadTrigger 
+                     companyData={companyData} 
+                     totals={totals}
+                     breakdown={prettyBreakdown} // Passed the pretty labels here
+                     activityData={activityData}
+                     fileVault={simpleFileVault} // Passed the simple {key: [names]} object here
+                     debouncedSigner={debouncedSigner}
+                   />
                </div>
            </div>
        </div>
