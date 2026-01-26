@@ -2,14 +2,13 @@
 
 import React, { useState } from 'react';
 import { Download, Loader2, AlertCircle } from 'lucide-react';
-// We use a standard import here because this file is already isolated by "use client"
 import { pdf } from '@react-pdf/renderer';
 import CarbonReportPDF from '@/components/CarbonReportPDF';
 
 interface DownloadTriggerProps {
   companyData: any;
   totals: any;
-  breakdown: any[]; // <--- ADDED THIS (Receives the list for Page 2)
+  breakdown: any[]; 
   activityData: any;
   fileVault: any;
   debouncedSigner: string;
@@ -28,24 +27,24 @@ export default function DownloadTrigger({
   const handleDownload = async () => {
     setIsGenerating(true);
     try {
-      // 1. Prepare Data
+      // 1. Scrub Data (Deep Clone to remove React Proxies)
       const cleanCompany = JSON.parse(JSON.stringify({ ...companyData, signer: debouncedSigner || "" }));
       const cleanTotals = JSON.parse(JSON.stringify(totals));
       const cleanActivity = JSON.parse(JSON.stringify(activityData));
       const cleanFiles = JSON.parse(JSON.stringify(fileVault));
-      // We use the breakdown passed from the parent, ensuring it's clean
       const cleanBreakdown = JSON.parse(JSON.stringify(breakdown));
 
-      // 2. Create the Document Element manually
-      const doc = (
-        <CarbonReportPDF 
-          company={cleanCompany}
-          totals={cleanTotals}
-          breakdown={cleanBreakdown} // <--- PASSING THE DATA HERE
-          activityData={cleanActivity}
-          files={cleanFiles}
-        />
-      );
+      // 2. THE CRITICAL FIX: Call the component as a FUNCTION
+      // ❌ OLD (Crashes in React 19): const doc = <CarbonReportPDF ... />
+      // ✅ NEW (Works): CarbonReportPDF({ ... })
+      // This bypasses the React Reconciler and gives the PDF engine the raw object it needs.
+      const doc = CarbonReportPDF({
+          company: cleanCompany,
+          totals: cleanTotals,
+          breakdown: cleanBreakdown,
+          activityData: cleanActivity,
+          files: cleanFiles
+      });
 
       // 3. Generate Blob
       const blob = await pdf(doc).toBlob();
@@ -57,12 +56,14 @@ export default function DownloadTrigger({
       link.download = `VSME_Report_${cleanCompany.year || '2024'}.pdf`;
       document.body.appendChild(link);
       link.click();
+      
+      // Cleanup
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
     } catch (err) {
       console.error("PDF Generation Error:", err);
-      alert("Error generating PDF. Please ensure your 'CarbonReportPDF.tsx' file uses <Document>, <Page>, <View> tags, NOT <div> or <html> tags.");
+      alert("PDF Generation Failed. Please check console.");
     } finally {
       setIsGenerating(false);
     }

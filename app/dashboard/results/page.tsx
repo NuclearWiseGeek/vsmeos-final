@@ -4,18 +4,26 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { uploadEvidence } from '../../../actions/uploadEvidence';
 
 // 1. Icons
-import { CheckCircle2, RotateCcw, ArrowLeft, ShieldCheck, FileText, Plus, X, File, AlertCircle } from 'lucide-react';
+import { 
+  CheckCircle2, RotateCcw, ArrowLeft, ShieldCheck, FileText, 
+  Plus, X, File, AlertCircle, Loader2, Save, CloudUpload 
+} from 'lucide-react';
 
 // 2. Logic & Data
 import { useESG } from '@/context/ESGContext';
 import { calculateEmissions, summarizeEmissions } from '@/utils/calculations';
 
-// 3. Import the Firewall Component
+// 3. Integration (Clerk + Supabase)
+import { useAuth } from '@clerk/nextjs';
+import { createSupabaseClient } from '@/utils/supabase';
+
+// 4. Import Your Fixed Download Trigger
 const DownloadTrigger = dynamic(() => import('@/components/DownloadTrigger'), {
   ssr: false,
-  loading: () => <div className="w-full py-4 bg-gray-50 text-center text-gray-400 rounded-xl">Loading PDF Engine...</div>
+  loading: () => <div className="w-full py-4 text-center text-gray-400">Loading Engine...</div>
 });
 
 export default function ResultsPage() {
@@ -24,13 +32,19 @@ export default function ResultsPage() {
   
   // Local state
   const [debouncedSigner, setDebouncedSigner] = useState(companyData.signer || "");
-  const [fileVault, setFileVault] = useState<Record<string, string[]>>({});
   
+  // UPGRADE: Store Name AND Url (for the database)
+  const [fileVault, setFileVault] = useState<Record<string, Array<{name: string, url: string}>>>({});
+  
+  // Status States
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const { getToken, userId } = useAuth();
   const router = useRouter();
 
-  // --- A. CONFIGURATION MAPS ---
-  
-  // Map 1: Evidence Requirements (What files do we need?)
+  // --- CONFIGURATION MAPS ---
   const EVIDENCE_MAP: Record<string, string> = {
     natural_gas: "Natural Gas Invoices",
     heating_oil: "Heating Oil Receipts",
@@ -47,8 +61,6 @@ export default function ResultsPage() {
     hotel_night_avg: "Hotel Expenses"
   };
 
-  // Map 2: Professional Labels (For the PDF Report)
-  // This translates "natural_gas" -> "Natural Gas (Stationary Combustion)"
   const ACTIVITY_LABELS: Record<string, string> = {
     natural_gas: "Natural Gas",
     heating_oil: "Heating Oil",
@@ -70,15 +82,88 @@ export default function ResultsPage() {
     return (activityData[key] && parseFloat(activityData[key]) > 0) && EVIDENCE_MAP[key];
   });
 
-  // --- FILE HANDLING ---
+  // --- B. DATABASE & STORAGE ACTIONS ---
+
+  // 1. SANITY CHECK: Save Data to Supabase
+  const saveToDatabase = async () => {
+    if (!userId) return;
+    setIsSaving(true);
+    setSaveStatus("idle");
+
+    try {
+        const token = await getToken({ template: 'supabase' });
+        if (!token) throw new Error("No auth token found");
+        
+        const supabase = createSupabaseClient(token);
+
+        // Step 1: Save Profile
+        // FIX: We cast companyData as 'any' to ignore the missing type definition for 'industry'
+        await supabase.from('profiles').upsert({
+            id: userId,
+            company_name: companyData.name || "Unknown",
+            industry: (companyData as any).industry || "General", 
+            country: companyData.country || "France",
+            updated_at: new Date().toISOString()
+        });
+
+        // Step 2: Save Assessment & Links
+        const results = calculateEmissions(activityData);
+        await supabase.from('assessments').upsert({
+            user_id: userId,
+            year: parseInt(companyData.year) || 2024,
+            activity_data: activityData,
+            emissions_totals: summarizeEmissions(results),
+            evidence_links: fileVault, 
+            status: 'draft',
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id, year' });
+
+        setSaveStatus("success");
+        console.log("✅ Data synced to Supabase successfully.");
+
+    } catch (err) {
+        console.error("Save Error:", err);
+        setSaveStatus("error");
+        alert("Failed to save to database. Check console for details.");
+    } finally {
+        setIsSaving(false);
+    }
+  };
+
+// 2. SMART UPLOAD: Uses Server Action to bypass UUID issues
   const handleAddFile = (key: string) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = ".pdf,.png,.jpg,.jpeg,.csv,.xlsx"; 
-    input.onchange = (e) => {
+    
+    input.onchange = async (e) => {
         const file = (e.target as HTMLInputElement).files?.[0];
-        if (file) {
-            setFileVault(prev => ({ ...prev, [key]: [...(prev[key] || []), file.name] }));
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            // Path: UserID/Year/Field/Timestamp_Filename
+            const filePath = `${userId}/${companyData.year || 'general'}/${key}/${Date.now()}_${file.name}`;
+            
+            // Prepare FormData for the Server Action
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('path', filePath);
+
+            // CALL SERVER ACTION
+            const publicUrl = await uploadEvidence(formData);
+
+            // Update State with Name AND URL
+            setFileVault(prev => ({
+                ...prev,
+                [key]: [...(prev[key] || []), { name: file.name, url: publicUrl }]
+            }));
+
+        } catch (error: any) {
+            console.error("Upload failed", error);
+            alert(`Upload failed: ${error.message}`);
+        } finally {
+            setIsUploading(false);
         }
     };
     input.click();
@@ -88,17 +173,16 @@ export default function ResultsPage() {
       setFileVault(prev => ({ ...prev, [key]: prev[key].filter((_, i) => i !== indexToRemove) }));
   };
 
+  // --- C. STANDARD LOGIC ---
   useEffect(() => { setIsClient(true) }, []);
-
+  
   useEffect(() => {
     const handler = setTimeout(() => { setDebouncedSigner(companyData.signer); }, 500);
     return () => clearTimeout(handler);
   }, [companyData.signer]);
 
-  // --- CALCULATIONS ---
   const results = calculateEmissions(activityData);
   const totals = summarizeEmissions(results);
-
   const fmt = (n: number) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
   const handleReset = () => {
@@ -107,6 +191,25 @@ export default function ResultsPage() {
           router.push('/dashboard/hub'); 
       }
   };
+
+  // --- D. DATA PREPARATION FOR DOWNLOAD TRIGGER ---
+  
+  // 1. Convert complex fileVault (name+url) to simple (name only) for the PDF
+  const simpleFileVault = Object.keys(fileVault).reduce((acc, key) => {
+      acc[key] = fileVault[key].map(f => f.name);
+      return acc;
+  }, {} as Record<string, string[]>);
+
+  // 2. Prepare pretty breakdown with labels
+  const prettyBreakdown = Object.entries(results).map(([key, val]: [string, any]) => {
+      const id = val?.id || val?.key || val?.activity || key;
+      const label = ACTIVITY_LABELS[id] || val?.label || id || "Activity";
+      return {
+        scope: val?.scope || "Scope 1", 
+        activity: label, 
+        emissions: val?.emissions || 0
+      };
+  });
 
   if (!isClient) return <div className="p-12 text-center text-gray-400">Loading engine...</div>;
 
@@ -118,9 +221,26 @@ export default function ResultsPage() {
            <Link href="/dashboard/hub" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 transition-colors group">
                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform"/> Back to Assessment Hub
            </Link>
-           <button onClick={handleReset} className="text-sm text-gray-400 hover:text-red-600 flex items-center gap-1 transition-colors">
-               <RotateCcw size={14} /> Start New Assessment
-           </button>
+
+           <div className="flex items-center gap-3">
+               {/* NEW: SAVE BUTTON */}
+               <button 
+                   onClick={saveToDatabase}
+                   disabled={isSaving}
+                   className={`text-sm px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-all ${
+                       saveStatus === 'success' ? 'bg-green-100 text-green-700 border border-green-200' : 
+                       saveStatus === 'error' ? 'bg-red-50 text-red-600 border border-red-200' :
+                       'bg-white border border-gray-200 hover:border-black text-gray-700'
+                   }`}
+               >
+                   {isSaving ? <Loader2 size={14} className="animate-spin"/> : <Save size={14}/>}
+                   {isSaving ? "Saving..." : saveStatus === 'success' ? "Saved" : "Save Progress"}
+               </button>
+
+               <button onClick={handleReset} className="text-sm text-gray-400 hover:text-red-600 flex items-center gap-1 transition-colors">
+                   <RotateCcw size={14} /> Start New
+               </button>
+           </div>
        </div>
       
        {/* SUCCESS BANNER */}
@@ -129,13 +249,14 @@ export default function ResultsPage() {
             <div>
                 <h2 className="text-xl sm:text-[22px] font-semibold text-gray-900 tracking-tight mb-2">Assessment Ready</h2>
                 <p className="text-gray-500 leading-relaxed text-sm sm:text-[15px] max-w-2xl">
-                    Your data has been successfully processed. The calculation engine has generated your totals below. Please review the figures and sign the declaration to generate your report GHG Protocol & ISO 14064-1 quantification methodologies. 
+                    Your data has been successfully processed. The calculation engine has generated your totals below. Please review the figures and sign the declaration to generate your report GHG Protocol & ISO 14064-1 quantification methodologies.
+                    {saveStatus === 'success' && <span className="text-green-600 font-bold ml-1"> Data successfully synced to the database.</span>}
                 </p>
             </div>
         </div>
 
        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-12">
-           {/* LEFT CARD: METRICS */}
+           {/* METRICS CARD */}
            <div className="bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/40 flex flex-col justify-center">
                <h3 className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Total Corporate Carbon Footprint</h3>
                <div className="flex items-baseline gap-2 sm:gap-3 mb-8 sm:mb-10">
@@ -167,7 +288,7 @@ export default function ResultsPage() {
                </div>
            </div>
 
-           {/* RIGHT CARD: DOWNLOAD */}
+           {/* DOWNLOAD CARD */}
            <div className="bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/40 flex flex-col justify-between">
                <div>
                    <h3 className="text-base font-bold text-gray-900 mb-6 sm:mb-8 flex items-center gap-2"><ShieldCheck size={20} className="text-black"/> Attestation & Download</h3>
@@ -187,26 +308,13 @@ export default function ResultsPage() {
                </div>
                
                <div className="mt-4">
-                    {/* HERE IS THE UPDATED LOGIC FOR PDF LABELS */}
+                    {/* INTEGRATED DOWNLOAD TRIGGER WITH CLEAN DATA */}
                     <DownloadTrigger 
                       companyData={companyData} 
                       totals={totals}
-                      // We map the results and try to find the best label
-                      breakdown={Object.entries(results).map(([key, val]: [string, any]) => {
-                          // 1. Try to find the ID inside the value (if it's an object)
-                          const id = val?.id || val?.key || val?.activity || key;
-                          
-                          // 2. Look up the pretty name, or fallback to the ID, or fallback to "Activity"
-                          const label = ACTIVITY_LABELS[id] || val?.label || id || "Activity";
-
-                          return {
-                            scope: val?.scope || "Scope 1", 
-                            activity: label, 
-                            emissions: val?.emissions || 0
-                          };
-                      })}
+                      breakdown={prettyBreakdown} // Passed the pretty labels here
                       activityData={activityData}
-                      fileVault={fileVault}
+                      fileVault={simpleFileVault} // Passed the simple {key: [names]} object here
                       debouncedSigner={debouncedSigner}
                     />
                </div>
@@ -216,7 +324,10 @@ export default function ResultsPage() {
        {/* EVIDENCE VAULT */}
        <div className="mb-12">
            <div className="flex items-center justify-between mb-6 px-2">
-               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2"><FileText className="text-gray-900" size={20}/> Verification Evidence</h3>
+               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                   <FileText className="text-gray-900" size={20}/> Verification Evidence
+                   {isUploading && <span className="text-xs text-blue-500 animate-pulse ml-2">Uploading...</span>}
+               </h3>
                <span className="text-xs font-medium text-gray-400">{Object.values(fileVault).flat().length} Files Attached</span>
            </div>
            <div className="bg-white border border-gray-100 rounded-[28px] overflow-hidden shadow-sm">
@@ -240,14 +351,19 @@ export default function ResultsPage() {
                                                    <div className="flex flex-wrap gap-2">
                                                        {files.map((file, idx) => (
                                                            <div key={idx} className="inline-flex items-center gap-2 bg-gray-50 border border-gray-100 px-4 py-2 rounded-xl text-[11px] font-bold text-gray-600">
-                                                               <File size={12}/><span className="max-w-[200px] truncate">{file}</span><button onClick={() => removeFile(key, idx)} className="text-gray-400 hover:text-red-500"><X size={12}/></button>
+                                                               <File size={12}/>
+                                                               <span className="max-w-[200px] truncate">{file.name}</span>
+                                                               <button onClick={() => removeFile(key, idx)} className="text-gray-400 hover:text-red-500"><X size={12}/></button>
                                                            </div>
                                                        ))}
                                                    </div>
                                                )}
                                            </div>
                                        </div>
-                                       <button onClick={() => handleAddFile(key)} className="px-6 py-3 bg-white border border-gray-100 text-gray-900 text-[11px] font-bold uppercase tracking-widest rounded-xl hover:border-black transition-all flex items-center gap-2"><Plus size={14}/> Add File</button>
+                                       <button onClick={() => handleAddFile(key)} className="px-6 py-3 bg-white border border-gray-100 text-gray-900 text-[11px] font-bold uppercase tracking-widest rounded-xl hover:border-black transition-all flex items-center gap-2">
+                                           {isUploading ? <Loader2 size={14} className="animate-spin"/> : <CloudUpload size={14}/>} 
+                                           {isUploading ? "Uploading..." : "Add File"}
+                                       </button>
                                    </div>
                                </div>
                            );
