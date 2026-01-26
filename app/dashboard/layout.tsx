@@ -4,12 +4,13 @@ import { ESGProvider } from '@/context/ESGContext';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import CompanyOnboarding from '@/components/CompanyOnboarding'; 
-import AutoSave from '@/components/AutoSave'; // <--- 1. IMPORT THIS
+import AutoSave from '@/components/AutoSave'; 
+import { Settings } from 'lucide-react'; // <--- 1. NEW IMPORT
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ESGProvider>
-      {/* 2. MOUNT THE ENGINE HERE */}
+      {/* MOUNT THE ENGINE */}
       <CompanyOnboarding /> 
       <AutoSave /> 
       
@@ -23,9 +24,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
             
             <div className="flex items-center gap-4">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-widest hidden md:block">Enterprise Edition</span>
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-widest hidden md:block">
+                    Enterprise Edition
+                </span>
                 
-                <div className="flex items-center">
+                {/* 2. NEW SETTINGS BUTTON */}
+                <Link 
+                    href="/dashboard/settings" 
+                    className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
+                    title="Workspace Settings"
+                >
+                    <Settings size={20} />
+                </Link>
+                
+                {/* User Profile with Divider */}
+                <div className="flex items-center pl-2 border-l border-gray-200 ml-2">
                     <UserButton afterSignOutUrl="/"/>
                 </div>
             </div>
