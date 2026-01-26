@@ -100,7 +100,7 @@ export default function LandingPage() {
               <span className="text-lg md:text-xl font-bold tracking-tighter italic text-black">GHG Protocol</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest mb-1 text-gray-500">Certification</span>
+              <span className="text-[8px] md:text-[9px] font-bold uppercase tracking-widest mb-1 text-gray-500">Quantification Methodo</span>
               <span className="text-lg md:text-xl font-bold tracking-tighter text-black">ISO 14064-1</span>
             </div>
             <div className="flex flex-col">

@@ -294,7 +294,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
         {/* 1.1 Company Profile */}
         <View style={styles.profileContainer}>
           <View style={styles.profileItem}><Text style={styles.profileLabel}>Legal Entity</Text><Text style={styles.profileValue}>{st(company?.name)}</Text></View>
-          <View style={styles.profileItem}><Text style={styles.profileLabel}>Reporting Period</Text><Text style={styles.profileValue}>{st(company?.year)}</Text></View>
+          <View style={styles.profileItem}><Text style={styles.profileLabel}>Financial Year</Text><Text style={styles.profileValue}>{st(company?.year)}</Text></View>
           <View style={styles.profileItem}><Text style={styles.profileLabel}>Site Geography</Text><Text style={styles.profileValue}>{st(company?.country)}</Text></View>
           <View style={styles.profileItem}><Text style={styles.profileLabel}>Financial Revenue</Text><Text style={styles.profileValue}>{fmtNum(company?.revenue)} {st(company?.currency)}</Text></View>
         </View>
