@@ -24,7 +24,7 @@ export default function AssessmentHub() {
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Assessment Hub</h1>
             <p className="text-gray-500 mt-2 text-sm sm:text-base">Select a scope to input data. You can complete them in any order.</p>
         </div>
-        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 font-medium transition-colors">
+        <Link href="/supplier" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 font-medium transition-colors">
             <ArrowLeft size={14}/> Edit Company Profile
         </Link>
       </div>
@@ -33,7 +33,7 @@ export default function AssessmentHub() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
         
         {/* Scope 1 Card */}
-        <Link href="/dashboard/scope1" className="group">
+        <Link href="/supplier/scope1" className="group">
             {/* 3. Card Padding: p-6 mobile -> p-8 desktop */}
             <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all h-full flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
@@ -57,7 +57,7 @@ export default function AssessmentHub() {
         </Link>
 
         {/* Scope 2 Card */}
-        <Link href="/dashboard/scope2" className="group">
+        <Link href="/supplier/scope2" className="group">
             <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-orange-200 transition-all h-full flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-orange-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 
@@ -79,7 +79,7 @@ export default function AssessmentHub() {
         </Link>
 
         {/* Scope 3 Card */}
-        <Link href="/dashboard/scope3" className="group">
+        <Link href="/supplier/scope3" className="group">
             <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-200 transition-all h-full flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-purple-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                 
@@ -109,7 +109,7 @@ export default function AssessmentHub() {
             <span className="text-lg sm:text-xl font-bold text-gray-900">{fmt(totals.total)} kgCO2e</span>
          </div>
          
-         <Link href="/dashboard/results" className="w-full sm:w-auto">
+         <Link href="/supplier/results" className="w-full sm:w-auto">
             {/* 4. Full Width Button on Mobile */}
             <button className="w-full sm:w-auto bg-black text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold hover:bg-gray-800 transition-all shadow-xl hover:shadow-2xl active:scale-95 flex items-center justify-center gap-3">
                 <CheckCircle2 size={20} />

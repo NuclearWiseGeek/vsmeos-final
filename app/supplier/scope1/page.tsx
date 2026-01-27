@@ -12,7 +12,7 @@ export default function Scope1() {
       
       {/* Nav */}
       <div className="flex justify-between items-center mb-6 sm:mb-8">
-        <Link href="/dashboard/hub" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 font-medium transition-colors">
+        <Link href="/supplier/hub" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 font-medium transition-colors">
             <ArrowLeft size={14}/> Back to Hub
         </Link>
         {isSaving && <span className="text-xs text-green-600 font-bold animate-pulse uppercase tracking-wider">Saving...</span>}
@@ -117,7 +117,7 @@ export default function Scope1() {
 
       {/* Action Button */}
       <div className="mt-8 flex justify-center sm:justify-end">
-        <Link href="/dashboard/hub" className="w-full sm:w-auto">
+        <Link href="/supplier/hub" className="w-full sm:w-auto">
             <button className="w-full sm:w-auto bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition-transform active:scale-[1.02] flex items-center justify-center gap-2 shadow-lg">
                 <Check size={18} /> Save & Return to Hub
             </button>

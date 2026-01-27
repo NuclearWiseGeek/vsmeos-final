@@ -220,7 +220,7 @@ export default function ResultsPage() {
   const handleReset = () => {
       if (window.confirm("Are you sure you want to start a new assessment? This will clear all your current data.")) {
           resetAssessment(); 
-          router.push('/dashboard/hub'); 
+          router.push('/supplier/hub'); 
       }
   };
 
@@ -250,7 +250,7 @@ export default function ResultsPage() {
        
        {/* HEADER */}
        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-           <Link href="/dashboard/hub" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 transition-colors group">
+           <Link href="/supplier/hub" className="text-sm text-gray-500 hover:text-black flex items-center gap-1 transition-colors group">
                <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform"/> Back to Assessment Hub
            </Link>
 

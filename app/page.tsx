@@ -31,7 +31,7 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="px-4 py-2 md:px-6 md:py-3 bg-black text-white text-xs md:text-sm font-bold rounded-full hover:shadow-2xl transition-all active:scale-95">
+            <Link href="/supplier" className="px-4 py-2 md:px-6 md:py-3 bg-black text-white text-xs md:text-sm font-bold rounded-full hover:shadow-2xl transition-all active:scale-95">
               Launch Hub
             </Link>
             {/* Mobile Menu Toggle */}
@@ -77,7 +77,7 @@ export default function LandingPage() {
 
           {/* Responsive CTA Group */}
           <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
-            <Link href="/dashboard" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-black text-white rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-zinc-800 transition-all active:scale-[0.98] shadow-xl shadow-black/10">
+            <Link href="/supplier" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-black text-white rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-zinc-800 transition-all active:scale-[0.98] shadow-xl shadow-black/10">
               Start Assessment
               <ArrowRight className="group-hover:translate-x-1 transition-transform" />
             </Link>

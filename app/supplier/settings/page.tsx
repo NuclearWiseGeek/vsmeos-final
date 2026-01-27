@@ -17,7 +17,7 @@ export default function SettingsPage() {
     setIsSaved(true);
     setTimeout(() => {
         setIsSaved(false);
-        router.push('/dashboard'); // Go back to dashboard after save
+        router.push('/supplier'); // Go back to supplier after save
     }, 800);
   };
 
@@ -27,7 +27,7 @@ export default function SettingsPage() {
       {/* HEADER */}
       <div className="flex items-center gap-4 mb-8">
         <Link 
-            href="/dashboard" 
+            href="/suppliyer" 
             className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
         >
             <ArrowLeft size={20} />
@@ -68,7 +68,7 @@ export default function SettingsPage() {
             {/* ACTION BUTTONS */}
             <div className="pt-4 flex justify-end gap-3">
                 <Link 
-                    href="/dashboard"
+                    href="/supplier"
                     className="px-6 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                 >
                     Cancel

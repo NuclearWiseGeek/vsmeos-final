@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         
         {/* Top Navigation Bar */}
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 sm:px-6 py-4 flex justify-between items-center transition-all">
-            <Link href="/dashboard/hub" className="font-bold text-xl tracking-tight flex items-center gap-2 group">
+            <Link href="/supplier/hub" className="font-bold text-xl tracking-tight flex items-center gap-2 group">
                 <span className="bg-black text-white px-2 py-1 rounded text-sm group-hover:bg-gray-800 transition-colors">VSME</span>
                 <span className="group-hover:text-gray-600 transition-colors">OS</span>
             </Link>
@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 
                 {/* 2. NEW SETTINGS BUTTON */}
                 <Link 
-                    href="/dashboard/settings" 
+                    href="/supplier/settings" 
                     className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
                     title="Workspace Settings"
                 >

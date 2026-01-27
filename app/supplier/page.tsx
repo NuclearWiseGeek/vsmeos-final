@@ -192,7 +192,7 @@ export default function DashboardHome() {
         {/* FOOTER ACTIONS */}
         <div className="p-8 bg-gray-50/50 border-t border-gray-200 flex justify-end">
           <Link 
-            href="/dashboard/hub" 
+            href="/supplier/hub" 
             className={`flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm transition-all shadow-lg active:scale-95 ${
               companyData.name.length > 1 
                 ? 'bg-black text-white hover:bg-gray-800 shadow-gray-200' 
