@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react'; // Only keeping the arrow for the button
+import { ArrowRight, Bell, Loader2 } from 'lucide-react'; 
 import { useESG } from '@/context/ESGContext'; 
+import { getPendingInvite, updateCompanyProfile } from '@/actions/supplier'; 
+import { useRouter } from 'next/navigation';
 
 // --- MACRO INDUSTRY LIST (GICS Sectors + Key Verticals) ---
 const INDUSTRIES = [
@@ -32,10 +34,26 @@ const INDUSTRIES = [
 ];
 
 export default function DashboardHome() {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
   const { companyData, setCompanyData } = useESG();
+  const [invite, setInvite] = useState<any>(null); 
   
   // Local state for formatted revenue display (e.g. "1,000,000")
   const [displayRevenue, setDisplayRevenue] = useState("");
+
+  // 🟢 FIX: Check for invite AND pre-fill the Locked Name
+  useEffect(() => {
+    getPendingInvite().then((data) => {
+       if (data) {
+         setInvite(data);
+         // Automatically fill the locked name so the button works
+         if (data.supplier_name) {
+            setCompanyData((prev: any) => ({ ...prev, name: data.supplier_name }));
+         }
+       }
+    });
+  }, [setCompanyData]);
 
   useEffect(() => {
     if (companyData.revenue) {
@@ -64,6 +82,21 @@ export default function DashboardHome() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
       
+      {/* 🟢 NEW: WELCOME BANNER */}
+      {invite && (
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-8 flex items-start gap-4 animate-in fade-in slide-in-from-top-4">
+           <div className="bg-blue-600 text-white p-2 rounded-lg mt-1">
+              <Bell size={20} />
+           </div>
+           <div>
+              <h3 className="font-bold text-blue-900 text-lg">Request from {invite.buyer_name || 'Your Partner'}</h3>
+              <p className="text-blue-700 mt-1 text-sm leading-relaxed">
+                 You have been invited to submit your ESG data. Please complete your Company Profile below to unlock the report builder.
+              </p>
+           </div>
+        </div>
+      )}
+
       {/* HEADER */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-1">
@@ -189,19 +222,39 @@ export default function DashboardHome() {
 
         </div>
 
-        {/* FOOTER ACTIONS */}
+        {/* FOOTER ACTIONS - UPDATED TO SAVE & REDIRECT */}
         <div className="p-8 bg-gray-50/50 border-t border-gray-200 flex justify-end">
-          <Link 
-            href="/supplier/hub" 
+          <button 
+            onClick={async () => {
+              if (companyData.name.length <= 1) return;
+              
+              setSaving(true);
+              
+              // 1. Save to Database
+              await updateCompanyProfile({
+                country: companyData.country,
+                industry: companyData.industry,
+                year: companyData.year,
+                currency: companyData.currency,
+                revenue: companyData.revenue
+              });
+
+              // 2. Redirect to Hub
+              router.push('/supplier/hub');
+            }}
+            disabled={saving || companyData.name.length <= 1}
             className={`flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm transition-all shadow-lg active:scale-95 ${
               companyData.name.length > 1 
                 ? 'bg-black text-white hover:bg-gray-800 shadow-gray-200' 
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
-            onClick={(e) => { if (companyData.name.length <= 1) e.preventDefault(); }}
           >
-            Save & Continue <ArrowRight size={16} />
-          </Link>
+            {saving ? (
+              <><Loader2 className="animate-spin" size={16}/> Saving...</>
+            ) : (
+              <>Save & Continue <ArrowRight size={16} /></>
+            )}
+          </button>
         </div>
       </div>
     </div>
