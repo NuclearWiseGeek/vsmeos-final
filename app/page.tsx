@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Globe, FileText, Zap, BarChart3, Menu, X } from 'lucide-react';
 import SampleReportModal from '@/components/SampleReportModal';
+// 🟢 IMPORT CLERK COMPONENTS
+import { SignInButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 export default function LandingPage() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -30,10 +32,30 @@ export default function LandingPage() {
             <a href="#alignment" className="hover:text-black transition-colors">Alignment</a>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Link href="/supplier" className="px-4 py-2 md:px-6 md:py-3 bg-black text-white text-xs md:text-sm font-bold rounded-full hover:shadow-2xl transition-all active:scale-95">
-              Launch Hub
-            </Link>
+          <div className="flex items-center gap-6">
+            
+            {/* 🟢 SMART BUYER LOGIN: 
+                - If Signed Out: Clicking opens Login -> Forces redirect to /buyer/dashboard 
+                - If Signed In: Clicking goes straight to /buyer/dashboard 
+            */}
+            <div className="hidden md:block">
+              <SignedOut>
+                <SignInButton mode="modal" forceRedirectUrl="/buyer/dashboard">
+                  <button className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">
+                    Buyer Login
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <Link 
+                  href="/buyer/dashboard" 
+                  className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 hover:text-black transition-colors"
+                >
+                  Buyer Dashboard
+                </Link>
+              </SignedIn>
+            </div>
+
             {/* Mobile Menu Toggle */}
             <button 
               className="md:hidden p-2 text-gray-400 hover:text-black"
@@ -50,6 +72,20 @@ export default function LandingPage() {
             <a href="#methodology" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-gray-400">Methodology</a>
             <a href="#framework" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-gray-400">Framework</a>
             <a href="#alignment" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-gray-400">Alignment</a>
+            
+            {/* Mobile Buyer Link (Smart) */}
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/buyer/dashboard">
+                 <button className="text-left text-xs font-bold uppercase tracking-widest text-blue-600 mt-4">
+                    Buyer Portal Login
+                 </button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+               <Link href="/buyer/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-blue-600 mt-4">
+                  Go to Dashboard
+               </Link>
+            </SignedIn>
           </div>
         )}
       </nav>
@@ -77,10 +113,23 @@ export default function LandingPage() {
 
           {/* Responsive CTA Group */}
           <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
-            <Link href="/supplier" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-black text-white rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-zinc-800 transition-all active:scale-[0.98] shadow-xl shadow-black/10">
-              Start Assessment
-              <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+            
+            {/* 🟢 SMART SUPPLIER CTA: Forces redirect to /supplier/hub */}
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/supplier/hub">
+                <button className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-black text-white rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-zinc-800 transition-all active:scale-[0.98] shadow-xl shadow-black/10">
+                  Start Assessment
+                  <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </SignInButton>
+            </SignedOut>
+
+            <SignedIn>
+              <Link href="/supplier/hub" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-black text-white rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-zinc-800 transition-all active:scale-[0.98] shadow-xl shadow-black/10">
+                  Resume Assessment
+                  <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </SignedIn>
             
             <button 
               onClick={() => setModalOpen(true)}
