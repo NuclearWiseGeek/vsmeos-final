@@ -4,7 +4,7 @@ import { createSupabaseClient } from '@/utils/supabase';
 import { auth, currentUser } from '@clerk/nextjs/server'; 
 import { Resend } from 'resend';
 
-// Initialize Resend
+// Initialize Resend with your API Key
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ---------------------------------------------------------
@@ -39,7 +39,7 @@ export async function uploadSupplierCSV(formData: FormData) {
         buyer_name: buyerName, 
         supplier_name: name?.trim() || 'Unknown Supplier',
         supplier_email: email?.trim().toLowerCase(),
-        status: 'draft', // <--- 🟢 CHANGED TO DRAFT
+        status: 'draft',
       };
     })
     .filter((s) => s !== null);
@@ -105,7 +105,7 @@ export async function addManualSupplier(name: string, email: string) {
     buyer_name: buyerName, 
     supplier_name: name || 'Unknown',
     supplier_email: email.toLowerCase(),
-    status: 'draft', // <--- 🟢 CHANGED TO DRAFT
+    status: 'draft',
   });
 
   if (error) {
@@ -173,7 +173,7 @@ export async function updateSupplier(id: string, name: string, email: string) {
 // ---------------------------------------------------------
 export async function sendInviteEmail(id: string, email: string, supplierName: string) {
   // 1. Auth Check
-  const { userId, getToken } = await auth(); // <--- 🟢 Extract getToken here
+  const { userId, getToken } = await auth();
   const user = await currentUser(); 
 
   if (!userId || !user) return { error: 'Unauthorized' };
@@ -183,8 +183,13 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
     ? `${user.firstName} ${user.lastName || ''}`.trim() 
     : 'VSME Enterprise';
 
+  // 🟢 3. DYNAMIC URL LOGIC (The Fix)
+  // This checks if we are in production (Vercel) or local development
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const inviteLink = `${baseUrl}/sign-up?email=${encodeURIComponent(email)}`;
+  
+  // We send them to /supplier/hub. Middleware will force them to sign up if needed.
+  // Using encodeURIComponent protects against emails with special characters.
+  const inviteLink = `${baseUrl}/supplier/hub?email=${encodeURIComponent(email)}`;
 
   try {
     const { data, error } = await resend.emails.send({
@@ -221,7 +226,7 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
       return { error: 'Failed to send email' };
     }
 
-    // 🟢 3. UPDATE STATUS TO 'SENT' AFTER SUCCESSFUL EMAIL
+    // 🟢 4. UPDATE STATUS TO 'SENT'
     const token = await getToken({ template: 'supabase' });
     if (token) {
         const supabase = createSupabaseClient(token);
