@@ -106,7 +106,7 @@ export default function LandingPage() {
           </h1>
 
           {/* Precision-first Subtext */}
-          <p className="text-lg sm:text-2xl md:text-3xl text-gray-400 max-w-3xl leading-[1.4] md:leading-[1.3] font-light mb-10 md:mb-12">
+          <p className="text-lg sm:text-2xl md:text-3xl text-gray-400 max-w-3xl leading-[1.4] md:leading-[1.3] font-light mb-10 md:mb-12 text-justify text-pretty">
             <span className="text-black font-normal">Precision-first carbon intelligence</span> for the modern supplier. 
             Methodologically aligned with GHG Protocol and ISO 14064-1 to <span className="text-black font-normal">streamline reporting frameworks</span> for global procurement requests.
           </p>
@@ -143,7 +143,8 @@ export default function LandingPage() {
 
       {/* 3. TRUST & FRAMEWORK BAR (Stable & Premium) */}
         <div className="mt-24 md:mt-32 pt-10 border-t border-gray-100 overflow-x-auto no-scrollbar">
-          <div className="flex flex-nowrap md:flex-wrap items-start gap-x-12 md:gap-x-20 gap-y-10 min-w-max md:min-w-0">
+          {/* 🟢 CHANGED: Replaced flex with strict grid to fix the layout alignment */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 md:gap-x-12 gap-y-10 min-w-[600px] md:min-w-0 w-full">
             
             {/* 1. GHG PROTOCOL */}
             <div className="flex flex-col space-y-2 cursor-default">
@@ -216,7 +217,8 @@ export default function LandingPage() {
               <Zap size={20} className="text-gray-300 group-hover:text-blue-500 transition-colors" />
             </div>
             <h3 className="text-base md:text-lg font-bold tracking-tight">Technical Methodology</h3>
-            <p className="text-sm text-gray-500 leading-relaxed font-light">
+            {/* 🟢 ADDED: text-justify and text-pretty to perfectly align text edges */}
+            <p className="text-sm text-gray-500 leading-relaxed font-light text-justify text-pretty">
               Calculations are powered by the <span className="text-black font-medium">ADEME Base Carbone v23.0</span> database. 
               We utilize verified emission factors to transform raw operational inputs into precise CO2e outputs.
             </p>
@@ -228,7 +230,7 @@ export default function LandingPage() {
               <BarChart3 size={20} className="text-gray-300 group-hover:text-black transition-colors" />
             </div>
             <h3 className="text-base md:text-lg font-bold tracking-tight">Reporting Framework</h3>
-            <p className="text-sm text-gray-500 leading-relaxed font-light">
+            <p className="text-sm text-gray-500 leading-relaxed font-light text-justify text-pretty">
               Our declaration architecture follows the <span className="text-black font-medium">CSRD ESRS E1</span> structure. 
               A comprehensive 3-page output covering Scope 1, 2, and 3 for seamless integration into corporate sustainability reports.
             </p>
@@ -240,7 +242,7 @@ export default function LandingPage() {
               <ShieldCheck size={20} className="text-gray-300 group-hover:text-emerald-500 transition-colors" />
             </div>
             <h3 className="text-base md:text-lg font-bold tracking-tight">Global Alignment</h3>
-            <p className="text-sm text-gray-500 leading-relaxed font-light">
+            <p className="text-sm text-gray-500 leading-relaxed font-light text-justify text-pretty">
               Every quantification is structured to align with <span className="text-black font-medium">GHG Protocol</span> and <span className="text-black font-medium">ISO 14064-1</span>. 
               We bridge the gap between supplier activity and international transparency mandates.
             </p>
