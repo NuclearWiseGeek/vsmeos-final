@@ -175,7 +175,7 @@ export default function LandingPage() {
             {/* Badge */}
             <div className="hero-item inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black text-white text-[10px] font-bold uppercase tracking-[0.2em] mb-10">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 animate-pulse" />
-              50,000 companies. Millions of suppliers. One data problem.
+              Your buyer is CSRD-regulated. They need your carbon data.
             </div>
 
             {/* Headline */}
@@ -498,7 +498,7 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-zinc-400 mb-7">Unlimited reports, one user.</p>
               <ul className="space-y-3 mb-8 flex-1">
-                {['Unlimited PDF reports', 'All years, all scopes', 'Evidence vault', 'Priority email support', 'Auto-updated emission factors'].map(i => (
+                {['Unlimited PDF reports', 'All years, all scopes', 'Evidence vault', 'Priority email support', 'Factors updated with DEFRA, ADEME & IEA releases'].map(i => (
                   <li key={i} className="flex items-center gap-2.5 text-sm text-zinc-300">
                     <CheckCircle2 size={13} className="text-emerald-400 flex-shrink-0" /> {i}
                   </li>
@@ -506,7 +506,7 @@ export default function LandingPage() {
               </ul>
               <SignedOut>
                 <SignInButton mode="modal" forceRedirectUrl="/supplier">
-                  <button className="w-full py-3 bg-white text-black rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors">Start Free Trial</button>
+                  <button className="w-full py-3 bg-white text-black rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors">Get Started</button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
@@ -522,7 +522,7 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-gray-500 mb-7">Up to 5 users.</p>
               <ul className="space-y-3 mb-8 flex-1">
-                {['Everything in Annual', 'Up to 5 team members', 'Shared evidence vault', 'Consolidated reporting', 'Dedicated onboarding call'].map(i => (
+                {['Everything in Annual', 'Up to 5 team members', 'Shared account access', 'Dedicated onboarding call', 'Priority email support'].map(i => (
                   <li key={i} className="flex items-center gap-2.5 text-sm text-gray-600">
                     <CheckCircle2 size={13} className="text-emerald-500 flex-shrink-0" /> {i}
                   </li>
@@ -616,7 +616,7 @@ export default function LandingPage() {
             <span className="text-sm font-bold tracking-tighter text-gray-400 uppercase">VSME OS</span>
           </div>
           <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-300 text-center">
-            © {new Date().getFullYear()} VSME OS SAS. All rights reserved.
+            © {new Date().getFullYear()} VSME OS. All rights reserved.
           </p>
           <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-gray-400">
             <a href="/privacy" className="hover:text-black transition-colors">Privacy</a>

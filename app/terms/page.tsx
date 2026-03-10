@@ -53,7 +53,7 @@ export default function TermsPage() {
             <p>
               These Terms of Service ("Terms") constitute a legally binding agreement between
               you ("User", "you") and <strong>{COMPANY_NAME}</strong> ("VSME OS", "we", "us"),
-              a company registered in France, governing your access to and use of the VSME OS
+              governing your access to and use of the VSME OS
               platform at vsmeos.fr ("the Service").
             </p>
             <p>
