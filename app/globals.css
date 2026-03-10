@@ -1,29 +1,148 @@
+@import "tailwindcss";
+
 html {
   scroll-behavior: smooth;
 }
-@import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   VSME OS — Global Animation System
+   All transition effects live here so Next.js picks them up
+   reliably across SSR and client hydration.
+   ============================================================ */
+
+/* Hero staggered entrance */
+.hero-item {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-visible .hero-item { opacity: 1; transform: translateY(0); }
+.hero-item:nth-child(1) { transition-delay: 0ms;   }
+.hero-item:nth-child(2) { transition-delay: 100ms; }
+.hero-item:nth-child(3) { transition-delay: 200ms; }
+.hero-item:nth-child(4) { transition-delay: 300ms; }
+.hero-item:nth-child(5) { transition-delay: 400ms; }
+.hero-item:nth-child(6) { transition-delay: 500ms; }
+
+/* Scroll reveal — sections fade up as they enter viewport */
+.reveal-section {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dot grid background */
+.dot-grid {
+  background-image: radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Pricing card hover lift */
+.price-card {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.price-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.13);
+}
+
+/* Pillar arrow nudge on hover */
+.pillar-arrow {
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+.pillar-link:hover .pillar-arrow {
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   PAGE TRANSITIONS
+   ============================================================ */
+.page-enter {
+  animation: pageEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.page-exit {
+  opacity: 0;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   COUNT-UP NUMBER — results page headline
+   ============================================================ */
+.count-up-number {
+  font-variant-numeric: tabular-nums;
+  transition: none;
+}
+
+/* ============================================================
+   TOAST SLIDE-IN
+   ============================================================ */
+.toast-enter {
+  animation: toastIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================
+   PDF PROGRESS BAR
+   ============================================================ */
+@keyframes pdfProgress {
+  0%   { width: 0%; }
+  20%  { width: 35%; }
+  55%  { width: 65%; }
+  80%  { width: 85%; }
+  95%  { width: 92%; }
+  100% { width: 100%; }
+}
+
+.pdf-progress-bar {
+  animation: pdfProgress 4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ============================================================
+   EMPTY STATE FADE-IN
+   ============================================================ */
+.empty-state-enter {
+  animation: emptyIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes emptyIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   ROW HOVER SLIDE
+   ============================================================ */
+.table-row-hover {
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.table-row-hover:hover {
+  background-color: #f9fafb;
 }

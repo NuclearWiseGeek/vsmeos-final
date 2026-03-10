@@ -116,9 +116,14 @@ export default function InviteTable({ suppliers: initialSuppliers }: { suppliers
 
   if (!suppliers || suppliers.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center mt-6">
-        <h3 className="text-lg font-medium text-slate-900">No Suppliers Yet</h3>
-        <p className="text-slate-500 mt-2">Upload a CSV or add manually to start.</p>
+      <div className="bg-white border border-gray-200 rounded-2xl p-14 text-center mt-6 empty-state-enter">
+        <div className="w-14 h-14 bg-gray-50 border border-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+          <Send size={22} className="text-gray-300" />
+        </div>
+        <h3 className="text-base font-bold text-gray-900 mb-2">No suppliers yet</h3>
+        <p className="text-sm text-gray-400 max-w-xs mx-auto leading-relaxed">
+          Add suppliers manually or upload a CSV file above to start collecting their carbon reports.
+        </p>
       </div>
     );
   }
