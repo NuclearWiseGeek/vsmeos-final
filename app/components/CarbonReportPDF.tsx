@@ -27,13 +27,13 @@
 // =============================================================================
 
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Svg, Path, Rect } from '@react-pdf/renderer';
 import { getCountryFactors } from '@/utils/calculations';
 
 // =============================================================================
 // SECTION 1: STYLESHEET
-// Zinc-based palette matching the VSME OS dashboard.
-// Pure black headers, zinc greys for body, emerald for compliance accents.
+// Deep forest + gold palette matching the VSME OS brand identity.
+// Forest headers (#0C2918), gold compliance accents (#C9A84C), zinc greys for body.
 // =============================================================================
 
 const styles = StyleSheet.create({
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
     marginBottom: 6,
     borderLeftWidth: 2,
-    borderLeftColor: '#000000',
+    borderLeftColor: '#0C2918',
     paddingLeft: 8
   },
   bodyText: {
@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f4f4f5'
   },
   tableHeader: {
-    backgroundColor: '#000000',
+    backgroundColor: '#0C2918',
     color: '#FFFFFF',
     borderRadius: 2,
     minHeight: 24
   },
   tableCell: { paddingHorizontal: 8, flex: 1 },
   summaryTotal: {
-    backgroundColor: '#000000',
+    backgroundColor: '#0C2918',
     color: '#FFFFFF',
     fontWeight: 'bold',
     minHeight: 26,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     width: 220,
     borderTopWidth: 1,
-    borderTopColor: '#000000',
+    borderTopColor: '#0C2918',
     paddingTop: 6
   },
 
@@ -211,9 +211,9 @@ const styles = StyleSheet.create({
     paddingTop: 8
   },
   footerRow: { flexDirection: 'row', alignItems: 'flex-end', width: '100%' },
-  footerLeftBox: { flex: 1 },
-  footerCenterBox: { flex: 2, textAlign: 'center' },
-  footerRightBox: { width: 50, textAlign: 'right' },
+  footerLeftBox: { width: 70, textAlign: 'left' },
+  footerCenterBox: { flex: 1, textAlign: 'center' },
+  footerRightBox: { width: 70, textAlign: 'right' },
   footerText: { fontSize: 6.5, color: '#a1a1aa', marginBottom: 1, letterSpacing: 0.1 },
 });
 
@@ -318,6 +318,15 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
   const SharedFooter = () => (
     <View style={styles.footerFixedContainer} fixed>
       <View style={styles.footerRow}>
+        <View style={styles.footerLeftBox}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Svg width={12} height={12} viewBox="0 0 34 34">
+              <Rect width="34" height="34" rx="7" fill="#0C2918" />
+              <Path d="M9 13 L17 25 L27 8" stroke="#C9A84C" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </Svg>
+            <Text style={[styles.footerText, { marginLeft: 4, fontWeight: 'bold' }]}>VSME OS</Text>
+          </View>
+        </View>
         <View style={styles.footerCenterBox}>
           <Text style={[styles.footerText, { textAlign: 'center' }]}>
             Emission factors: {primarySource}
@@ -346,6 +355,15 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
 
         {/* ── Page 1 Header ──────────────────────────────────────────── */}
         <View style={styles.header}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+            {/* VSME OS Logo Mark */}
+            <Svg width={28} height={28} viewBox="0 0 34 34">
+              <Rect width="34" height="34" rx="7" fill="#0C2918" />
+              <Path d="M9 13 L17 25 L27 8" stroke="#C9A84C" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </Svg>
+            <Text style={{ fontSize: 13, fontWeight: 'bold', color: '#18181b', marginLeft: 8, letterSpacing: -0.5 }}>VSME</Text>
+            <Text style={{ fontSize: 13, fontWeight: 'normal', color: '#a1a1aa', marginLeft: 3 }}>OS</Text>
+          </View>
           <Text style={styles.title}>Corporate Carbon Footprint Declaration</Text>
           <Text style={styles.reportMeta}>
             Report Generated: {dateStr} · Assurance Level: Self-Attested (Limited) · Prepared by VSME OS
@@ -440,7 +458,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
             flexDirection: 'row',
             paddingVertical: 11,
             paddingHorizontal: 12,
-            backgroundColor: '#18181b',
+            backgroundColor: '#0C2918',
             alignItems: 'center',
           }}>
             <Text style={{ flex: 1.2, fontSize: 8.5, fontWeight: 'bold', color: '#FFFFFF' }}>Total</Text>
@@ -455,7 +473,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
             flexDirection: 'row',
             paddingVertical: 11,
             paddingHorizontal: 12,
-            backgroundColor: '#27272a',
+            backgroundColor: '#122F1E',
             borderBottomLeftRadius: 6,
             borderBottomRightRadius: 6,
             alignItems: 'center',

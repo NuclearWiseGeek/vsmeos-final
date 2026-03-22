@@ -31,9 +31,7 @@ export default function SharedNav() {
 
         {/* Logo — clicking returns to landing */}
         <Link href="/" className="text-xl font-bold tracking-tighter flex items-center gap-2.5 group">
-          <div className="flex items-center">
-            <VsmeLogo size={32} />
-          </div>
+          <VsmeLogo size={32} />
           <span>VSME</span>
           <span className="text-gray-400 font-medium text-lg">OS</span>
         </Link>

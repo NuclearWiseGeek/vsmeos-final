@@ -41,7 +41,7 @@ export default function CSVUploader() {
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={loading}
-        className="flex items-center gap-2 bg-[#0071E3] hover:bg-[#0077ED] text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-sm hover:shadow-md disabled:opacity-50 text-sm"
+        className="flex items-center gap-2 bg-[#0C2918] hover:bg-[#122F1E] text-[#C9A84C] px-6 py-2.5 rounded-full font-medium transition-all shadow-sm hover:shadow-md disabled:opacity-50 text-sm"
       >
         {loading ? <Loader2 className="animate-spin" size={18} /> : <UploadCloud size={18} />}
         <span>{loading ? 'Uploading...' : 'Upload CSV'}</span>

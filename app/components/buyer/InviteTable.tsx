@@ -157,10 +157,10 @@ export default function InviteTable({ suppliers: initialSuppliers }: { suppliers
           <table className="w-full text-left min-w-[640px]">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Supplier Name</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Email</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
+                <th className="pl-6 pr-4 py-4 text-xs font-bold text-gray-400 uppercase">Supplier Name</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase">Email</th>
+                <th className="px-4 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
+                <th className="pl-4 pr-6 py-4 text-xs font-bold text-gray-400 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -168,18 +168,18 @@ export default function InviteTable({ suppliers: initialSuppliers }: { suppliers
                 const isEditing = editingId === s.id;
                 return (
                   <tr key={s.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-slate-900">
+                    <td className="pl-6 pr-4 py-4 font-medium text-slate-900">
                       {isEditing ? (
                         <input className="border border-gray-300 rounded-lg px-3 py-1.5 w-full text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editName} onChange={(e) => setEditName(e.target.value)} />
                       ) : s.supplier_name}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-4 py-4 text-sm text-gray-500">
                       {isEditing ? (
                         <input className="border border-gray-300 rounded-lg px-3 py-1.5 w-full text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
                       ) : s.supplier_email}
                     </td>
-                    <td className="px-6 py-4"><StatusBadge status={s.status || 'draft'} /></td>
-                    <td className="px-6 py-4 text-right"><ActionButtons s={s} /></td>
+                    <td className="px-4 py-4"><StatusBadge status={s.status || 'draft'} /></td>
+                    <td className="pl-4 pr-6 py-4"><ActionButtons s={s} /></td>
                   </tr>
                 );
               })}

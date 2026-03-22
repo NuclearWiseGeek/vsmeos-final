@@ -82,7 +82,7 @@ export default function MethodologyPage() {
             </p>
 
             {/* Formula block */}
-            <div className="my-6 p-6 bg-gray-900 rounded-2xl text-center">
+            <div className="my-6 p-6 bg-[#0C2918] rounded-2xl text-center">
               <p className="text-white font-mono text-lg sm:text-xl tracking-tight">
                 Emissions (kgCO₂e) = Activity Data × Emission Factor
               </p>
@@ -481,7 +481,7 @@ export default function MethodologyPage() {
           {/* ================================================================
               CTA BLOCK
               ================================================================ */}
-          <div className="bg-gray-900 text-white rounded-2xl p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="bg-[#0C2918] text-white rounded-2xl p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
               <h3 className="font-bold text-lg mb-1">Questions about our methodology?</h3>
               <p className="text-gray-400 text-sm">

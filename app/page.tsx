@@ -96,9 +96,7 @@ export default function LandingPage() {
         <div className="flex items-center justify-between px-6 py-4 md:px-10 md:py-5 max-w-7xl mx-auto">
 
           <div className="text-xl md:text-2xl font-bold tracking-tighter flex items-center gap-2.5">
-            <div className="flex items-center justify-center">
-              <VsmeLogo size={32} />
-            </div>
+            <VsmeLogo size={32} />
             VSME <span className="text-gray-400 font-medium text-lg md:text-xl">OS</span>
           </div>
 
@@ -609,18 +607,18 @@ export default function LandingPage() {
           9. FOOTER
           ================================================================ */}
       <footer className="border-t border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 py-8 flex flex-col md:flex-row justify-between items-center gap-5">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-8 flex flex-col items-center gap-5">
           <div className="flex items-center gap-2.5">
             <VsmeLogo size={24} />
             <span className="text-sm font-bold tracking-tighter text-gray-400 uppercase">VSME OS</span>
           </div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-300 text-center">
-            © {new Date().getFullYear()} VSME OS. All rights reserved.
-          </p>
           <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-gray-400">
             <a href="/privacy" className="hover:text-black transition-colors">Privacy</a>
             <a href="/terms"   className="hover:text-black transition-colors">Terms of Service</a>
           </div>
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-gray-300 text-center">
+            © {new Date().getFullYear()} VSME OS. All rights reserved.
+          </p>
         </div>
       </footer>
 

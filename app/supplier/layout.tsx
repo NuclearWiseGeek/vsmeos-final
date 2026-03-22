@@ -47,8 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             href="/supplier/hub"
             className="font-bold text-lg sm:text-xl tracking-tighter flex items-center gap-2 sm:gap-2.5 group"
           >
-            <div className="flex items-center"><VsmeLogo size={28} />
-            </div>
+            <VsmeLogo size={28} />
             <span>VSME</span>
             <span className="text-gray-400 font-medium">OS</span>
           </Link>

@@ -46,7 +46,7 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
 
       {/* ── DESKTOP SIDEBAR — hidden below lg ────────────────── */}
       <aside className="hidden lg:flex w-64 bg-gray-50/80 backdrop-blur-md border-r border-gray-200 flex-col fixed h-full z-10">
-        <div className="h-16 flex items-center px-6 border-b border-gray-200">
+        <div className="h-16 flex items-center gap-2.5 px-6 border-b border-gray-200">
           <VsmeLogo size={24} />
           <span className="font-bold text-lg tracking-tight text-gray-900">VSME <span className="text-gray-400 font-normal">Enterprise</span></span>
         </div>
@@ -72,8 +72,8 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
           {/* Slide-in panel */}
           <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-2xl flex flex-col animate-slide-in">
             <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-black rounded-md flex items-center justify-center text-white font-bold text-xs shadow-sm">V</div>
+              <div className="flex items-center gap-2.5">
+                <VsmeLogo size={24} />
                 <span className="font-bold text-lg tracking-tight">VSME <span className="text-gray-400 font-normal">Enterprise</span></span>
               </div>
               <button

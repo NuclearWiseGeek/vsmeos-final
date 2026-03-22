@@ -278,7 +278,7 @@ export default function AlignmentPage() {
           </Section>
 
           {/* Questions CTA */}
-          <div className="bg-gray-900 text-white rounded-2xl p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="bg-[#0C2918] text-white rounded-2xl p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
               <h3 className="font-bold text-lg mb-1">Need a compliance briefing for your ESG team?</h3>
               <p className="text-gray-400 text-sm">
