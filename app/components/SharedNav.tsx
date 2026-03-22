@@ -3,19 +3,15 @@
 // PURPOSE: Unified navigation bar for all public-facing pages:
 //          /methodology, /framework, /alignment, /privacy, /terms
 //
-//          Replaces the 5 different ad-hoc headers those pages had before.
-//          Keeps the product feeling like one designed thing from landing page
-//          through to legal pages.
-//
-// PROPS:
-//   activePage — highlights the correct nav item in the top bar
+// RESPONSIVE: Full hamburger menu on mobile. Desktop shows all links inline.
 // =============================================================================
 
 'use client';
 
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, ArrowLeft, Menu, X } from 'lucide-react';
 import { SignInButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 const NAV_LINKS = [
@@ -26,6 +22,7 @@ const NAV_LINKS = [
 
 export default function SharedNav() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50 bg-white/85 backdrop-blur-lg border-b border-gray-100">
@@ -40,16 +37,14 @@ export default function SharedNav() {
           <span className="text-gray-400 font-medium text-lg">OS</span>
         </Link>
 
-        {/* Centre nav — methodology / framework / alignment */}
+        {/* Centre nav — DESKTOP only */}
         <div className="hidden md:flex items-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em]">
           {NAV_LINKS.map(({ label, href }) => (
             <Link
               key={href}
               href={href}
               className={`transition-colors ${
-                pathname === href
-                  ? 'text-black'
-                  : 'text-gray-400 hover:text-black'
+                pathname === href ? 'text-black' : 'text-gray-400 hover:text-black'
               }`}
             >
               {label}
@@ -57,8 +52,9 @@ export default function SharedNav() {
           ))}
         </div>
 
-        {/* Right — back to app or start */}
+        {/* Right side */}
         <div className="flex items-center gap-4">
+          {/* Desktop auth links */}
           <SignedIn>
             <Link
               href="/supplier/hub"
@@ -74,8 +70,56 @@ export default function SharedNav() {
               </button>
             </SignInButton>
           </SignedOut>
+
+          {/* Mobile hamburger — MOBILE only */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 text-gray-400 hover:text-black transition-colors -mr-2"
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
+
+      {/* ── MOBILE DROPDOWN ──────────────────────────────────── */}
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-b border-gray-100 px-6 py-6 flex flex-col gap-5 animate-fade-in">
+          {NAV_LINKS.map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMobileOpen(false)}
+              className={`text-xs font-bold uppercase tracking-widest transition-colors ${
+                pathname === href ? 'text-black' : 'text-gray-400 hover:text-black'
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+
+          <div className="pt-3 border-t border-gray-100">
+            <SignedIn>
+              <Link
+                href="/supplier/hub"
+                onClick={() => setMobileOpen(false)}
+                className="text-xs font-bold uppercase tracking-widest text-emerald-600"
+              >
+                ← Back to App
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="text-xs font-bold uppercase tracking-widest text-emerald-600"
+                >
+                  Sign In
+                </button>
+              </SignInButton>
+            </SignedOut>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

@@ -146,3 +146,27 @@ html {
 .table-row-hover:hover {
   background-color: #f9fafb;
 }
+
+/* ============================================================
+   MOBILE SIDEBAR SLIDE-IN
+   ============================================================ */
+.animate-slide-in {
+  animation: slideIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ============================================================
+   MOBILE MENU FADE-IN
+   ============================================================ */
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

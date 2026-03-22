@@ -12,14 +12,15 @@
 // DATA SOURCES:
 //   - Scope 1 Fuels:        ADEME Base Carbone 2024 (full lifecycle, incl. upstream)
 //   - Scope 1 Refrigerants: IPCC AR5 GWP100 (legally required standard)
-//   - Scope 2 Electricity:  IEA 2023 / EMBER 2023 (country-specific)
+//   - Scope 2 Electricity:  IEA 2025 / EMBER 2024 (country-specific) / EPA eGRID2023 (USA)
 //   - Scope 2 Thermal:      Euroheat & Power 2023 / IEA
 //   - Scope 3 Travel:       DEFRA 2025 (includes Radiative Forcing x1.9 for flights)
 //                           NOTE: DEFRA 2025 flight factors reduced 31-42% due to post-COVID load
 //                           factor recovery. Updated June 2025. Previous 2024 factors were materially overstated.
 //   - Scope 3 Hotels:       Cornell/Greenview CHSB 2024 (conservative global estimate)
 //
-// LAST UPDATED: March 2026 — DEFRA 2025 applied (June 2025). Next update due Q2 2026 when DEFRA 2026 is released.
+// LAST UPDATED: March 2026 — EPA eGRID2023 applied (US: 0.386→0.352, verified from Table 6). IEA 2025 world fallback applied (0.494→0.464).
+//                DEFRA 2025 applied (June 2025). Next update due Q2 2026 when DEFRA 2026 is released.
 // =============================================================================
 
 // =============================================================================
@@ -111,7 +112,7 @@ const SCOPE3_UNIVERSAL_FACTORS: Record<string, EmissionFactor> = {
 // Each country has a different electricity grid intensity based on their
 // energy mix. France (nuclear) = 0.052. South Africa (coal) = 0.928.
 // Using the wrong country's factor produces completely wrong results.
-// Sources: IEA 2023, EMBER 2023, national grid operators
+// Sources: IEA 2023/2025, EMBER 2023/2024, national grid operators
 // =============================================================================
 
 export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
@@ -150,7 +151,7 @@ export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
   "Iceland":        { electricityGrid: 0.003, districtHeating: 0.015, districtCooling: 0.001, railTravel: 0.002, primaryCalculator: "Orkustofnun (OS) / IEA 2023",                      methodologyNote: "Quantified using Orkustofnun Iceland. Grid is almost entirely geothermal and hydro — one of the world's cleanest." },
 
   // NORTH AMERICA
-  "United States":  { electricityGrid: 0.386, districtHeating: 0.190, districtCooling: 0.110, railTravel: 0.103, primaryCalculator: "US EPA eGRID 2023",                               methodologyNote: "Quantified using US EPA eGRID 2023 national average emission factors for the US electrical grid." },
+  "United States":  { electricityGrid: 0.352, districtHeating: 0.190, districtCooling: 0.110, railTravel: 0.103, primaryCalculator: "EPA eGRID2023 (Jan 2025, AR5 GWP)",                               methodologyNote: "Quantified using US EPA eGRID2023 national average emission factors for the US electrical grid (released January 2025, year 2023 data). US Average 771.5 lbCO2/MWh + CH4/N2O. Updated from eGRID2022 (0.386)." },
   "Canada":         { electricityGrid: 0.130, districtHeating: 0.110, districtCooling: 0.037, railTravel: 0.033, primaryCalculator: "Environment & Climate Change Canada (ECCC) 2023",  methodologyNote: "Quantified using ECCC 2023 National Inventory Report factors. Canada's grid benefits from significant hydro power." },
   "Mexico":         { electricityGrid: 0.454, districtHeating: 0.180, districtCooling: 0.130, railTravel: 0.075, primaryCalculator: "SEMARNAT Mexico / IEA 2023",                       methodologyNote: "Quantified using SEMARNAT Mexico and IEA 2023 emission factors." },
 
@@ -203,12 +204,12 @@ export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
 // =============================================================================
 
 const DEFAULT_COUNTRY_FACTORS: CountryFactors = {
-  electricityGrid: 0.494,
+  electricityGrid: 0.464,
   districtHeating: 0.200,
-  districtCooling: 0.141,
+  districtCooling: 0.132,
   railTravel: 0.041,
-  primaryCalculator: "IEA World Energy Statistics 2023 / EMBER 2023",
-  methodologyNote: "Quantified using IEA World Energy Statistics 2023 average emission factors. Country-specific data was not available; IEA world averages have been applied as a conservative estimate."
+  primaryCalculator: "IEA Emissions Factors 2025 / EMBER 2024",
+  methodologyNote: "Quantified using IEA Emissions Factors 2025 world average emission factors (data year 2023). Country-specific data was not available; IEA world averages have been applied as a conservative estimate. Updated from IEA 2023 edition (0.494)."
 };
 
 const GREEN_ELECTRICITY_FACTOR = 0.000; // Market-based method — GHG Protocol Scope 2 Guidance

@@ -174,7 +174,7 @@ export default function SampleReportModal({ isOpen, onClose }: { isOpen: boolean
               Start Your Report
             </button>
             <p className="text-[9px] text-zinc-600 text-center">
-              Self-attested · Based on GHG Protocol · ISO 14064-1:2018
+              Self-attested · Based on GHG Protocol · Aligned with ISO 14064-1:2018
             </p>
           </div>
         </div>

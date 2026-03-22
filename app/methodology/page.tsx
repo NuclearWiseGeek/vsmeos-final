@@ -146,13 +146,13 @@ export default function MethodologyPage() {
                     { country: 'Belgium',        db: 'CREG Belgium / IEA 2023',           factor: '0.167',  updated: '2024 Q1' },
                     { country: 'Sweden',         db: 'Energimyndigheten 2023',            factor: '0.013',  updated: '2024 Q1' },
                     { country: 'Poland',         db: 'URE / IEA 2023',                    factor: '0.773',  updated: '2024 Q1' },
-                    { country: 'USA',            db: 'US EPA eGRID 2023',                 factor: '0.386',  updated: '2024 Q2' },
+                    { country: 'USA',            db: 'US EPA eGRID2023 (Jan 2025)',       factor: '0.352',  updated: '2026 Q1' },
                     { country: 'Canada',         db: 'ECCC NIR 2023',                     factor: '0.130',  updated: '2024 Q1' },
                     { country: 'Australia',      db: 'Australian NGA 2023 / Clean Energy Regulator', factor: '0.656',  updated: '2024 Q1' },
                     { country: 'South Africa',   db: 'DFFE / Eskom 2022',                 factor: '0.928',  updated: '2023 Q4' },
                     { country: 'India',          db: 'BEE / CEA 2022',                    factor: '0.708',  updated: '2023 Q4' },
                     { country: 'China',          db: 'NDRC / IEA 2022',                   factor: '0.581',  updated: '2023 Q4' },
-                    { country: 'Other (default)','db': 'IEA World Average 2023',          factor: '0.494',  updated: '2024 Q1' },
+                    { country: 'Other (default)','db': 'IEA Emissions Factors 2025',       factor: '0.464',  updated: '2026 Q1' },
                   ].map(({ country, db, factor, updated }) => (
                     <tr key={country} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
                       <td className="px-4 py-2.5 font-medium text-gray-900">{country}</td>
@@ -166,7 +166,7 @@ export default function MethodologyPage() {
             </div>
             <p className="text-xs text-gray-400 mt-3">
               60+ countries are supported. For countries where national grid operators do not
-              publish standalone emission factors, IEA World Energy Statistics 2023 averages
+              publish standalone emission factors, IEA Emissions Factors 2025 averages
               are applied as a conservative estimate and clearly labelled as such in the report.
               Factors are reviewed and updated annually, typically in Q1 following national
               database publication cycles.

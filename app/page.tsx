@@ -13,7 +13,7 @@ import { SignInButton, SignedIn, SignedOut } from '@clerk/nextjs';
 const FAQS = [
   {
     q: 'Is this actually CSRD compliant?',
-    a: 'VSME OS generates reports designed for CSRD Scope 3 data collection — the standard your buyer uses when requesting supplier carbon data. Reports are self-attested (limited assurance) and based on GHG Protocol methodology. They are designed to satisfy buyer CSRD data requests. For independently verified reports, we recommend engaging a third-party verifier. Our alignment page explains this in full.'
+    a: 'VSME OS generates reports designed for CSRD Scope 3 data collection — the standard your buyer uses when requesting supplier carbon data. The report covers Scope 1 (direct emissions), Scope 2 (purchased energy), and Scope 3 Categories 6 and 7 (business travel and employee commuting). Reports are self-attested (limited assurance) and based on GHG Protocol methodology. They are designed to satisfy buyer CSRD data requests. For independently verified reports, we recommend engaging a third-party verifier. Our alignment page explains this in full.'
   },
   {
     q: 'How long does it take to complete a report?',
@@ -264,7 +264,7 @@ export default function LandingPage() {
               {
                 step: '01', icon: <FileText size={20} className="text-blue-400" />,
                 title: 'Enter your data',
-                desc: 'Fill in energy bills, fuel usage, and business travel across Scope 1, 2, and 3. Tooltips on every field tell you exactly where to find each number.',
+                desc: 'Fill in energy bills, fuel usage, and business travel across Scope 1, 2, and 3 (Categories 6 & 7: business travel, employee commuting). Tooltips on every field tell you exactly where to find each number.',
                 border: 'border-blue-900/60', bg: 'bg-blue-950/20',
               },
               {

@@ -8,6 +8,28 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ---------------------------------------------------------
+// Helper: Validate email format (RFC 5322 simplified)
+// ---------------------------------------------------------
+function isValidEmail(email: string): boolean {
+  const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return re.test(email) && email.length <= 254;
+}
+
+// ---------------------------------------------------------
+// Helper: Sanitize string to prevent XSS when displayed
+// ---------------------------------------------------------
+function sanitize(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .trim()
+    .substring(0, 200); // Limit length
+}
+
+// ---------------------------------------------------------
 // 1. Upload CSV
 // ---------------------------------------------------------
 export async function uploadSupplierCSV(formData: FormData) {
@@ -22,29 +44,48 @@ export async function uploadSupplierCSV(formData: FormData) {
   const file = formData.get('file') as File;
   if (!file) return { error: 'No file uploaded' };
 
+  // Validate file size (max 1MB for CSV)
+  if (file.size > 1024 * 1024) return { error: 'CSV file too large (max 1MB)' };
+
   // Determine Buyer Name
   const buyerName = user?.firstName 
-    ? `${user.firstName} ${user.lastName || ''}`.trim() 
+    ? sanitize(`${user.firstName} ${user.lastName || ''}`.trim())
     : 'VSME Enterprise';
 
   const text = await file.text();
   const rows = text.split('\n').slice(1); 
 
+  // Track seen emails for deduplication within this upload
+  const seenEmails = new Set<string>();
+
   const suppliers = rows
     .map((row) => {
       const [name, email] = row.split(',');
-      if (!email || !email.includes('@')) return null;
+      if (!email) return null;
+
+      const cleanEmail = email.trim().toLowerCase();
+      
+      // Validate email format properly
+      if (!isValidEmail(cleanEmail)) return null;
+      
+      // Deduplicate within this CSV
+      if (seenEmails.has(cleanEmail)) return null;
+      seenEmails.add(cleanEmail);
+
       return {
         buyer_id: userId,
         buyer_name: buyerName, 
-        supplier_name: name?.trim() || 'Unknown Supplier',
-        supplier_email: email?.trim().toLowerCase(),
+        supplier_name: sanitize(name?.trim() || 'Unknown Supplier'),
+        supplier_email: cleanEmail,
         status: 'draft',
       };
     })
     .filter((s) => s !== null);
 
-  if (suppliers.length === 0) return { error: 'No valid emails found' };
+  if (suppliers.length === 0) return { error: 'No valid emails found in CSV' };
+
+  // Rate limit: max 500 suppliers per upload
+  if (suppliers.length > 500) return { error: 'Too many suppliers (max 500 per upload)' };
 
   const supabase = createSupabaseClient(token);
   const { error } = await supabase.from('supplier_invites').insert(suppliers);
@@ -88,7 +129,7 @@ export async function addManualSupplier(name: string, email: string) {
 
   if (!userId) return { error: 'Unauthorized' };
 
-  if (!email || !email.includes('@')) return { error: 'Invalid email' };
+  if (!email || !isValidEmail(email.trim().toLowerCase())) return { error: 'Invalid email address' };
 
   const token = await getToken({ template: 'supabase' });
   if (!token) return { error: 'No auth token' };
@@ -103,8 +144,8 @@ export async function addManualSupplier(name: string, email: string) {
   const { error } = await supabase.from('supplier_invites').insert({
     buyer_id: userId,
     buyer_name: buyerName, 
-    supplier_name: name || 'Unknown',
-    supplier_email: email.toLowerCase(),
+    supplier_name: sanitize(name) || 'Unknown',
+    supplier_email: email.trim().toLowerCase(),
     status: 'draft',
   });
 
@@ -193,7 +234,7 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'VSME <onboarding@resend.dev>',
+      from: 'VSME OS <hello@vsmeos.fr>',
       to: email, 
       subject: `Action Required: ${buyerName} invited you to VSME`, 
       html: `

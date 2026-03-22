@@ -22,9 +22,10 @@ import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, FileText } from 'lucide-react';
 
-const LAST_UPDATED  = '1 January 2025';
+const LAST_UPDATED  = '22 March 2026';
 const CONTACT_EMAIL = 'legal@vsmeos.fr';
-const COMPANY_NAME  = 'VSME OS SAS';
+// NOTE: Update to 'VSME OS SAS' + add SIRET once incorporation is complete
+const COMPANY_NAME  = 'VSME OS';
 
 export default function TermsPage() {
   return (

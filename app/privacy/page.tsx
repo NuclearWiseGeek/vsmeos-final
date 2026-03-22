@@ -16,9 +16,10 @@ import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, Shield } from 'lucide-react';
 
-const LAST_UPDATED  = '1 January 2025';
+const LAST_UPDATED  = '22 March 2026';
 const CONTACT_EMAIL = 'privacy@vsmeos.fr';
-const COMPANY_NAME  = 'VSME OS SAS';
+// NOTE: Update to 'VSME OS SAS' + add SIRET once incorporation is complete
+const COMPANY_NAME  = 'VSME OS';
 
 export default function PrivacyPage() {
   return (
@@ -47,7 +48,7 @@ export default function PrivacyPage() {
           {/* 1. Who We Are */}
           <Section title="1. Who We Are (Data Controller)">
             <p>
-              The data controller is <strong>{COMPANY_NAME}</strong>, registered in France.
+              The data controller is <strong>{COMPANY_NAME}</strong>, operating from France.
               For privacy enquiries contact{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="text-blue-600 hover:underline">{CONTACT_EMAIL}</a>.
               Our supervisory authority is the <strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés).

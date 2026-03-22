@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: app/components/CarbonReportPDF.tsx
-// PURPOSE: Generates the 4-page GHG Protocol / ISO 14064-1 compliant PDF report.
+// PURPOSE: Generates the 4-page GHG Protocol / ISO 14064-1 aligned PDF report.
 //          This is the core deliverable of VSME OS — the document a supplier
 //          sends to their buyer to satisfy CSRD Scope 3 data requests.
 //
@@ -12,7 +12,7 @@
 //
 // KEY DESIGN PRINCIPLE — DYNAMIC BY COUNTRY:
 //   The report cites the correct national emission factor database based on the
-//   supplier's country. A UK supplier's report says "DEFRA 2024". A French
+//   supplier's country. A UK supplier's report says "DEFRA 2025". A French
 //   supplier's report says "ADEME Base Carbone 2024". This is what makes the
 //   report audit-ready and credible to international procurement teams.
 //
@@ -323,7 +323,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
             Emission factors: {primarySource}
           </Text>
           <Text style={[styles.footerText, { textAlign: 'center' }]}>
-            GHG Protocol · ISO 14064-1:2018 · Commission Recommendation (EU) 2025/1710
+            GHG Protocol · Aligned with ISO 14064-1:2018 · Commission Recommendation (EU) 2025/1710
           </Text>
         </View>
         <View style={styles.footerRightBox}>
@@ -387,9 +387,11 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
         <View style={styles.complianceBlock}>
           <Text style={styles.bold}>Reporting Standards & Methodological Alignment:</Text>
           <Text>• GHG Protocol Corporate Accounting and Reporting Standard (WRI/WBCSD)</Text>
-          <Text>• ISO 14064-1:2018 — Specification for quantification of GHG emissions</Text>
+          <Text>• Aligned with ISO 14064-1:2018 — Specification for quantification of GHG emissions</Text>
           <Text>• Commission Recommendation (EU) 2025/1710 of 30 July 2025 — voluntary sustainability reporting standard for SMEs</Text>
           <Text>• CSRD ESRS E1 — Climate change disclosure requirements</Text>
+          <Text style={{ marginTop: 4 }}>Consolidation approach: Operational Control · Scope 3 boundary: Categories 6 (Business Travel) and 7 (Employee Commuting)</Text>
+          <Text>Base year: FY {st(company?.year)} (first reporting period — to be used as reference for year-on-year comparison)</Text>
           {/* DYNAMIC: the methodology note is specific to this supplier's country */}
           <Text style={{ marginTop: 4, color: '#71717a' }}>{methodologyNote}</Text>
         </View>
@@ -630,7 +632,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               <Text style={styles.bulletPoint}>•</Text>
               <Text>
                 This declaration is aligned with the <Text style={styles.bold}>GHG Protocol</Text>,{' '}
-                <Text style={styles.bold}>ISO 14064-1:2018</Text>, and{' '}
+                aligned with <Text style={styles.bold}>ISO 14064-1:2018</Text>, and{' '}
                 <Text style={styles.bold}>Commission Recommendation (EU) 2025/1710 of 30 July 2025</Text>.
               </Text>
             </View>
@@ -745,9 +747,10 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               <Text style={styles.bulletPoint}>3.</Text>
               <Text>
                 <Text style={styles.bold}>Scope Boundary: </Text>
-                This report covers Scope 1 (direct), Scope 2 (purchased energy), and selected
-                Scope 3 categories (business travel, employee commuting, remote working).
-                Upstream supply chain (Scope 3 Cat. 1–4) and downstream categories are excluded.
+                This report covers Scope 1 (direct), Scope 2 (purchased energy), and
+                Scope 3 Categories 6 (business travel) and 7 (employee commuting &amp; remote working).
+                Upstream supply chain (Scope 3 Cat. 1–5), downstream categories (Cat. 8–15),
+                and purchased goods &amp; services are excluded from this boundary.
               </Text>
             </View>
             <View style={styles.bulletRow}>
