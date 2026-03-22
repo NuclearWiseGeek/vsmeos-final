@@ -173,7 +173,7 @@ function CountryDropdown({ value, onChange }: CountryDropdownProps) {
                   onClick={() => handleSelect(country)}
                   className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-gray-50 ${
                     country === value
-                      ? 'bg-black text-white hover:bg-black font-medium'
+                      ? 'bg-[#0C2918] text-[#C9A84C] hover:bg-black font-medium'
                       : 'text-gray-700'
                   }`}
                 >
@@ -522,7 +522,7 @@ export default function SupplierProfilePage() {
             disabled={saving || !isValid}
             className={`flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm transition-all shadow-lg active:scale-95 ${
               isValid
-                ? 'bg-black text-white hover:bg-gray-800 shadow-gray-200'
+                ? 'bg-[#0C2918] text-[#C9A84C] hover:bg-[#122F1E] shadow-gray-200'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
             }`}
           >

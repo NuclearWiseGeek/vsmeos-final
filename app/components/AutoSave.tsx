@@ -60,11 +60,11 @@ function SaveToast({ status }: { status: Status }) {
       text: 'text-blue-600',
     },
     saved: {
-      icon: <CheckCircle2 size={14} className="text-emerald-500" />,
+      icon: <CheckCircle2 size={14} className="text-[#C9A84C]" />,
       label: 'All changes saved',
       bg: 'bg-white/95',
-      border: 'border-emerald-100',
-      text: 'text-emerald-600',
+      border: 'border-[#C9A84C]/30',
+      text: 'text-[#C9A84C]',
     },
     error: {
       icon: <CloudOff size={14} className="text-amber-500" />,

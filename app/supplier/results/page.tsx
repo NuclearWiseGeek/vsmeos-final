@@ -79,7 +79,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { uploadEvidence } from '../../../actions/uploadEvidence';
 import {
-  CheckCircle2, RotateCcw, ArrowLeft, ShieldCheck, FileText,
+  CheckCircle2, RotateCcw, ArrowLeft, FileText,
   X, File, AlertCircle, Loader2, Save, CloudUpload,
   TrendingUp, Scale
 } from 'lucide-react';
@@ -508,7 +508,7 @@ export default function ResultsPage() {
         <div className="bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 flex flex-col justify-between">
           <div>
             <h3 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <ShieldCheck size={20} className="text-black" /> Attestation & Download
+              ★ Attestation & Download
             </h3>
 
             {/* Signer input */}
@@ -609,7 +609,7 @@ export default function ResultsPage() {
                       <div className="flex items-start gap-4 flex-1">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
                           files.length > 0
-                            ? 'bg-emerald-50 text-emerald-500'
+                            ? 'bg-[#C9A84C]/10 text-[#C9A84C]'
                             : 'bg-gray-50 text-gray-300'
                         }`}>
                           {files.length > 0
@@ -623,7 +623,7 @@ export default function ResultsPage() {
                           </p>
                           <p className="text-[10px] mt-0.5 mb-3">
                             {files.length > 0
-                              ? <span className="text-emerald-600 font-bold uppercase tracking-widest">✓ Evidence Linked</span>
+                              ? <span className="text-[#C9A84C] font-bold uppercase tracking-widest">✓ Evidence Linked</span>
                               : <span className="text-gray-400">Awaiting documentation</span>}
                           </p>
 

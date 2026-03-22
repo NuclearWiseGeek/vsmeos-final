@@ -76,7 +76,7 @@ export default function ManualEntry() {
         <button 
           type="submit" 
           disabled={loading}
-          className="bg-black text-white px-6 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
+          className="bg-[#0C2918] text-[#C9A84C] px-6 py-2.5 rounded-lg font-bold hover:bg-[#122F1E] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
         >
           {loading ? <Loader2 className="animate-spin" size={18} /> : <><Plus size={18} /> Add</>}
         </button>

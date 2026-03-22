@@ -32,9 +32,9 @@ export default function PrivacyPage() {
 
         {/* Title block */}
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-100 rounded-full mb-4">
-            <Shield size={12} className="text-green-600" />
-            <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">GDPR Compliant</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#C9A84C]/10 border border-[#C9A84C]/20 rounded-full mb-4">
+            <Shield size={12} className="text-[#C9A84C]" />
+            <span className="text-[10px] font-bold text-[#C9A84C] uppercase tracking-widest">GDPR Compliant</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-3">Privacy Policy</h1>
           <p className="text-gray-500 text-lg leading-relaxed">
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
                 'Data breach notification to CNIL and affected users within 72 hours (GDPR Art. 33)',
               ].map(item => (
                 <li key={item} className="flex gap-3 text-sm">
-                  <span className="text-green-500 mt-0.5 flex-shrink-0">✓</span>
+                  <span className="text-[#C9A84C] mt-0.5 flex-shrink-0">✓</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -213,7 +213,7 @@ export default function PrivacyPage() {
                   ].map(({ name, type, purpose, duration }) => (
                     <tr key={name} className="border-b border-gray-50 last:border-0">
                       <td className="px-4 py-3 font-mono text-xs text-gray-700">{name}</td>
-                      <td className="px-4 py-3 text-xs font-bold text-green-600">{type}</td>
+                      <td className="px-4 py-3 text-xs font-bold text-[#C9A84C]">{type}</td>
                       <td className="px-4 py-3 text-gray-600 text-xs">{purpose}</td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{duration}</td>
                     </tr>
@@ -239,7 +239,7 @@ export default function PrivacyPage() {
             </p>
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0C2918] text-[#C9A84C] rounded-full text-sm font-medium hover:bg-[#122F1E] transition-colors"
             >
               {CONTACT_EMAIL}
             </a>

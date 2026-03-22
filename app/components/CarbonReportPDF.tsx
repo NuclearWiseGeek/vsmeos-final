@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#f4f4f5',
     borderLeftWidth: 1.5,
-    borderLeftColor: '#10b981',
+    borderLeftColor: '#C9A84C',
     fontSize: 7.8,
     color: '#52525b',
     lineHeight: 1.45

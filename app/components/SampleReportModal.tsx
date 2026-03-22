@@ -73,9 +73,9 @@ export default function SampleReportModal({ isOpen, onClose }: { isOpen: boolean
                 <p className="text-[10px] leading-relaxed text-zinc-600 mb-2">
                   Covers <span className="font-bold text-black">Scope 1</span>, <span className="font-bold text-black">Scope 2</span>, and <span className="font-bold text-black">Scope 3</span> emissions. Calculated using country-specific ADEME Base Carbone 2024 / DEFRA 2025 factors.
                 </p>
-                <div className="bg-zinc-50 border-l-2 border-emerald-500 px-3 py-2">
+                <div className="bg-zinc-50 border-l-2 border-[#C9A84C] px-3 py-2">
                   <p className="text-[9px] font-bold text-black uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                    <ShieldCheck size={10} className="text-emerald-500" /> Standards &amp; Compliance
+                    ✓ Standards &amp; Compliance
                   </p>
                   <ul className="space-y-1">
                     {[
@@ -85,7 +85,7 @@ export default function SampleReportModal({ isOpen, onClose }: { isOpen: boolean
                       'CSRD ESRS E1 — Scope 3 data collection',
                     ].map(item => (
                       <li key={item} className="flex items-start gap-1.5 text-[9px] text-zinc-500">
-                        <span className="text-emerald-500 font-bold mt-px">•</span> {item}
+                        <span className="text-[#C9A84C] font-bold mt-px">•</span> {item}
                       </li>
                     ))}
                   </ul>
@@ -96,7 +96,7 @@ export default function SampleReportModal({ isOpen, onClose }: { isOpen: boolean
               <div className="blur-[3px] opacity-30 select-none pointer-events-none px-8 py-3">
                 <p className="text-[9px] font-bold uppercase tracking-widest text-black mb-2">Emissions Summary</p>
                 <div className="w-full text-xs">
-                  <div className="flex bg-black text-white py-1.5 px-2 rounded-t-sm">
+                  <div className="flex bg-[#0C2918] text-[#C9A84C] py-1.5 px-2 rounded-t-sm">
                     <div className="flex-1 font-bold text-[9px] uppercase tracking-wider">Category</div>
                     <div className="font-bold text-[9px] uppercase tracking-wider">kgCO₂e</div>
                   </div>
@@ -113,11 +113,11 @@ export default function SampleReportModal({ isOpen, onClose }: { isOpen: boolean
           </div>
 
           {/* RIGHT — what's in the full report */}
-          <div className="w-full md:w-72 flex-shrink-0 bg-zinc-950 text-white flex flex-col p-6 gap-5">
+          <div className="w-full md:w-72 flex-shrink-0 bg-[#0C2918] text-white flex flex-col p-6 gap-5">
 
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Layers size={14} className="text-emerald-400" />
+                <Layers size={14} className="text-[#C9A84C]" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Full Report — 4 Pages</span>
               </div>
               <p className="text-xs text-zinc-500 leading-relaxed">
@@ -152,14 +152,14 @@ export default function SampleReportModal({ isOpen, onClose }: { isOpen: boolean
                   unlocked: false,
                 },
               ].map(({ num, title, desc, unlocked }) => (
-                <div key={num} className={`rounded-xl p-4 border ${unlocked ? 'border-emerald-800/50 bg-emerald-950/30' : 'border-zinc-800 bg-zinc-900/50'}`}>
+                <div key={num} className={`rounded-xl p-4 border ${unlocked ? 'border-[#C9A84C]/30 bg-[#0C2918]/20' : 'border-[#1A5C3A]/30 bg-[#122F1E]/30'}`}>
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-mono text-zinc-500">{num}</span>
                       <span className={`text-xs font-bold ${unlocked ? 'text-white' : 'text-zinc-300'}`}>{title}</span>
                     </div>
                     {unlocked
-                      ? <CheckCircle2 size={12} className="text-emerald-400" />
+                      ? <CheckCircle2 size={12} className="text-[#C9A84C]" />
                       : <Lock size={11} className="text-zinc-600" />}
                   </div>
                   <p className="text-[10px] text-zinc-500 leading-relaxed">{desc}</p>

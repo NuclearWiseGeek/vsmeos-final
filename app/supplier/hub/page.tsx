@@ -124,7 +124,7 @@ export default function AssessmentHub() {
           Only shown when no company profile is set up yet.
           ================================================================ */}
       {isFirstVisit && (
-        <div className="mb-8 bg-black text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 empty-state-enter">
+        <div className="mb-8 bg-[#0C2918] text-[#C9A84C] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 empty-state-enter">
           <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
             <TrendingUp size={20} className="text-white" />
           </div>
@@ -471,7 +471,7 @@ export default function AssessmentHub() {
         <Link href="/supplier/results" className="w-full sm:w-auto">
           <button className={`w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3 text-base ${
             completedScopes > 0
-              ? 'bg-black text-white hover:bg-gray-800 hover:shadow-2xl'
+              ? 'bg-[#0C2918] text-[#C9A84C] hover:bg-[#122F1E] hover:shadow-2xl'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
           }`}
           // Prevent navigation if no data entered at all

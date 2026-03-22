@@ -36,7 +36,7 @@ function StatusBadge({ status }: { status: string }) {
     </span>
   );
   if (status === 'completed') return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#0C2918]/10 text-[#1A5C3A] border border-[#1A5C3A]/40">
       <CheckCircle2 size={12} /> Report Ready
     </span>
   );
@@ -111,7 +111,7 @@ export default function InviteTable({ suppliers: initialSuppliers }: { suppliers
     if (isLoading) return <Loader2 className="animate-spin text-blue-600" size={18} />;
     if (isEditing) return (
       <div className="flex items-center gap-2">
-        <button onClick={() => handleSave(s.id)} className="text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-md transition-colors"><Check size={18} /></button>
+        <button onClick={() => handleSave(s.id)} className="text-[#C9A84C] hover:bg-[#0C2918]/10 p-1.5 rounded-md transition-colors"><Check size={18} /></button>
         <button onClick={cancelEdit} className="text-gray-400 hover:bg-gray-100 p-1.5 rounded-md transition-colors"><X size={18} /></button>
       </div>
     );
@@ -121,7 +121,7 @@ export default function InviteTable({ suppliers: initialSuppliers }: { suppliers
           onClick={() => handleSendEmail(s.id, s.supplier_email, s.supplier_name)}
           disabled={isSending || isSentRecently || s.status === 'completed' || s.status === 'in_progress'}
           className={`p-2 rounded-full transition-colors ${
-            isSentRecently || s.status === 'sent' ? 'text-emerald-600 bg-emerald-50' : 'text-blue-600 hover:bg-blue-50'
+            isSentRecently || s.status === 'sent' ? 'text-[#C9A84C] bg-[#0C2918]/10' : 'text-blue-600 hover:bg-blue-50'
           } ${s.status === 'completed' ? 'opacity-30 cursor-not-allowed' : ''}`}
           title="Send Invite Email"
         >

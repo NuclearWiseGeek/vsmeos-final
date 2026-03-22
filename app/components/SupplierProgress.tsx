@@ -84,8 +84,8 @@ export default function SupplierProgress() {
                   <div className={`
                     w-10 h-10 rounded-full flex items-center justify-center
                     transition-all duration-300
-                    ${isComplete ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200 group-hover:bg-emerald-600' : ''}
-                    ${isActive   ? 'bg-black text-white shadow-lg shadow-black/20 scale-110' : ''}
+                    ${isComplete ? 'bg-[#C9A84C] text-white shadow-sm shadow-[#C9A84C]/30 group-hover:bg-[#B8973F]' : ''}
+                    ${isActive   ? 'bg-[#0C2918] text-[#C9A84C] shadow-lg shadow-black/20 scale-110' : ''}
                     ${isFuture   ? 'bg-gray-100 text-gray-300' : ''}
                   `}>
                     {isComplete
@@ -99,7 +99,7 @@ export default function SupplierProgress() {
                     text-[10px] font-bold uppercase tracking-wider
                     transition-colors duration-300
                     ${isActive   ? 'text-black' : ''}
-                    ${isComplete ? 'text-emerald-600' : ''}
+                    ${isComplete ? 'text-[#C9A84C]' : ''}
                     ${isFuture   ? 'text-gray-300' : ''}
                   `}>
                     {step.label}
@@ -116,7 +116,7 @@ export default function SupplierProgress() {
                             key={sub.label}
                             className={`
                               h-1 w-5 rounded-full transition-all duration-300
-                              ${subComplete ? 'bg-emerald-500' : ''}
+                              ${subComplete ? 'bg-[#C9A84C]' : ''}
                               ${subActive   ? 'bg-black' : ''}
                               ${!subComplete && !subActive ? (isActive ? 'bg-gray-200' : 'bg-gray-100') : ''}
                             `}
@@ -132,7 +132,7 @@ export default function SupplierProgress() {
                   <div className="flex-1 relative h-px mx-3 mb-5 bg-gray-100 overflow-hidden">
                     {/* Filled portion */}
                     <div
-                      className="absolute inset-y-0 left-0 bg-emerald-400 transition-all duration-500"
+                      className="absolute inset-y-0 left-0 bg-[#C9A84C] transition-all duration-500"
                       style={{ width: isComplete ? '100%' : '0%' }}
                     />
                   </div>

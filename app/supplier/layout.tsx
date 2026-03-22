@@ -20,7 +20,8 @@ import { usePathname } from 'next/navigation';
 import CompanyOnboarding from '@/components/CompanyOnboarding';
 import AutoSave from '@/components/AutoSave';
 import SupplierProgress from '@/components/SupplierProgress';
-import { Settings, ShieldCheck, LayoutDashboard, Flame, Zap, Plane, FileText } from 'lucide-react';
+import { Settings, LayoutDashboard, Flame, Zap, Plane, FileText } from 'lucide-react';
+import VsmeLogo from '@/components/VsmeLogo';
 
 const BOTTOM_NAV = [
   { label: 'Hub',      href: '/supplier/hub',     icon: LayoutDashboard },
@@ -46,8 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             href="/supplier/hub"
             className="font-bold text-lg sm:text-xl tracking-tighter flex items-center gap-2 sm:gap-2.5 group"
           >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-black rounded-xl flex items-center justify-center shadow-lg shadow-black/10 group-hover:bg-zinc-800 transition-colors">
-              <ShieldCheck className="text-white w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5px]" />
+            <div className="flex items-center"><VsmeLogo size={28} />
             </div>
             <span>VSME</span>
             <span className="text-gray-400 font-medium">OS</span>

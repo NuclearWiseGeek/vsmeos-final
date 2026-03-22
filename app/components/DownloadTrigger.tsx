@@ -123,7 +123,7 @@ export default function DownloadTrigger({
     return (
       <button
         disabled
-        className="w-full bg-emerald-600 text-white py-4 sm:py-5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
+        className="w-full bg-[#0C2918] text-[#C9A84C] py-4 sm:py-5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-[#C9A84C]/20"
       >
         <FileCheck size={18} />
         Report Downloaded
@@ -154,12 +154,12 @@ export default function DownloadTrigger({
             <div key={i} className="flex items-center gap-2">
               <div className={`
                 w-1.5 h-1.5 rounded-full transition-all duration-300
-                ${i < stageIndex  ? 'bg-emerald-500' : ''}
+                ${i < stageIndex  ? 'bg-[#C9A84C]' : ''}
                 ${i === stageIndex ? 'bg-black scale-125' : ''}
                 ${i > stageIndex  ? 'bg-gray-200' : ''}
               `} />
               {i < STAGES.length - 1 && (
-                <div className={`h-px w-6 transition-colors duration-300 ${i < stageIndex ? 'bg-emerald-300' : 'bg-gray-100'}`} />
+                <div className={`h-px w-6 transition-colors duration-300 ${i < stageIndex ? 'bg-[#DFC06A]' : 'bg-gray-100'}`} />
               )}
             </div>
           ))}
@@ -175,7 +175,7 @@ export default function DownloadTrigger({
   return (
     <button
       onClick={handleDownload}
-      className="w-full bg-black text-white py-4 sm:py-5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-zinc-800 transition-all shadow-lg active:scale-95"
+      className="w-full bg-[#0C2918] text-[#C9A84C] py-4 sm:py-5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 hover:bg-[#122F1E] transition-all shadow-lg active:scale-95"
     >
       <Download size={18} />
       Download Official PDF Report

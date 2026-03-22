@@ -226,7 +226,7 @@ export default function SettingsPage() {
                   isSaved
                     ? 'bg-green-600 shadow-green-200'
                     : nameInput.trim().length >= 2
-                    ? 'bg-black hover:bg-gray-800 shadow-gray-200'
+                    ? 'bg-black hover:bg-[#122F1E] shadow-gray-200'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                 }`}
               >

@@ -331,7 +331,7 @@ export default function TermsPage() {
             </p>
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0C2918] text-[#C9A84C] rounded-full text-sm font-medium hover:bg-[#122F1E] transition-colors"
             >
               {CONTACT_EMAIL}
             </a>

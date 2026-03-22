@@ -132,7 +132,7 @@ export default function AlignmentPage() {
                     { step: '5', label: 'Buyer discloses aggregated Scope 3 in CSRD filing',      detail: 'Under ESRS E1-6, with supplier data as evidence base' },
                   ].map(({ step, label, detail }) => (
                     <div key={step} className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-black text-white rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-6 h-6 bg-[#0C2918] text-[#C9A84C] rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                         {step}
                       </div>
                       <div>

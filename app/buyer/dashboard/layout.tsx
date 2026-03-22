@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Settings, LogOut, Menu, X, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, LogOut, Menu, X } from 'lucide-react';
+import VsmeLogo from '@/components/VsmeLogo';
 import { UserButton } from "@clerk/nextjs";
 
 export default function BuyerLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,7 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
               isActive
-                ? 'bg-black text-white shadow-md'
+                ? 'bg-[#0C2918] text-[#C9A84C] shadow-md'
                 : 'text-gray-500 hover:bg-gray-200 hover:text-gray-900'
             }`}
           >
@@ -46,7 +47,7 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
       {/* ── DESKTOP SIDEBAR — hidden below lg ────────────────── */}
       <aside className="hidden lg:flex w-64 bg-gray-50/80 backdrop-blur-md border-r border-gray-200 flex-col fixed h-full z-10">
         <div className="h-16 flex items-center px-6 border-b border-gray-200">
-          <div className="w-6 h-6 bg-black rounded-md flex items-center justify-center text-white font-bold text-xs mr-2 shadow-sm">V</div>
+          <VsmeLogo size={24} />
           <span className="font-bold text-lg tracking-tight text-gray-900">VSME <span className="text-gray-400 font-normal">Enterprise</span></span>
         </div>
         <nav className="p-4 space-y-1 flex-1">

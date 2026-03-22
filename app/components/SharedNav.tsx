@@ -11,7 +11,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, ArrowLeft, Menu, X } from 'lucide-react';
+import { ArrowLeft, Menu, X } from 'lucide-react';
+import VsmeLogo from '@/components/VsmeLogo';
 import { SignInButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 const NAV_LINKS = [
@@ -30,8 +31,8 @@ export default function SharedNav() {
 
         {/* Logo — clicking returns to landing */}
         <Link href="/" className="text-xl font-bold tracking-tighter flex items-center gap-2.5 group">
-          <div className="w-8 h-8 bg-black rounded-xl flex items-center justify-center shadow-lg shadow-black/10 group-hover:bg-zinc-800 transition-colors">
-            <ShieldCheck className="text-white w-4 h-4 stroke-[2.5px]" />
+          <div className="flex items-center">
+            <VsmeLogo size={32} />
           </div>
           <span>VSME</span>
           <span className="text-gray-400 font-medium text-lg">OS</span>
@@ -102,7 +103,7 @@ export default function SharedNav() {
               <Link
                 href="/supplier/hub"
                 onClick={() => setMobileOpen(false)}
-                className="text-xs font-bold uppercase tracking-widest text-emerald-600"
+                className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]"
               >
                 ← Back to App
               </Link>
@@ -111,7 +112,7 @@ export default function SharedNav() {
               <SignInButton mode="modal" forceRedirectUrl="/supplier">
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="text-xs font-bold uppercase tracking-widest text-emerald-600"
+                  className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]"
                 >
                   Sign In
                 </button>

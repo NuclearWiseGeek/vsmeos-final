@@ -329,7 +329,7 @@ export default function Scope3() {
           ================================================================ */}
       <div className="mt-8 flex justify-center sm:justify-end">
         <Link href="/supplier/hub" className="w-full sm:w-auto">
-          <button className="w-full sm:w-auto bg-black text-white px-8 py-4 rounded-full font-bold hover:bg-gray-800 transition-transform active:scale-[1.02] flex items-center justify-center gap-2 shadow-lg">
+          <button className="w-full sm:w-auto bg-[#0C2918] text-[#C9A84C] px-8 py-4 rounded-full font-bold hover:bg-[#122F1E] transition-transform active:scale-[1.02] flex items-center justify-center gap-2 shadow-lg">
             <Check size={18} /> Save & Return to Hub
           </button>
         </Link>
