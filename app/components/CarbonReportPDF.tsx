@@ -320,8 +320,8 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
       <View style={styles.footerRow}>
         <View style={styles.footerLeftBox}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 10, height: 10, backgroundColor: '#0C2918', borderRadius: 2, marginRight: 3, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ fontSize: 5, color: '#C9A84C', fontWeight: 'bold', marginTop: -0.5 }}>V</Text>
+            <View style={{ width: 7, height: 7, backgroundColor: '#0C2918', borderRadius: 1.5, marginRight: 2.5, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ fontSize: 3.5, color: '#C9A84C', fontWeight: 'bold', marginTop: -0.3 }}>V</Text>
             </View>
             <Text style={{ fontSize: 6.5, fontWeight: 'bold', color: '#a1a1aa', letterSpacing: 0.1 }}>VSME OS</Text>
           </View>
