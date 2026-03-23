@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#e4e4e7',
     paddingTop: 8
   },
-  footerRow: { flexDirection: 'row', alignItems: 'flex-end', width: '100%' },
+  footerRow: { flexDirection: 'row', alignItems: 'center', width: '100%' },
   footerLeftBox: { width: 70, textAlign: 'left' },
   footerCenterBox: { flex: 1, textAlign: 'center' },
   footerRightBox: { width: 70, textAlign: 'right' },
@@ -319,12 +319,12 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
     <View style={styles.footerFixedContainer} fixed>
       <View style={styles.footerRow}>
         <View style={styles.footerLeftBox}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Svg width={12} height={12} viewBox="0 0 34 34">
+          <View style={{ flexDirection: 'row', alignItems: 'center', height: 12 }}>
+            <Svg width={9} height={9} viewBox="0 0 34 34">
               <Rect width="34" height="34" rx="7" fill="#0C2918" />
-              <Path d="M9 13 L17 25 L27 8" stroke="#C9A84C" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              <Path d="M9 13 L17 25 L27 8" stroke="#C9A84C" strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
             </Svg>
-            <Text style={[styles.footerText, { marginLeft: 4, fontWeight: 'bold' }]}>VSME OS</Text>
+            <Text style={{ fontSize: 6.5, fontWeight: 'bold', color: '#a1a1aa', marginLeft: 3, letterSpacing: 0.1 }}>VSME OS</Text>
           </View>
         </View>
         <View style={styles.footerCenterBox}>
