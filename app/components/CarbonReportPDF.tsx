@@ -316,30 +316,36 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
   // ─── Shared footer ───────────────────────────────────────────────────────
   // Footer is dynamic — shows the correct national database for this supplier
   const SharedFooter = () => (
-    <View style={styles.footerFixedContainer} fixed>
-      <View style={styles.footerRow}>
-        <View style={styles.footerLeftBox}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 7, height: 7, backgroundColor: '#0C2918', borderRadius: 1.5, marginRight: 2.5, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ fontSize: 3.5, color: '#C9A84C', fontWeight: 'bold', marginTop: -0.3 }}>V</Text>
-            </View>
-            <Text style={{ fontSize: 6.5, fontWeight: 'bold', color: '#a1a1aa', letterSpacing: 0.1 }}>VSME OS</Text>
-          </View>
-        </View>
-        <View style={styles.footerCenterBox}>
-          <Text style={[styles.footerText, { textAlign: 'center' }]}>
-            Emission factors: {primarySource}
-          </Text>
-          <Text style={[styles.footerText, { textAlign: 'center' }]}>
-            GHG Protocol · Aligned with ISO 14064-1:2018 · Commission Recommendation (EU) 2025/1710
-          </Text>
-        </View>
-        <View style={styles.footerRightBox}>
-          <Text
-            style={styles.footerText}
-            render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
-          />
-        </View>
+    <View
+      style={{
+        position: 'absolute',
+        bottom: 25,
+        left: 50,
+        right: 50,
+        borderTopWidth: 0.5,
+        borderTopColor: '#e4e4e7',
+        paddingTop: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+      }}
+      fixed
+    >
+      <View style={{ width: 70 }}>
+        <Text style={{ fontSize: 6.5, fontWeight: 'bold', color: '#a1a1aa' }}>VSME OS</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 6.5, color: '#a1a1aa', textAlign: 'center', marginBottom: 1 }}>
+          Emission factors: {primarySource}
+        </Text>
+        <Text style={{ fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }}>
+          GHG Protocol · Aligned with ISO 14064-1:2018 · Commission Recommendation (EU) 2025/1710
+        </Text>
+      </View>
+      <View style={{ width: 70, alignItems: 'flex-end' }}>
+        <Text
+          style={{ fontSize: 6.5, color: '#a1a1aa' }}
+          render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
+        />
       </View>
     </View>
   );
