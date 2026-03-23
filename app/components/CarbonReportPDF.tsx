@@ -319,12 +319,11 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
     <View style={styles.footerFixedContainer} fixed>
       <View style={styles.footerRow}>
         <View style={styles.footerLeftBox}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', height: 12 }}>
-            <Svg width={9} height={9} viewBox="0 0 34 34">
-              <Rect width="34" height="34" rx="7" fill="#0C2918" />
-              <Path d="M9 13 L17 25 L27 8" stroke="#C9A84C" strokeWidth={4.5} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-            </Svg>
-            <Text style={{ fontSize: 6.5, fontWeight: 'bold', color: '#a1a1aa', marginLeft: 3, letterSpacing: 0.1 }}>VSME OS</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width: 10, height: 10, backgroundColor: '#0C2918', borderRadius: 2, marginRight: 3, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ fontSize: 5, color: '#C9A84C', fontWeight: 'bold', marginTop: -0.5 }}>V</Text>
+            </View>
+            <Text style={{ fontSize: 6.5, fontWeight: 'bold', color: '#a1a1aa', letterSpacing: 0.1 }}>VSME OS</Text>
           </View>
         </View>
         <View style={styles.footerCenterBox}>
