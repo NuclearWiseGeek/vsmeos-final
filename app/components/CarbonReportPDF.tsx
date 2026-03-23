@@ -313,42 +313,9 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
     }
   });
 
-  // ─── Shared footer ───────────────────────────────────────────────────────
-  // Footer is dynamic — shows the correct national database for this supplier
-  const SharedFooter = () => (
-    <View
-      style={{
-        position: 'absolute',
-        bottom: 25,
-        left: 50,
-        right: 50,
-        borderTopWidth: 0.5,
-        borderTopColor: '#e4e4e7',
-        paddingTop: 8,
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
-      fixed
-    >
-      <View style={{ width: 70 }}>
-        <Text style={{ fontSize: 6.5, fontWeight: 'bold', color: '#a1a1aa' }}>VSME OS</Text>
-      </View>
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 6.5, color: '#a1a1aa', textAlign: 'center', marginBottom: 1 }}>
-          Emission factors: {primarySource}
-        </Text>
-        <Text style={{ fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }}>
-          GHG Protocol · Aligned with ISO 14064-1:2018 · Commission Recommendation (EU) 2025/1710
-        </Text>
-      </View>
-      <View style={{ width: 70, alignItems: 'flex-end' }}>
-        <Text
-          style={{ fontSize: 6.5, color: '#a1a1aa' }}
-          render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
-        />
-      </View>
-    </View>
-  );
+  // ─── Footer lines (rendered as fixed Text on each page) ─────────────────
+  const footerLine1 = `VSME OS  ·  Emission factors: ${primarySource}`;
+  const footerLine2 = 'GHG Protocol · Aligned with ISO 14064-1:2018 · Commission Recommendation (EU) 2025/1710';
 
   // =============================================================================
   // PAGE 1: COVER + EMISSIONS SUMMARY
@@ -503,7 +470,9 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
           </View>
         </View>
 
-        <SharedFooter />
+        <Text style={{ position: 'absolute', bottom: 35, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine1}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine2}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, right: 50, fontSize: 6.5, color: '#a1a1aa' }} fixed render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
       </Page>
 
       {/* =============================================================================
@@ -596,7 +565,9 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
           </View>
         </View>
 
-        <SharedFooter />
+        <Text style={{ position: 'absolute', bottom: 35, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine1}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine2}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, right: 50, fontSize: 6.5, color: '#a1a1aa' }} fixed render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
       </Page>
 
       {/* =============================================================================
@@ -674,7 +645,9 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
           </View>
         </View>
 
-        <SharedFooter />
+        <Text style={{ position: 'absolute', bottom: 35, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine1}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine2}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, right: 50, fontSize: 6.5, color: '#a1a1aa' }} fixed render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
       </Page>
 
       {/* =============================================================================
@@ -797,7 +770,9 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
         </View>
 
 
-        <SharedFooter />
+        <Text style={{ position: 'absolute', bottom: 35, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine1}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, left: 50, right: 50, fontSize: 6.5, color: '#a1a1aa', textAlign: 'center' }} fixed>{footerLine2}</Text>
+        <Text style={{ position: 'absolute', bottom: 25, right: 50, fontSize: 6.5, color: '#a1a1aa' }} fixed render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
       </Page>
     </Document>
   );
