@@ -6,6 +6,11 @@
 //   - Saves 1 second after the last change to companyData or activityData
 //   - Shows a polished bottom-right toast for: restoring / saving / saved / error
 //
+// FIXES IN THIS VERSION (April 2026):
+//   - Removed currency + revenue from assessments upsert (columns dropped)
+//   - Uses singleton createSupabaseClient from utils/supabase (fixes GoTrueClient flood)
+//   - Revenue + currency now saved only to profiles table
+//
 // TOAST STATES:
 //   idle     → hidden
 //   loading  → "Restoring session..." (blue, bounce icon)
@@ -18,19 +23,10 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { createClient } from '@supabase/supabase-js';
 import { useESG } from '@/context/ESGContext';
+import { createSupabaseClient } from '@/utils/supabase';
 import { calculateEmissions, summarizeEmissions } from '@/utils/calculations';
 import { Loader2, CloudOff, DownloadCloud, CheckCircle2 } from 'lucide-react';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-function createClerkSupabaseClient(token: string) {
-  return createClient(supabaseUrl, supabaseKey, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
-}
 
 type Status = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
 
@@ -101,7 +97,7 @@ export default function AutoSave() {
   useEffect(() => { companyDataRef.current  = companyData;  }, [companyData]);
   useEffect(() => { activityDataRef.current = activityData; }, [activityData]);
 
-  const [status, setStatus]   = useState<Status>('idle');
+  const [status, setStatus] = useState<Status>('idle');
   const hasLoaded = useRef(false);
 
   // ── LOADER ────────────────────────────────────────────────────────────────
@@ -112,6 +108,7 @@ export default function AutoSave() {
       let localName = '';
 
       try {
+        // 1. Try localStorage first (instant)
         const localBackup = localStorage.getItem(`esg_backup_${userId}`);
         if (localBackup) {
           const parsed = JSON.parse(localBackup);
@@ -122,11 +119,18 @@ export default function AutoSave() {
           }
         }
 
+        // 2. Load from Supabase (authoritative)
         const token = await getToken({ template: 'supabase' });
         if (token) {
-          const supabase = createClerkSupabaseClient(token);
+          const supabase = createSupabaseClient(token);
+
+          // Load profile
           const { data: profile } = await supabase
-            .from('profiles').select('*').eq('id', userId).maybeSingle();
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle();
+
           const dbName = profile?.company_name || '';
 
           if ((!dbName || dbName === 'EMPTY') && localName.length > 0) {
@@ -134,22 +138,36 @@ export default function AutoSave() {
           } else if (dbName && dbName !== 'EMPTY') {
             setCompanyData(prev => ({
               ...prev,
-              name: profile.company_name,
+              name:     profile.company_name,
               industry: profile.industry || prev.industry,
-              country: profile.country   || prev.country,
+              country:  profile.country  || prev.country,
+              revenue:  profile.revenue  || prev.revenue,
+              currency: profile.currency || prev.currency,
+              signer:   profile.signer   || prev.signer,
+              year:     profile.year?.toString() || prev.year,
             }));
           }
 
+          // Load latest assessment
           const { data: assess } = await supabase
-            .from('assessments').select('*').eq('user_id', userId)
-            .order('updated_at', { ascending: false }).limit(1).maybeSingle();
+            .from('assessments')
+            .select('*')
+            .eq('user_id', userId)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
           if (assess) {
-            if (assess.activity_data) setActivityData(prev => ({ ...prev, ...assess.activity_data }));
-            if (assess.year) setCompanyData(prev => ({ ...prev, year: assess.year.toString() }));
+            if (assess.activity_data) {
+              setActivityData(prev => ({ ...prev, ...assess.activity_data }));
+            }
+            if (assess.year) {
+              setCompanyData(prev => ({ ...prev, year: assess.year.toString() }));
+            }
           }
         }
       } catch (err) {
-        console.error('Load error:', err);
+        console.error('AutoSave load error:', err);
       } finally {
         hasLoaded.current = true;
         setStatus('idle');
@@ -167,25 +185,33 @@ export default function AutoSave() {
       const co = companyDataRef.current;
       const ac = activityDataRef.current;
 
+      // Always save to localStorage as backup
       localStorage.setItem(`esg_backup_${userId}`, JSON.stringify({ company: co, activity: ac }));
 
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('No token');
-      const supabase = createClerkSupabaseClient(token);
+      const supabase = createSupabaseClient(token);
 
+      // Save profile — includes revenue + currency (these live in profiles only)
       await supabase.from('profiles').upsert({
-        id: userId,
-        company_name: co.name || 'EMPTY',
+        id:           userId,
+        company_name: co.name     || 'EMPTY',
         industry:     co.industry || 'General',
         country:      co.country  || 'France',
+        revenue:      co.revenue  || 0,
+        currency:     co.currency || 'EUR',
+        signer:       co.signer   || '',
+        year:         parseInt(co.year) || new Date().getFullYear(),
         updated_at:   new Date().toISOString(),
       });
 
-      const results = calculateEmissions(ac);
+      // Save assessment — NO revenue/currency here (columns dropped from assessments)
+      const results = calculateEmissions(ac, co.country || 'France');
       const totals  = summarizeEmissions(results, co.revenue || 0);
+
       await supabase.from('assessments').upsert({
         user_id:          userId,
-        year:             parseInt(co.year) || 2024,
+        year:             parseInt(co.year) || new Date().getFullYear(),
         activity_data:    ac,
         emissions_totals: totals,
         status:           'draft',
@@ -194,14 +220,15 @@ export default function AutoSave() {
 
       setStatus('saved');
       setTimeout(() => setStatus('idle'), 2000);
+
     } catch (err) {
-      console.error('Save error:', err);
+      console.error('AutoSave save error:', err);
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
     }
   }, [userId, getToken]);
 
-  // ── TRIGGER (debounced 1s) ────────────────────────────────────────────────
+  // ── TRIGGER (debounced 1s after last change) ──────────────────────────────
   useEffect(() => {
     if (!hasLoaded.current) return;
     const t = setTimeout(() => save(), 1000);

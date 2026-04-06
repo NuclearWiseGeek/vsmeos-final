@@ -17,14 +17,16 @@ export async function getPendingInvite() {
 
   const { data } = await supabase
     .from('supplier_invites')
-    .select('buyer_name, status, supplier_name') // <--- 🟢 ADDED supplier_name
+    .select('buyer_name, status, supplier_name')
     .eq('supplier_email', email)
     .maybeSingle();
 
   return data;
 }
 
-// 🟢 UPDATED: Saves to BOTH 'supplier_invites' and 'assessments'
+// Saves company profile to supplier_invites and creates/updates assessment record.
+// NOTE: revenue and currency are NOT saved to assessments (columns were dropped).
+// They live in profiles only. The ESGContext saveToSupabase handles profiles.
 export async function updateCompanyProfile(data: {
   country: string;
   industry: string;
@@ -35,30 +37,29 @@ export async function updateCompanyProfile(data: {
   const user = await currentUser();
   if (!user) return { error: 'Unauthorized' };
   
-  // Get the Clerk User ID (needed for assessments table)
-  const userId = user.id; 
+  const userId = user.id;
   const email = user.emailAddresses[0].emailAddress;
 
   const { getToken } = await auth();
   const token = await getToken({ template: 'supabase' });
 
-  // 🟢 FIX: Ensure token is not null before proceeding
   if (!token) {
     return { error: 'No authentication token found' };
   }
 
   const supabase = createSupabaseClient(token);
 
-  // 1. Update the Invite (So the Buyer sees "In Progress")
+  // 1. Update the supplier_invites record so buyer sees progress
   const { error: inviteError } = await supabase
     .from('supplier_invites')
     .update({
-      country: data.country,
-      industry: data.industry,
+      country:        data.country,
+      industry:       data.industry,
       financial_year: data.year,
-      currency: data.currency,
-      revenue: data.revenue,
-      status: 'in_progress'
+      currency:       data.currency,
+      revenue:        data.revenue,
+      status:         'started',      // matches our status vocabulary
+      updated_at:     new Date().toISOString(),
     })
     .eq('supplier_email', email);
 
@@ -67,21 +68,22 @@ export async function updateCompanyProfile(data: {
     return { success: false };
   }
 
-  // 2. Create/Update the Assessment (So YOU have the data for the report)
+  // 2. Create/update assessment record for this user + year
+  //    NO revenue or currency here — those columns were dropped from assessments
   const { error: assessmentError } = await supabase
     .from('assessments')
     .upsert({
-      user_id: userId,        // The Clerk ID
-      year: parseInt(data.year),
-      revenue: data.revenue,
-      currency: data.currency,
-      status: 'draft'         // Default status
-    }, { 
-      onConflict: 'user_id, year' // Ensure we don't create duplicates for the same year
+      user_id:    userId,
+      year:       parseInt(data.year),
+      status:     'draft',
+      updated_at: new Date().toISOString(),
+    }, {
+      onConflict: 'user_id, year',
     });
 
   if (assessmentError) {
     console.error('Assessment Update Error:', assessmentError);
+    // Non-fatal — profile page still works without this
   }
 
   return { success: true };

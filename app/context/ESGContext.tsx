@@ -311,7 +311,7 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
    */
   const resetAssessment = useCallback(() => {
     if (confirm('Are you sure you want to start a new assessment? All current data will be cleared.')) {
-      setCompanyData(INITIAL_COMPANY_DATA);
+      setCompanyData(prev => ({ ...INITIAL_COMPANY_DATA, name: prev.name })); // ← keeps name
       setActivityData(INITIAL_ACTIVITY_DATA);
       setLastSaved(null);
     }

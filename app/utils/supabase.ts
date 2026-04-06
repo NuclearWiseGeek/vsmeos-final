@@ -1,30 +1,38 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+let client: SupabaseClient | null = null;
+let currentToken: string | null = null;
+
 /**
- * Creates a Supabase client authenticated with the user's Clerk token.
- * Use this for ALL database actions (reads, writes, deletes).
+ * Returns a singleton Supabase client authenticated with the user's Clerk token.
+ * Reuses the same instance as long as the token hasn't changed — prevents the
+ * "Multiple GoTrueClient instances" warning and undefined behaviour between pages.
  *
- * SECURITY: This client respects Row Level Security (RLS) policies.
- * Each user can only access their own data because the JWT contains
- * their Clerk userId, and RLS policies filter on that.
- *
+ * SECURITY: Respects Row Level Security (RLS). Each user only sees their own data.
  * NEVER use SUPABASE_SERVICE_ROLE_KEY in user-facing code — it bypasses RLS.
  */
-export const createSupabaseClient = (clerkToken: string) => {
-  return createClient(supabaseUrl, supabaseAnonKey, {
+export const createSupabaseClient = (clerkToken: string): SupabaseClient => {
+  // Reuse existing client if token is the same
+  if (client && currentToken === clerkToken) {
+    return client;
+  }
+
+  // Create new client (first load or token refreshed)
+  currentToken = clerkToken;
+  client = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
     global: {
       headers: {
         Authorization: `Bearer ${clerkToken}`,
       },
     },
   });
-};
 
-// NOTE: The anonymous client export was removed (March 2026, security audit).
-// An unauthenticated client bypasses RLS and should never be used for
-// user-facing operations. If you need an admin client for a server action,
-// use SUPABASE_SERVICE_ROLE_KEY inside that specific server action only
-// (see actions/uploadEvidence.ts for the pattern).
+  return client;
+};
