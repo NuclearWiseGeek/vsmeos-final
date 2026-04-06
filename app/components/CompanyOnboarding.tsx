@@ -2,19 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
-import { createClient } from '@supabase/supabase-js';
 import { useESG } from '@/context/ESGContext';
+import { createSupabaseClient } from '@/utils/supabase';
 import { Building2, ArrowRight, Loader2 } from 'lucide-react';
-
-// Use a single Supabase instance helper if possible, or create locally
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-function createClerkSupabaseClient(token: string) {
-  return createClient(supabaseUrl, supabaseKey, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
-}
 
 export default function CompanyOnboarding() {
   const { companyData, setCompanyData } = useESG();
@@ -34,7 +24,7 @@ export default function CompanyOnboarding() {
       try {
         const token = await getToken({ template: 'supabase' });
         if (!token) return;
-        const supabase = createClerkSupabaseClient(token);
+        const supabase = createSupabaseClient(token);
 
         // Check DB for existing name
         const { data: profile } = await supabase
@@ -69,7 +59,7 @@ export default function CompanyOnboarding() {
     try {
       const token = await getToken({ template: 'supabase' });
       if (!token) return;
-      const supabase = createClerkSupabaseClient(token);
+      const supabase = createSupabaseClient(token);
 
       // FORCE SAVE to Database
       const { error } = await supabase.from('profiles').upsert({
