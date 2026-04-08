@@ -176,7 +176,7 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
           .from('profiles')
           .select('*')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (profileError && profileError.code !== 'PGRST116') {
           // PGRST116 = row not found (new user, no profile yet) — that's fine
@@ -197,15 +197,15 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
           }));
         }
 
-        // Load the most recent assessment for this user from 'assessments' table
-        // We order by year DESC so we get the latest one first
+        // Load the most recently UPDATED assessment — order by updated_at not year
+        // This ensures we get the row with real data, not a blank newer-year row
         const { data: assessmentData, error: assessmentError } = await supabase
           .from('assessments')
           .select('*')
           .eq('user_id', userId)
-          .order('year', { ascending: false })
+          .order('updated_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (assessmentError && assessmentError.code !== 'PGRST116') {
           console.error('[VSME OS] Error loading assessment:', assessmentError);
