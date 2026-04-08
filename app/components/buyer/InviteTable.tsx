@@ -8,6 +8,12 @@
 //
 // REAL-TIME: Supabase postgres_changes subscription updates status badges
 //            live as suppliers progress through their assessment.
+//
+// STATUS VALUES (must match exactly what is in supplier_invites table):
+//   'draft'     → Added but invite not yet sent
+//   'sent'      → Invite email sent, supplier hasn't opened yet
+//   'started'   → Supplier has opened the assessment hub
+//   'submitted' → Supplier has generated their PDF report (complete)
 // =============================================================================
 
 'use client';
@@ -23,23 +29,24 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// ── Status badge component (reused in both mobile + desktop) ──────
+// ── Status badge component ────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   if (status === 'sent') return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
       <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Invite Sent
     </span>
   );
-  if (status === 'in_progress') return (
+  if (status === 'started') return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
       <Loader2 size={10} className="animate-spin" /> In Progress
     </span>
   );
-  if (status === 'completed') return (
+  if (status === 'submitted') return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#0C2918]/10 text-[#1A5C3A] border border-[#1A5C3A]/40">
       <CheckCircle2 size={12} /> Report Ready
     </span>
   );
+  // default: 'draft'
   return (
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
       <div className="w-1.5 h-1.5 rounded-full bg-slate-400" /> Draft
@@ -101,12 +108,17 @@ export default function InviteTable({ suppliers: initialSuppliers }: { suppliers
     else { alert("Failed to send email"); }
   };
 
-  // ── Action buttons (reused in both layouts) ───────────────────────
+  // ── Action buttons ────────────────────────────────────────────────
   function ActionButtons({ s }: { s: any }) {
     const isLoading = loadingId === s.id;
     const isEditing = editingId === s.id;
     const isSending = sendingId === s.id;
     const isSentRecently = sentSuccessId === s.id;
+
+    // Supplier has submitted — send button is permanently disabled
+    const isComplete = s.status === 'submitted';
+    // Supplier has started — don't re-send
+    const isStarted = s.status === 'started';
 
     if (isLoading) return <Loader2 className="animate-spin text-blue-600" size={18} />;
     if (isEditing) return (
@@ -119,11 +131,11 @@ export default function InviteTable({ suppliers: initialSuppliers }: { suppliers
       <div className="flex items-center gap-1">
         <button
           onClick={() => handleSendEmail(s.id, s.supplier_email, s.supplier_name)}
-          disabled={isSending || isSentRecently || s.status === 'completed' || s.status === 'in_progress'}
+          disabled={isSending || isSentRecently || isComplete || isStarted}
           className={`p-2 rounded-full transition-colors ${
             isSentRecently || s.status === 'sent' ? 'text-[#C9A84C] bg-[#0C2918]/10' : 'text-blue-600 hover:bg-blue-50'
-          } ${s.status === 'completed' ? 'opacity-30 cursor-not-allowed' : ''}`}
-          title="Send Invite Email"
+          } ${isComplete || isStarted ? 'opacity-30 cursor-not-allowed' : ''}`}
+          title={isComplete ? 'Report submitted' : isStarted ? 'Supplier is in progress' : 'Send Invite Email'}
         >
           {isSending ? <Loader2 className="animate-spin" size={16} /> : (s.status === 'sent' ? <CheckCircle2 size={16} /> : <Send size={16} />)}
         </button>
