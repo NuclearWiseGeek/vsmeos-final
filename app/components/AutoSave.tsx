@@ -2,16 +2,20 @@
 // FILE: components/AutoSave.tsx
 // PURPOSE: Debounced auto-save engine + toast notification.
 //
-//   This component ONLY saves. Loading is handled by ESGContext on mount.
+//   - Loads data from localStorage (fast) then Supabase (authoritative)
+//   - Saves 1 second after the last change to companyData or activityData
+//   - Shows a polished bottom-right toast for: restoring / saving / saved / error
 //
-//   SAVE TRIGGERS:
-//   - Waits for Clerk auth to be ready (isLoaded + userId)
-//   - Then waits 1.5 seconds before first save (gives ESGContext time to finish
-//     loading from Supabase and set real state into context)
-//   - After that, saves 1 second after every change to companyData or activityData
+// FIXES IN THIS VERSION (April 2026):
+//   - Removed currency + revenue from assessments upsert (columns dropped)
+//   - Uses singleton createSupabaseClient from utils/supabase (fixes GoTrueClient flood)
+//   - Revenue + currency now saved only to profiles table
+//   - justLoaded guard: blocks save trigger for 2s after load completes,
+//     preventing blank state from overwriting Supabase data in incognito sessions
 //
 // TOAST STATES:
 //   idle     → hidden
+//   loading  → "Restoring session..." (blue, bounce icon)
 //   saving   → "Saving..." (blue, spin icon)
 //   saved    → "All changes saved" (gold, 2s then hides)
 //   error    → "Saved locally" (amber, 3s then hides)
@@ -24,9 +28,9 @@ import { useAuth } from '@clerk/nextjs';
 import { useESG } from '@/context/ESGContext';
 import { createSupabaseClient } from '@/utils/supabase';
 import { calculateEmissions, summarizeEmissions } from '@/utils/calculations';
-import { Loader2, CloudOff, CheckCircle2 } from 'lucide-react';
+import { Loader2, CloudOff, DownloadCloud, CheckCircle2 } from 'lucide-react';
 
-type Status = 'idle' | 'saving' | 'saved' | 'error';
+type Status = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
 
 // ── Toast UI ──────────────────────────────────────────────────────────────────
 function SaveToast({ status }: { status: Status }) {
@@ -39,6 +43,13 @@ function SaveToast({ status }: { status: Status }) {
     border: string;
     text: string;
   }> = {
+    loading: {
+      icon: <DownloadCloud size={14} className="text-blue-500 animate-bounce" />,
+      label: 'Restoring session...',
+      bg: 'bg-white/95',
+      border: 'border-blue-100',
+      text: 'text-blue-600',
+    },
     saving: {
       icon: <Loader2 size={14} className="text-blue-500 animate-spin" />,
       label: 'Saving...',
@@ -80,47 +91,120 @@ function SaveToast({ status }: { status: Status }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function AutoSave() {
-  const { companyData, activityData } = useESG();
+  const { companyData, setCompanyData, activityData, setActivityData } = useESG();
   const { getToken, userId, isLoaded } = useAuth();
 
-  // Refs so the save callback always reads the latest values without stale closure
   const companyDataRef  = useRef(companyData);
   const activityDataRef = useRef(activityData);
   useEffect(() => { companyDataRef.current  = companyData;  }, [companyData]);
   useEffect(() => { activityDataRef.current = activityData; }, [activityData]);
 
   const [status, setStatus] = useState<Status>('idle');
+  const hasLoaded  = useRef(false); // true once initial Supabase load completes
+  const justLoaded = useRef(false); // true for 2s after load — blocks first save
 
-  // readyToSave: flips to true after a 1.5s delay once Clerk auth is ready.
-  // This gives ESGContext enough time to finish loading from Supabase and
-  // populate real data into state before AutoSave is allowed to write anything.
-  const readyToSave = useRef(false);
-
+  // ── LOADER ────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!isLoaded || !userId) return;
-    const t = setTimeout(() => { readyToSave.current = true; }, 1500);
-    return () => clearTimeout(t);
-  }, [isLoaded, userId]);
+    const load = async () => {
+      if (!isLoaded || !userId || hasLoaded.current) return;
+      setStatus('loading');
+      let localName = '';
 
-  // ── SAVER ─────────────────────────────────────────────────────────────────
+      try {
+        // 1. Try localStorage first (instant)
+        const localBackup = localStorage.getItem(`esg_backup_${userId}`);
+        if (localBackup) {
+          const parsed = JSON.parse(localBackup);
+          if (parsed.company?.name) {
+            setCompanyData(parsed.company);
+            if (parsed.activity) setActivityData(parsed.activity);
+            localName = parsed.company.name;
+          }
+        }
+
+        // 2. Load from Supabase (authoritative — always wins)
+        const token = await getToken({ template: 'supabase' });
+        if (token) {
+          const supabase = createSupabaseClient(token);
+
+          // Load profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle();
+
+          const dbName = profile?.company_name || '';
+
+          if ((!dbName || dbName === 'EMPTY') && localName.length > 0) {
+            // Keep local — cloud has no name yet
+          } else if (dbName && dbName !== 'EMPTY') {
+            setCompanyData(prev => ({
+              ...prev,
+              name:     profile.company_name,
+              industry: profile.industry || prev.industry,
+              country:  profile.country  || prev.country,
+              revenue:  profile.revenue  || prev.revenue,
+              currency: profile.currency || prev.currency,
+              signer:   profile.signer   || prev.signer,
+              year:     profile.year?.toString() || prev.year,
+            }));
+          }
+
+          // Load most recently updated assessment
+          const { data: assess } = await supabase
+            .from('assessments')
+            .select('*')
+            .eq('user_id', userId)
+            .order('updated_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (assess) {
+            if (assess.activity_data) {
+              setActivityData(prev => ({ ...prev, ...assess.activity_data }));
+            }
+            if (assess.year) {
+              setCompanyData(prev => ({ ...prev, year: assess.year.toString() }));
+            }
+          }
+        }
+      } catch (err) {
+        console.error('AutoSave load error:', err);
+      } finally {
+        hasLoaded.current = true;
+
+        // Block the debounce save for 2 seconds after load completes.
+        // This prevents state changes from setCompanyData/setActivityData above
+        // from triggering a save before refs update with the real loaded values.
+        justLoaded.current = true;
+        setTimeout(() => { justLoaded.current = false; }, 2000);
+
+        setStatus('idle');
+      }
+    };
+    load();
+  }, [isLoaded, userId, getToken, setCompanyData, setActivityData]);
+
+  // ── SAVER ────────────────────────────────────────────────────────────────
   const save = useCallback(async () => {
-    if (!userId || !readyToSave.current) return;
+    if (!userId || !hasLoaded.current) return;
     setStatus('saving');
 
     try {
       const co = companyDataRef.current;
       const ac = activityDataRef.current;
 
-      // Always write to localStorage as an offline backup
+      // Always save to localStorage as backup
       try {
         localStorage.setItem(`esg_backup_${userId}`, JSON.stringify({ company: co, activity: ac }));
-      } catch (_) { /* non-fatal if localStorage is unavailable */ }
+      } catch (_) { /* non-fatal */ }
 
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('No token');
       const supabase = createSupabaseClient(token);
 
-      // Save profile — revenue + currency live here ONLY, never in assessments
+      // Save profile — revenue + currency live here ONLY
       await supabase.from('profiles').upsert({
         id:           userId,
         company_name: co.name     || 'EMPTY',
@@ -150,7 +234,7 @@ export default function AutoSave() {
       setTimeout(() => setStatus('idle'), 2000);
 
     } catch (err) {
-      console.error('AutoSave error:', err);
+      console.error('AutoSave save error:', err);
       setStatus('error');
       setTimeout(() => setStatus('idle'), 3000);
     }
@@ -158,7 +242,8 @@ export default function AutoSave() {
 
   // ── TRIGGER (debounced 1s after last change) ──────────────────────────────
   useEffect(() => {
-    if (!readyToSave.current) return;
+    if (!hasLoaded.current) return;
+    if (justLoaded.current) return; // block save immediately after load
     const t = setTimeout(() => save(), 1000);
     return () => clearTimeout(t);
   }, [companyData, activityData, save]);
