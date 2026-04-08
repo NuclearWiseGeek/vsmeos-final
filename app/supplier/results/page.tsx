@@ -424,6 +424,7 @@ export default function ResultsPage() {
             activityData={activityData}
             fileVault={simpleFileVault}
             debouncedSigner={debouncedSigner}
+            onDownloadComplete={saveToDatabase}
           />
         </div>
       </div>

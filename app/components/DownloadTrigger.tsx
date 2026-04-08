@@ -24,12 +24,13 @@ import { pdf } from '@react-pdf/renderer';
 import CarbonReportPDF from '@/components/CarbonReportPDF';
 
 interface DownloadTriggerProps {
-  companyData:     any;
-  totals:          any;
-  breakdown:       any[];
-  activityData:    any;
-  fileVault:       any;
-  debouncedSigner: string;
+  companyData:          any;
+  totals:               any;
+  breakdown:            any[];
+  activityData:         any;
+  fileVault:            any;
+  debouncedSigner:      string;
+  onDownloadComplete?:  () => Promise<void>;
 }
 
 const STAGES = [
@@ -39,7 +40,7 @@ const STAGES = [
 ];
 
 export default function DownloadTrigger({
-  companyData, totals, breakdown, activityData, fileVault, debouncedSigner
+  companyData, totals, breakdown, activityData, fileVault, debouncedSigner, onDownloadComplete
 }: DownloadTriggerProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [stageIndex,   setStageIndex]   = useState(0);
@@ -88,6 +89,12 @@ export default function DownloadTrigger({
 
       // Brief "done" state before resetting
       setDone(true);
+
+      // Fire status update — marks supplier as submitted in DB + buyer dashboard
+      if (onDownloadComplete) {
+        try { await onDownloadComplete(); } catch (e) { console.error('Status update after download failed:', e); }
+      }
+
       setTimeout(() => {
         setIsGenerating(false);
         setDone(false);
