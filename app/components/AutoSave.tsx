@@ -10,6 +10,9 @@
 //   - Removed currency + revenue from assessments upsert (columns dropped)
 //   - Uses singleton createSupabaseClient from utils/supabase (fixes GoTrueClient flood)
 //   - Revenue + currency now saved only to profiles table
+//   - Added justLoaded guard: blocks auto-save from firing immediately after
+//     load completes, preventing blank state from overwriting real Supabase data
+//     (critical fix for incognito / fresh sessions)
 //
 // TOAST STATES:
 //   idle     → hidden
@@ -98,7 +101,8 @@ export default function AutoSave() {
   useEffect(() => { activityDataRef.current = activityData; }, [activityData]);
 
   const [status, setStatus] = useState<Status>('idle');
-  const hasLoaded = useRef(false);
+  const hasLoaded   = useRef(false); // true once initial load from Supabase completes
+  const justLoaded  = useRef(false); // true for 2s after load — blocks first save trigger
 
   // ── LOADER ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -119,7 +123,7 @@ export default function AutoSave() {
           }
         }
 
-        // 2. Load from Supabase (authoritative)
+        // 2. Load from Supabase (authoritative — always wins over localStorage)
         const token = await getToken({ template: 'supabase' });
         if (token) {
           const supabase = createSupabaseClient(token);
@@ -134,7 +138,7 @@ export default function AutoSave() {
           const dbName = profile?.company_name || '';
 
           if ((!dbName || dbName === 'EMPTY') && localName.length > 0) {
-            // Keep local — cloud is empty
+            // Keep local — cloud has no name yet
           } else if (dbName && dbName !== 'EMPTY') {
             setCompanyData(prev => ({
               ...prev,
@@ -148,7 +152,7 @@ export default function AutoSave() {
             }));
           }
 
-          // Load latest assessment
+          // Load the most recently updated assessment for this user
           const { data: assess } = await supabase
             .from('assessments')
             .select('*')
@@ -170,6 +174,16 @@ export default function AutoSave() {
         console.error('AutoSave load error:', err);
       } finally {
         hasLoaded.current = true;
+
+        // ── KEY FIX ──────────────────────────────────────────────────────────
+        // Block the debounce save from firing for 2 seconds after load.
+        // Without this, the state changes from setCompanyData/setActivityData
+        // above trigger the debounce effect before the refs update, causing
+        // blank data to overwrite real Supabase data in fresh/incognito sessions.
+        justLoaded.current = true;
+        setTimeout(() => { justLoaded.current = false; }, 2000);
+        // ─────────────────────────────────────────────────────────────────────
+
         setStatus('idle');
       }
     };
@@ -229,8 +243,11 @@ export default function AutoSave() {
   }, [userId, getToken]);
 
   // ── TRIGGER (debounced 1s after last change) ──────────────────────────────
+  // justLoaded guard prevents this from firing immediately after load
+  // which would overwrite Supabase data with blank default state
   useEffect(() => {
     if (!hasLoaded.current) return;
+    if (justLoaded.current) return;   // ← THE FIX
     const t = setTimeout(() => save(), 1000);
     return () => clearTimeout(t);
   }, [companyData, activityData, save]);
