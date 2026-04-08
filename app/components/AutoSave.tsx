@@ -2,16 +2,13 @@
 // FILE: components/AutoSave.tsx
 // PURPOSE: Debounced auto-save engine + toast notification.
 //
-//   IMPORTANT ARCHITECTURE NOTE:
-//   This component ONLY saves. It never loads data.
-//   Loading is handled entirely by ESGContext on mount.
-//   Having two components both load and set state created a race condition
-//   where blank default state overwrote real Supabase data in fresh/incognito
-//   sessions. Removing load logic from here fixes that permanently.
+//   This component ONLY saves. Loading is handled by ESGContext on mount.
 //
 //   SAVE TRIGGERS:
-//   - 1 second after the last change to companyData or activityData
-//   - Only fires after ESGContext has finished its initial load (isLoading = false)
+//   - Waits for Clerk auth to be ready (isLoaded + userId)
+//   - Then waits 1.5 seconds before first save (gives ESGContext time to finish
+//     loading from Supabase and set real state into context)
+//   - After that, saves 1 second after every change to companyData or activityData
 //
 // TOAST STATES:
 //   idle     → hidden
@@ -83,10 +80,10 @@ function SaveToast({ status }: { status: Status }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function AutoSave() {
-  const { companyData, activityData, isLoading } = useESG();
-  const { getToken, userId } = useAuth();
+  const { companyData, activityData } = useESG();
+  const { getToken, userId, isLoaded } = useAuth();
 
-  // Refs so the save callback always reads the latest values
+  // Refs so the save callback always reads the latest values without stale closure
   const companyDataRef  = useRef(companyData);
   const activityDataRef = useRef(activityData);
   useEffect(() => { companyDataRef.current  = companyData;  }, [companyData]);
@@ -94,9 +91,20 @@ export default function AutoSave() {
 
   const [status, setStatus] = useState<Status>('idle');
 
+  // readyToSave: flips to true after a 1.5s delay once Clerk auth is ready.
+  // This gives ESGContext enough time to finish loading from Supabase and
+  // populate real data into state before AutoSave is allowed to write anything.
+  const readyToSave = useRef(false);
+
+  useEffect(() => {
+    if (!isLoaded || !userId) return;
+    const t = setTimeout(() => { readyToSave.current = true; }, 1500);
+    return () => clearTimeout(t);
+  }, [isLoaded, userId]);
+
   // ── SAVER ─────────────────────────────────────────────────────────────────
   const save = useCallback(async () => {
-    if (!userId) return;
+    if (!userId || !readyToSave.current) return;
     setStatus('saving');
 
     try {
@@ -106,13 +114,13 @@ export default function AutoSave() {
       // Always write to localStorage as an offline backup
       try {
         localStorage.setItem(`esg_backup_${userId}`, JSON.stringify({ company: co, activity: ac }));
-      } catch (_) { /* localStorage unavailable (incognito storage full etc) — non-fatal */ }
+      } catch (_) { /* non-fatal if localStorage is unavailable */ }
 
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('No token');
       const supabase = createSupabaseClient(token);
 
-      // Save profile — revenue + currency live here ONLY
+      // Save profile — revenue + currency live here ONLY, never in assessments
       await supabase.from('profiles').upsert({
         id:           userId,
         company_name: co.name     || 'EMPTY',
@@ -125,7 +133,7 @@ export default function AutoSave() {
         updated_at:   new Date().toISOString(),
       });
 
-      // Save assessment — no revenue/currency (columns don't exist on assessments)
+      // Save assessment — no revenue/currency (not in assessments table)
       const results = calculateEmissions(ac, co.country || 'France');
       const totals  = summarizeEmissions(results, co.revenue || 0);
 
@@ -148,14 +156,12 @@ export default function AutoSave() {
     }
   }, [userId, getToken]);
 
-  // ── TRIGGER ───────────────────────────────────────────────────────────────
-  // Only fires after ESGContext has finished loading (isLoading = false)
-  // This is the key guard — prevents saving blank defaults during initial load
+  // ── TRIGGER (debounced 1s after last change) ──────────────────────────────
   useEffect(() => {
-    if (isLoading) return;   // ESGContext still loading — do not save yet
+    if (!readyToSave.current) return;
     const t = setTimeout(() => save(), 1000);
     return () => clearTimeout(t);
-  }, [companyData, activityData, save, isLoading]);
+  }, [companyData, activityData, save]);
 
   return <SaveToast status={status} />;
 }
