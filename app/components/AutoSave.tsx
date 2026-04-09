@@ -4,14 +4,15 @@
 //
 //   - Loads data from localStorage (fast) then Supabase (authoritative)
 //   - Saves 1 second after the last change to companyData or activityData
+//   - Guards against saving all-zero activity data (prevents blank overwrites)
 //   - Shows a polished bottom-right toast for: restoring / saving / saved / error
 //
 // FIXES IN THIS VERSION (April 2026):
 //   - Removed currency + revenue from assessments upsert (columns dropped)
 //   - Uses singleton createSupabaseClient from utils/supabase (fixes GoTrueClient flood)
 //   - Revenue + currency now saved only to profiles table
-//   - justLoaded guard: blocks save trigger for 2s after load completes,
-//     preventing blank state from overwriting Supabase data in incognito sessions
+//   - hasRealData guard: skips assessment upsert if all activity values are zero,
+//     preventing blank default state from overwriting real data in Supabase
 //
 // TOAST STATES:
 //   idle     → hidden
@@ -31,6 +32,12 @@ import { calculateEmissions, summarizeEmissions } from '@/utils/calculations';
 import { Loader2, CloudOff, DownloadCloud, CheckCircle2 } from 'lucide-react';
 
 type Status = 'idle' | 'loading' | 'saving' | 'saved' | 'error';
+
+// Returns true if at least one activity field has a non-zero value
+// Used to guard against saving blank default state over real Supabase data
+function hasRealData(activity: Record<string, number>): boolean {
+  return Object.values(activity).some(v => v > 0);
+}
 
 // ── Toast UI ──────────────────────────────────────────────────────────────────
 function SaveToast({ status }: { status: Status }) {
@@ -100,8 +107,7 @@ export default function AutoSave() {
   useEffect(() => { activityDataRef.current = activityData; }, [activityData]);
 
   const [status, setStatus] = useState<Status>('idle');
-  const hasLoaded  = useRef(false); // true once initial Supabase load completes
-  const justLoaded = useRef(false); // true for 2s after load — blocks first save
+  const hasLoaded = useRef(false);
 
   // ── LOADER ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -122,7 +128,7 @@ export default function AutoSave() {
           }
         }
 
-        // 2. Load from Supabase (authoritative — always wins)
+        // 2. Load from Supabase (authoritative — always wins over localStorage)
         const token = await getToken({ template: 'supabase' });
         if (token) {
           const supabase = createSupabaseClient(token);
@@ -173,13 +179,6 @@ export default function AutoSave() {
         console.error('AutoSave load error:', err);
       } finally {
         hasLoaded.current = true;
-
-        // Block the debounce save for 2 seconds after load completes.
-        // This prevents state changes from setCompanyData/setActivityData above
-        // from triggering a save before refs update with the real loaded values.
-        justLoaded.current = true;
-        setTimeout(() => { justLoaded.current = false; }, 2000);
-
         setStatus('idle');
       }
     };
@@ -204,7 +203,7 @@ export default function AutoSave() {
       if (!token) throw new Error('No token');
       const supabase = createSupabaseClient(token);
 
-      // Save profile — revenue + currency live here ONLY
+      // Always save profile (company name, country etc — safe to save even when empty)
       await supabase.from('profiles').upsert({
         id:           userId,
         company_name: co.name     || 'EMPTY',
@@ -217,18 +216,22 @@ export default function AutoSave() {
         updated_at:   new Date().toISOString(),
       });
 
-      // Save assessment — no revenue/currency (not in assessments table)
-      const results = calculateEmissions(ac, co.country || 'France');
-      const totals  = summarizeEmissions(results, co.revenue || 0);
+      // Only save assessment if there is real data (at least one non-zero value)
+      // This is the key guard — prevents blank default state from overwriting
+      // real Supabase data when state initialises with zeros on fresh/incognito load
+      if (hasRealData(ac)) {
+        const results = calculateEmissions(ac, co.country || 'France');
+        const totals  = summarizeEmissions(results, co.revenue || 0);
 
-      await supabase.from('assessments').upsert({
-        user_id:          userId,
-        year:             parseInt(co.year) || new Date().getFullYear(),
-        activity_data:    ac,
-        emissions_totals: totals,
-        status:           'draft',
-        updated_at:       new Date().toISOString(),
-      }, { onConflict: 'user_id, year' });
+        await supabase.from('assessments').upsert({
+          user_id:          userId,
+          year:             parseInt(co.year) || new Date().getFullYear(),
+          activity_data:    ac,
+          emissions_totals: totals,
+          status:           'draft',
+          updated_at:       new Date().toISOString(),
+        }, { onConflict: 'user_id, year' });
+      }
 
       setStatus('saved');
       setTimeout(() => setStatus('idle'), 2000);
@@ -243,7 +246,6 @@ export default function AutoSave() {
   // ── TRIGGER (debounced 1s after last change) ──────────────────────────────
   useEffect(() => {
     if (!hasLoaded.current) return;
-    if (justLoaded.current) return; // block save immediately after load
     const t = setTimeout(() => save(), 1000);
     return () => clearTimeout(t);
   }, [companyData, activityData, save]);
