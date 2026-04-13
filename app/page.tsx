@@ -14,7 +14,7 @@ import { SignInButton, SignedIn, SignedOut } from '@clerk/nextjs';
 const FAQS = [
   {
     q: 'Is this actually CSRD compliant?',
-    a: 'VSME OS generates reports designed for CSRD Scope 3 data collection — the standard your buyer uses when requesting supplier carbon data. The report covers Scope 1 (direct emissions), Scope 2 (purchased energy), and Scope 3 Categories 6 and 7 (business travel and employee commuting). Reports are self-attested (limited assurance) and based on GHG Protocol methodology. They are designed to satisfy buyer CSRD data requests. For independently verified reports, we recommend engaging a third-party verifier. Our alignment page explains this in full.'
+    a: 'VSME OS generates reports designed for CSRD Scope 3 data collection — the standard your buyer uses when requesting supplier carbon data. The report covers Scope 1 (direct emissions), Scope 2 (purchased energy), and Scope 3 Categories 6 and 7 (business travel and employee commuting). Reports are self-attested (limited assurance) and based on GHG Protocol methodology. They are designed to satisfy common buyer Scope 3 data requests under CSRD. They do not constitute an independently verified or assured report. For independently verified reports, we recommend engaging a third-party verifier. Our alignment page explains this in full.'
   },
   {
     q: 'How long does it take to complete a report?',
@@ -92,7 +92,7 @@ export default function LandingPage() {
       {/* ================================================================
           1. NAVIGATION
           ================================================================ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-lg border-b border-gray-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-100">
         <div className="flex items-center justify-between px-6 py-4 md:px-10 md:py-5 max-w-7xl mx-auto">
 
           <div className="text-xl md:text-2xl font-bold tracking-tighter flex items-center gap-2.5">
@@ -106,18 +106,27 @@ export default function LandingPage() {
             <a href="/alignment"   className="hover:text-black transition-colors">Alignment</a>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="hidden md:block">
+          <div className="flex items-center gap-4">
+            {/* Desktop nav buttons */}
+            <div className="hidden md:flex items-center gap-3">
               <SignedOut>
                 <SignInButton mode="modal" forceRedirectUrl="/buyer/dashboard">
-                  <button className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">
-                    Buyer Login
+                  <button className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#C9A84C]/60 hover:text-[#C9A84C] border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 px-4 py-2 rounded-lg transition-all">
+                    For Buyers
+                  </button>
+                </SignInButton>
+                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                  <button className="text-[11px] font-bold uppercase tracking-[0.15em] bg-[#C9A84C] text-[#0C2918] hover:bg-[#DFC06A] px-4 py-2 rounded-lg transition-all">
+                    For Suppliers
                   </button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <Link href="/buyer/dashboard" className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C9A84C] hover:text-black transition-colors">
+                <Link href="/buyer/dashboard" className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#C9A84C]/60 hover:text-[#C9A84C] border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 px-4 py-2 rounded-lg transition-all">
                   Buyer Dashboard
+                </Link>
+                <Link href="/supplier" className="text-[11px] font-bold uppercase tracking-[0.15em] bg-[#C9A84C] text-[#0C2918] hover:bg-[#DFC06A] px-4 py-2 rounded-lg transition-all">
+                  Supplier Portal
                 </Link>
               </SignedIn>
             </div>
@@ -134,12 +143,18 @@ export default function LandingPage() {
             <a href="/alignment"   onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-gray-400">Alignment</a>
             <SignedOut>
               <SignInButton mode="modal" forceRedirectUrl="/buyer/dashboard">
-                <button className="text-left text-xs font-bold uppercase tracking-widest text-[#C9A84C] mt-2">Buyer Portal Login</button>
+                <button className="text-left text-xs font-bold uppercase tracking-widest text-[#C9A84C]/60 mt-2">For Buyers</button>
+              </SignInButton>
+              <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <button className="text-left text-xs font-bold uppercase tracking-widest text-[#C9A84C] mt-1">For Suppliers</button>
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <Link href="/buyer/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]">
-                Go to Dashboard
+              <Link href="/buyer/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]/60">
+                Buyer Dashboard
+              </Link>
+              <Link href="/supplier" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]">
+                Supplier Portal
               </Link>
             </SignedIn>
           </div>
@@ -174,7 +189,7 @@ export default function LandingPage() {
             {/* Badge */}
             <div className="hero-item inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0C2918] text-[#C9A84C] text-[10px] font-bold uppercase tracking-[0.2em] mb-10">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C9A84C] flex-shrink-0 animate-pulse" />
-              Your buyer is CSRD-regulated. They need your carbon data.
+              The CSRD supply chain compliance platform — for buyers and suppliers.
             </div>
 
             {/* Headline */}
@@ -185,39 +200,49 @@ export default function LandingPage() {
 
             {/* Subline */}
             <p className="hero-item text-lg sm:text-2xl md:text-3xl text-gray-400 max-w-3xl leading-[1.4] font-light mb-5">
-              VSME OS turns energy bills and travel records into a{' '}
-              <span className="text-black font-normal">GHG Protocol-based carbon declaration</span>{' '}
-              — ready to send to any procurement team, worldwide.
+              For suppliers: turn energy bills into a{' '}
+              <span className="text-black font-normal">GHG Protocol carbon declaration</span>{' '}
+              in one session. For buyers: track your entire supply chain footprint in real time.
             </p>
 
             {/* Legal micro-disclaimer */}
             <p className="hero-item text-[10px] text-gray-400 mb-10 font-medium tracking-wide">
-              Self-attested reports · Based on GHG Protocol &amp; ISO 14064-1:2018 ·{' '}
+              Self-attested · GHG Protocol &amp; ISO 14064-1:2018 · 15–30 min ·{' '}
               <a href="/methodology" className="underline underline-offset-2 hover:text-gray-600 transition-colors">Full methodology →</a>
             </p>
 
-            {/* CTAs */}
+            {/* CTAs — two clear entry points */}
             <div className="hero-item flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <SignedOut>
-                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <SignInButton mode="modal" forceRedirectUrl="/buyer/dashboard">
                   <button className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-[#0C2918] text-[#C9A84C] rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-[#122F1E] transition-all active:scale-[0.98] shadow-xl shadow-black/10">
-                    Start Your Report
+                    I&apos;m a Buyer
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </SignInButton>
+                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                  <button className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-white text-gray-900 border border-gray-200 rounded-2xl text-base md:text-lg font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
+                    I&apos;m a Supplier
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-gray-400" />
                   </button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <Link href="/supplier" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-[#0C2918] text-[#C9A84C] rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-[#122F1E] transition-all active:scale-[0.98] shadow-xl shadow-black/10">
-                  Resume Assessment
+                <Link href="/buyer/dashboard" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-[#0C2918] text-[#C9A84C] rounded-2xl text-base md:text-lg font-bold flex items-center justify-center gap-3 hover:bg-[#122F1E] transition-all active:scale-[0.98] shadow-xl shadow-black/10">
+                  Buyer Dashboard
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link href="/supplier" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-white text-gray-900 border border-gray-200 rounded-2xl text-base md:text-lg font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
+                  Supplier Portal
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-gray-400" />
                 </Link>
               </SignedIn>
               <button
                 onClick={() => setModalOpen(true)}
-                className="w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-white text-gray-900 border border-gray-200 rounded-2xl text-base md:text-lg font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                className="hidden sm:flex w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-white/60 text-gray-600 border border-gray-100 rounded-2xl text-base md:text-lg font-bold hover:bg-gray-50 transition-all items-center justify-center gap-3 active:scale-[0.98]"
               >
                 <FileText size={18} className="text-gray-400" />
-                View Sample Report
+                Sample Report
               </button>
             </div>
           </div>
@@ -331,7 +356,7 @@ export default function LandingPage() {
                   {[
                     'Enter energy, fuel, and travel data — we do the maths',
                     'Country-specific factors (60+ countries supported)',
-                    'Download a signed, audit-standard 4-page PDF',
+                    'Download a signed, audit-ready 4-page PDF',
                     'Evidence vault to attach supporting documents',
                   ].map(item => (
                     <li key={item} className="flex items-start gap-2.5 text-sm text-[#6B9B7A]">
@@ -342,14 +367,14 @@ export default function LandingPage() {
                 </ul>
               </div>
               <SignedOut>
-                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <SignInButton mode="modal" forceRedirectUrl="/onboarding">
                   <button className="group flex items-center gap-2 text-sm font-bold text-white hover:text-zinc-300 transition-colors">
                     Start as a Supplier <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <Link href="/supplier" className="group flex items-center gap-2 text-sm font-bold text-white hover:text-zinc-300 transition-colors">
+                <Link href="/onboarding" className="group flex items-center gap-2 text-sm font-bold text-white hover:text-zinc-300 transition-colors">
                   Go to Assessment Hub <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
               </SignedIn>
@@ -367,7 +392,7 @@ export default function LandingPage() {
                   {[
                     'Invite suppliers by email or CSV upload',
                     'Track submission status in real time',
-                    'Data coverage dashboard for CSRD filing',
+                    'Data coverage dashboard for Scope 3 collection',
                     'Standardised PDF format — no reformatting needed',
                   ].map(item => (
                     <li key={item} className="flex items-start gap-2.5 text-sm text-gray-600">
@@ -401,7 +426,7 @@ export default function LandingPage() {
         <div ref={pillarsRef} className="reveal-section max-w-7xl mx-auto px-6 md:px-10 py-24 md:py-32">
           <div className="mb-12">
             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Technical Foundation</p>
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Built for auditors, not just buyers.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Built for procurement teams and sustainability leads.</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
@@ -474,12 +499,12 @@ export default function LandingPage() {
                 ))}
               </ul>
               <SignedOut>
-                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <SignInButton mode="modal" forceRedirectUrl="/onboarding">
                   <button className="w-full py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors">Get Started</button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <Link href="/supplier" className="w-full py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors text-center block">Get Started</Link>
+                <Link href="/onboarding" className="w-full py-3 border border-gray-200 rounded-xl text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors text-center block">Get Started</Link>
               </SignedIn>
             </div>
 
@@ -504,12 +529,12 @@ export default function LandingPage() {
                 ))}
               </ul>
               <SignedOut>
-                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <SignInButton mode="modal" forceRedirectUrl="/onboarding">
                   <button className="w-full py-3 bg-white text-black rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors">Get Started</button>
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <Link href="/supplier" className="w-full py-3 bg-white text-black rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors text-center block">Go to Dashboard</Link>
+                <Link href="/onboarding" className="w-full py-3 bg-white text-black rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors text-center block">Go to Dashboard</Link>
               </SignedIn>
             </div>
 
@@ -589,15 +614,15 @@ export default function LandingPage() {
             </p>
           </div>
           <SignedOut>
-            <SignInButton mode="modal" forceRedirectUrl="/supplier">
+            <SignInButton mode="modal" forceRedirectUrl="/onboarding">
               <button className="group flex-shrink-0 px-8 py-4 bg-white text-black rounded-2xl font-bold text-base hover:bg-gray-100 transition-all flex items-center gap-3 active:scale-95 shadow-2xl shadow-black/60">
                 Start Your Report <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            <Link href="/supplier" className="group flex-shrink-0 px-8 py-4 bg-white text-black rounded-2xl font-bold text-base hover:bg-gray-100 transition-all flex items-center gap-3 active:scale-95">
-              Resume Assessment <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            <Link href="/onboarding" className="group flex-shrink-0 px-8 py-4 bg-white text-black rounded-2xl font-bold text-base hover:bg-gray-100 transition-all flex items-center gap-3 active:scale-95">
+              Start Assessment <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </SignedIn>
         </div>

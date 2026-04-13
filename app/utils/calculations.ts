@@ -47,6 +47,12 @@ export interface ActivityResult {
 }
 
 export interface Totals {
+  // Canonical keys (used by buyer dashboard)
+  scope1Total: number;
+  scope2Total: number;
+  scope3Total: number;
+  grandTotal:  number;
+  // Legacy aliases (kept for backwards compatibility)
   scope1: number;
   scope2: number;
   scope3: number;
@@ -99,11 +105,11 @@ const SCOPE1_FACTORS: Record<string, EmissionFactor> = {
 // =============================================================================
 
 const SCOPE3_UNIVERSAL_FACTORS: Record<string, EmissionFactor> = {
-  grey_fleet:         { key: "grey_fleet",         value: 0.218,  unit: "kgCO2e/km",    source: "DEFRA 2024 (average car fleet, petrol+diesel)",  id: "TRAVEL-GREY"   },
+  grey_fleet:         { key: "grey_fleet",         value: 0.216,  unit: "kgCO2e/km",    source: "DEFRA 2025 (average car fleet, petrol+diesel)",  id: "TRAVEL-GREY"   },
   flight_short_haul:  { key: "flight_short_haul",  value: 0.175,  unit: "kgCO2e/pkm",   source: "DEFRA 2025 (incl. RF x1.9)",    id: "FLIGHT-SH"     },
   flight_long_haul:   { key: "flight_long_haul",   value: 0.117,  unit: "kgCO2e/pkm",   source: "DEFRA 2025 (incl. RF x1.9)",    id: "FLIGHT-LH"     },
   hotel_nights:       { key: "hotel_nights",        value: 28.0,   unit: "kgCO2e/night", source: "Cornell/Greenview CHSB 2024 (conservative global estimate)",              id: "HOTEL-AVG"     },
-  employee_commuting: { key: "employee_commuting",  value: 0.141,  unit: "kgCO2e/km",    source: "DEFRA 2024 / ADEME 2024 (average commute, mixed modes)", id: "COMMUTE-AVG"   },
+  employee_commuting: { key: "employee_commuting",  value: 0.138,  unit: "kgCO2e/km",    source: "DEFRA 2025 (average commute, mixed modes)", id: "COMMUTE-AVG"   },
   remote_working:     { key: "remote_working",      value: 2.84,   unit: "kgCO2e/day",   source: "DEFRA 2024 / ADEME 2024",       id: "REMOTE-WFH"    },
 };
 
@@ -118,19 +124,19 @@ const SCOPE3_UNIVERSAL_FACTORS: Record<string, EmissionFactor> = {
 export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
   // EUROPE
   "France":         { electricityGrid: 0.052, districtHeating: 0.110, districtCooling: 0.015, railTravel: 0.006, primaryCalculator: "ADEME Base Carbone 2024",                          methodologyNote: "Quantified using ADEME Base Carbone v2024. France's nuclear-dominated grid produces among the lowest electricity emissions in Europe (RTE 2023)." },
-  "Germany":        { electricityGrid: 0.380, districtHeating: 0.145, districtCooling: 0.109, railTravel: 0.023, primaryCalculator: "Umweltbundesamt (UBA) 2023 / IEA",                  methodologyNote: "Quantified using UBA Germany emission factors. Grid intensity reflects ongoing coal phase-out transition." },
+  "Germany":        { electricityGrid: 0.364, districtHeating: 0.145, districtCooling: 0.109, railTravel: 0.023, primaryCalculator: "Umweltbundesamt (UBA) 2024 / IEA",                  methodologyNote: "Quantified using UBA Germany emission factors. Grid intensity reflects ongoing coal phase-out transition." },
   "United Kingdom": { electricityGrid: 0.196, districtHeating: 0.142, districtCooling: 0.059, railTravel: 0.036, primaryCalculator: "DEFRA 2025 / National Grid ESO",                   methodologyNote: "Quantified using DEFRA 2025 UK Government GHG Conversion Factors (generation 0.177 + T&D 0.019 = 0.196 combined). 14.5% reduction from 2024 driven by reduced natural gas use and increased renewables." },
   "Spain":          { electricityGrid: 0.181, districtHeating: 0.100, districtCooling: 0.052, railTravel: 0.015, primaryCalculator: "CNMC Spain / REE / IEA 2023",                       methodologyNote: "Quantified using Red Electrica de Espana (REE) emission factors for 2023 grid mix." },
-  "Italy":          { electricityGrid: 0.233, districtHeating: 0.150, districtCooling: 0.067, railTravel: 0.007, primaryCalculator: "GSE Italy / IEA 2023",                              methodologyNote: "Quantified using GSE (Gestore dei Servizi Energetici) Italy 2023 emission factors." },
-  "Netherlands":    { electricityGrid: 0.341, districtHeating: 0.130, districtCooling: 0.097, railTravel: 0.003, primaryCalculator: "CBS Netherlands / IEA 2023",                        methodologyNote: "Quantified using CBS Netherlands Statline and IEA 2023 grid emission factors. NS trains run on 100% wind power since 2017." },
-  "Belgium":        { electricityGrid: 0.167, districtHeating: 0.130, districtCooling: 0.048, railTravel: 0.005, primaryCalculator: "CREG Belgium / IEA 2023",                           methodologyNote: "Quantified using CREG Belgian grid operator and IEA 2023 emission factors." },
+  "Italy":          { electricityGrid: 0.251, districtHeating: 0.150, districtCooling: 0.067, railTravel: 0.007, primaryCalculator: "GSE Italy 2024 / IEA",                              methodologyNote: "Quantified using GSE (Gestore dei Servizi Energetici) Italy 2023 emission factors." },
+  "Netherlands":    { electricityGrid: 0.298, districtHeating: 0.130, districtCooling: 0.097, railTravel: 0.003, primaryCalculator: "CBS Netherlands / IEA 2024",                        methodologyNote: "Quantified using CBS Netherlands Statline and IEA 2023 grid emission factors. NS trains run on 100% wind power since 2017." },
+  "Belgium":        { electricityGrid: 0.144, districtHeating: 0.130, districtCooling: 0.048, railTravel: 0.005, primaryCalculator: "CREG Belgium / IEA 2024",                           methodologyNote: "Quantified using CREG Belgian grid operator and IEA 2023 emission factors." },
   "Sweden":         { electricityGrid: 0.013, districtHeating: 0.042, districtCooling: 0.004, railTravel: 0.001, primaryCalculator: "Energimyndigheten (SEA) 2023 / IEA",               methodologyNote: "Quantified using Swedish Energy Agency emission factors. Sweden's grid is among Europe's cleanest (hydro + nuclear)." },
   "Norway":         { electricityGrid: 0.017, districtHeating: 0.025, districtCooling: 0.005, railTravel: 0.001, primaryCalculator: "NVE Norway 2023 / IEA",                             methodologyNote: "Quantified using NVE (Norwegian Water Resources and Energy Directorate) 2023. Grid is almost entirely hydroelectric." },
   "Denmark":        { electricityGrid: 0.133, districtHeating: 0.068, districtCooling: 0.038, railTravel: 0.002, primaryCalculator: "Energistyrelsen (DEA) 2023 / IEA",                 methodologyNote: "Quantified using Danish Energy Agency (DEA) 2023 emission factors." },
   "Finland":        { electricityGrid: 0.079, districtHeating: 0.055, districtCooling: 0.023, railTravel: 0.005, primaryCalculator: "Fingrid 2023 / IEA",                               methodologyNote: "Quantified using Fingrid Finland national grid 2023 emission factors." },
   "Austria":        { electricityGrid: 0.158, districtHeating: 0.120, districtCooling: 0.045, railTravel: 0.010, primaryCalculator: "Umweltbundesamt Austria / IEA 2023",               methodologyNote: "Quantified using Austrian Environment Agency (UBA) and IEA 2023 emission factors." },
   "Switzerland":    { electricityGrid: 0.024, districtHeating: 0.080, districtCooling: 0.007, railTravel: 0.002, primaryCalculator: "SFOE Switzerland / IEA 2023",                      methodologyNote: "Quantified using Swiss Federal Office of Energy (SFOE) 2023. Grid is very clean (nuclear + hydro)." },
-  "Poland":         { electricityGrid: 0.773, districtHeating: 0.280, districtCooling: 0.221, railTravel: 0.037, primaryCalculator: "URE Poland / IEA 2023",                            methodologyNote: "Quantified using Polish Energy Regulatory Office (URE) and IEA 2023. Poland has one of Europe's most coal-heavy grids." },
+  "Poland":         { electricityGrid: 0.695, districtHeating: 0.280, districtCooling: 0.221, railTravel: 0.037, primaryCalculator: "URE Poland / IEA 2024",                            methodologyNote: "Quantified using Polish Energy Regulatory Office (URE) and IEA 2023. Poland has one of Europe's most coal-heavy grids." },
   "Czech Republic": { electricityGrid: 0.489, districtHeating: 0.240, districtCooling: 0.140, railTravel: 0.016, primaryCalculator: "ERU Czech Republic / IEA 2023",                   methodologyNote: "Quantified using Czech Energy Regulatory Office (ERU) and IEA 2023 emission factors." },
   "Portugal":       { electricityGrid: 0.218, districtHeating: 0.100, districtCooling: 0.062, railTravel: 0.017, primaryCalculator: "DGEG Portugal / IEA 2023",                         methodologyNote: "Quantified using DGEG Portugal Directorate General of Energy and IEA 2023 factors." },
   "Ireland":        { electricityGrid: 0.295, districtHeating: 0.120, districtCooling: 0.084, railTravel: 0.035, primaryCalculator: "SEAI Ireland 2023 / IEA",                          methodologyNote: "Quantified using Sustainable Energy Authority of Ireland (SEAI) 2023 emission factors." },
@@ -156,11 +162,11 @@ export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
   "Mexico":         { electricityGrid: 0.454, districtHeating: 0.180, districtCooling: 0.130, railTravel: 0.075, primaryCalculator: "SEMARNAT Mexico / IEA 2023",                       methodologyNote: "Quantified using SEMARNAT Mexico and IEA 2023 emission factors." },
 
   // ASIA-PACIFIC
-  "China":          { electricityGrid: 0.581, districtHeating: 0.220, districtCooling: 0.166, railTravel: 0.018, primaryCalculator: "CEPCI China / IEA 2023 / EMBER 2023",              methodologyNote: "Quantified using Chinese national emission factors and IEA 2023 grid data. Grid intensity is improving year-on-year." },
+  "China":          { electricityGrid: 0.557, districtHeating: 0.220, districtCooling: 0.166, railTravel: 0.018, primaryCalculator: "CEPCI China / IEA 2024 / EMBER 2024",              methodologyNote: "Quantified using Chinese national emission factors and IEA 2023 grid data. Grid intensity is improving year-on-year." },
   "Japan":          { electricityGrid: 0.463, districtHeating: 0.180, districtCooling: 0.132, railTravel: 0.017, primaryCalculator: "Ministry of Environment Japan / IEA 2023",         methodologyNote: "Quantified using Japan Ministry of Environment and IEA 2023 emission factors." },
   "South Korea":    { electricityGrid: 0.459, districtHeating: 0.200, districtCooling: 0.131, railTravel: 0.017, primaryCalculator: "KEPCO / Ministry of Environment Korea 2023",       methodologyNote: "Quantified using KEPCO Korea Electric Power Corporation and Ministry of Environment Korea 2023 factors." },
-  "India":          { electricityGrid: 0.708, districtHeating: 0.000, districtCooling: 0.202, railTravel: 0.040, primaryCalculator: "CEA India 2023 / IEA",                             methodologyNote: "Quantified using Central Electricity Authority (CEA) India 2023 and IEA emission factors." },
-  "Australia":      { electricityGrid: 0.656, districtHeating: 0.000, districtCooling: 0.188, railTravel: 0.153, primaryCalculator: "Australian NGA 2023 / Clean Energy Regulator",     methodologyNote: "Quantified using Australian National Greenhouse Accounts (NGA) 2023 emission factors." },
+  "India":          { electricityGrid: 0.716, districtHeating: 0.000, districtCooling: 0.202, railTravel: 0.040, primaryCalculator: "CEA India 2024 / IEA",                             methodologyNote: "Quantified using Central Electricity Authority (CEA) India 2023 and IEA emission factors." },
+  "Australia":      { electricityGrid: 0.610, districtHeating: 0.000, districtCooling: 0.188, railTravel: 0.153, primaryCalculator: "Australian NGA 2024 / Clean Energy Regulator",     methodologyNote: "Quantified using Australian National Greenhouse Accounts (NGA) 2023 emission factors." },
   "New Zealand":    { electricityGrid: 0.098, districtHeating: 0.000, districtCooling: 0.028, railTravel: 0.012, primaryCalculator: "Ministry for the Environment NZ / IEA 2023",       methodologyNote: "Quantified using New Zealand Ministry for the Environment and IEA 2023. Grid is hydro and geothermal dominant." },
   "Singapore":      { electricityGrid: 0.408, districtHeating: 0.000, districtCooling: 0.117, railTravel: 0.005, primaryCalculator: "EMA Singapore / IEA 2023",                        methodologyNote: "Quantified using Energy Market Authority (EMA) Singapore and IEA 2023 emission factors." },
   "Indonesia":      { electricityGrid: 0.709, districtHeating: 0.000, districtCooling: 0.203, railTravel: 0.060, primaryCalculator: "PLN Indonesia / IEA 2023",                        methodologyNote: "Quantified using PLN (Perusahaan Listrik Negara) Indonesia and IEA 2023 emission factors." },
@@ -423,6 +429,12 @@ export function summarizeEmissions(
   const total = scope1 + scope2 + scope3;
 
   return {
+    // New canonical keys — used by buyer dashboard (getSupplierEmissions, EmissionsPanel, CSV export)
+    scope1Total: scope1,
+    scope2Total: scope2,
+    scope3Total: scope3,
+    grandTotal:  total,
+    // Legacy aliases — kept so existing references don't break
     scope1,
     scope2,
     scope3,

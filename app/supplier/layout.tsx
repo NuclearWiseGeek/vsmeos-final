@@ -14,14 +14,16 @@
 'use client';
 
 import { ESGProvider } from '@/context/ESGContext';
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 import CompanyOnboarding from '@/components/CompanyOnboarding';
 import AutoSave from '@/components/AutoSave';
 import SupplierProgress from '@/components/SupplierProgress';
 import { Settings, LayoutDashboard, Flame, Zap, Plane, FileText } from 'lucide-react';
 import VsmeLogo from '@/components/VsmeLogo';
+import { createSupabaseClient } from '@/utils/supabase';
 
 const BOTTOM_NAV = [
   { label: 'Hub',      href: '/supplier/hub',     icon: LayoutDashboard },
@@ -33,6 +35,22 @@ const BOTTOM_NAV = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { userId, getToken } = useAuth();
+
+  // Auto-save supplier role silently on first load (Option B — no onboarding screen)
+  useEffect(() => {
+    if (!userId) return;
+    (async () => {
+      try {
+        const token = await getToken({ template: 'supabase' });
+        if (!token) return;
+        const supabase = createSupabaseClient(token);
+        await supabase
+          .from('profiles')
+          .upsert({ id: userId, role: 'supplier', updated_at: new Date().toISOString() }, { onConflict: 'id' });
+      } catch (e) { /* non-fatal */ }
+    })();
+  }, [userId]);
 
   return (
     <ESGProvider>

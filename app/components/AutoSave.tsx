@@ -227,7 +227,14 @@ export default function AutoSave() {
           user_id:          userId,
           year:             parseInt(co.year) || new Date().getFullYear(),
           activity_data:    ac,
-          emissions_totals: totals,
+          emissions_totals: {
+            scope1Total: totals.scope1,
+            scope2Total: totals.scope2,
+            scope3Total: totals.scope3,
+            grandTotal:  totals.total,
+            totalTonnes: totals.totalTonnes,
+            intensity:   totals.intensity,
+          },
           status:           'draft',
           updated_at:       new Date().toISOString(),
         }, { onConflict: 'user_id, year' });

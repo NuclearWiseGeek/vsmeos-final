@@ -42,7 +42,7 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
   );
 
   return (
-    <div className="flex min-h-screen bg-white font-sans text-slate-900">
+    <div className="flex min-h-screen bg-[#F7F7F5] font-sans text-slate-900">
 
       {/* ── DESKTOP SIDEBAR — hidden below lg ────────────────── */}
       <aside className="hidden lg:flex w-64 bg-gray-50/80 backdrop-blur-md border-r border-gray-200 flex-col fixed h-full z-10">

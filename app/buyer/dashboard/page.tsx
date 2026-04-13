@@ -11,6 +11,14 @@
 //   5. Data Coverage %     — (submitted ÷ total) × 100
 //   6. Pending (not sent)  — count where status = 'draft' (added but not yet invited)
 //
+// PHASE 3.1 ADDITIONS:
+//   7. Total tCO₂e         — sum of grandTotal from all submitted assessments
+//   8. Avg Intensity        — tCO₂e per €M revenue across submitted suppliers
+//   9. EmissionsPanel       — per-supplier scope 1/2/3 breakdown table + bar chart
+//
+// PHASE 3.2 ADDITIONS:
+//   10. ExportButton        — downloads all supplier data + emissions as .csv
+//
 // STATUS VALUES (from supplier_invites table):
 //   'draft'     → Added to list but invite email not yet sent
 //   'sent'      → Invite email sent, supplier hasn't started yet
@@ -18,13 +26,14 @@
 //   'submitted' → Supplier has generated their PDF report (complete)
 //
 // WHEN TO MODIFY:
-//   - Phase 3: Add aggregated Scope 3 tonnage across all submitted suppliers
-//   - Phase 3: Add data quality score (outlier detection)
+//   - Phase 4: Add anomaly detection flags on the supplier table
 //   - Phase 6: Add procurement marketplace filters
 //
 // DEPENDENCIES:
-//   - actions/buyer.ts — getSuppliers() server action
+//   - actions/buyer.ts — getSuppliers(), getSupplierEmissions(), getCSVExportData()
 //   - components/buyer/CSVUploader, InviteTable, ManualEntry
+//   - components/buyer/EmissionsPanel (Phase 3.1)
+//   - components/buyer/ExportButton   (Phase 3.2)
 // =============================================================================
 
 import React from 'react';
@@ -32,10 +41,14 @@ import CSVUploader from '@/components/buyer/CSVUploader';
 import InviteTable from '@/components/buyer/InviteTable';
 import ManualEntry from '@/components/buyer/ManualEntry';
 import ProgressRing from '@/components/ProgressRing';
-import { getSuppliers } from '@/actions/buyer';
+import EmissionsPanel from '@/components/buyer/EmissionsPanel';
+import ExportButton from '@/components/buyer/ExportButton';
+import { getSuppliers, getSupplierEmissions, getCSVExportData } from '@/actions/buyer';
+import { auth } from '@clerk/nextjs/server';
+import { createSupabaseClient } from '@/utils/supabase';
 import {
   Users, Send, Clock, CheckCircle2,
-  PieChart, AlertCircle, TrendingUp, UserPlus
+  PieChart, TrendingUp, UserPlus, Wind
 } from 'lucide-react';
 
 // =============================================================================
@@ -66,6 +79,41 @@ function calculateKPIs(suppliers: any[]) {
     : 0;
 
   return { total, pending, sent, inProgress, completed, coverage, responseRate };
+}
+
+/**
+ * Calculates emission KPIs from submitted assessment data.
+ * Handles both new key format (scope1Total/grandTotal) and legacy (scope1/total).
+ */
+function calculateEmissionKPIs(emissionsData: any[]) {
+  let totalTCO2e = 0;
+  let totalRevenue = 0;
+
+  for (const row of emissionsData) {
+    const totals = row.emissions_totals;
+    if (!totals) continue;
+    // Support new keys (grandTotal) and legacy keys (total)
+    const grand = typeof totals.grandTotal === 'number' ? totals.grandTotal
+                : typeof totals.total      === 'number' ? totals.total
+                : 0;
+    totalTCO2e += grand;
+
+    // Revenue lives on the joined supplier_invites row
+    const invite = Array.isArray(row.supplier_invites) ? row.supplier_invites[0] : row.supplier_invites;
+    const rev = invite?.revenue;
+    if (rev && rev > 0) totalRevenue += rev;
+  }
+
+  // Avg intensity = tCO₂e per €M revenue
+  const avgIntensity = totalRevenue > 0
+    ? Math.round((totalTCO2e / (totalRevenue / 1_000_000)) * 10) / 10
+    : null;
+
+  return {
+    totalTCO2e: Math.round(totalTCO2e * 10) / 10,
+    avgIntensity,
+    suppliersWithData: emissionsData.length,
+  };
 }
 
 // =============================================================================
@@ -108,14 +156,32 @@ function CoverageBar({ percent }: { percent: number }) {
 
 export default async function BuyerDashboard() {
 
-  // Fetch all suppliers for this buyer from Supabase
-  // getSuppliers() is a server action that reads from supplier_invites table
-  const suppliers = await getSuppliers();
+  // Auto-save buyer role silently on first load (Option B — no onboarding screen)
+  const { userId, getToken } = await auth();
+  if (userId) {
+    try {
+      const token = await getToken({ template: 'supabase' });
+      if (token) {
+        const supabase = createSupabaseClient(token);
+        await supabase
+          .from('profiles')
+          .upsert({ id: userId, role: 'buyer', updated_at: new Date().toISOString() }, { onConflict: 'id' });
+      }
+    } catch (e) { /* non-fatal */ }
+  }
+
+  // Fetch all data in parallel — no sequential waterfall
+  const [suppliers, emissionsData, csvData] = await Promise.all([
+    getSuppliers(),
+    getSupplierEmissions(),
+    getCSVExportData(),
+  ]);
 
   // Calculate all KPIs from the fetched data
-  const kpis = calculateKPIs(suppliers);
+  const kpis         = calculateKPIs(suppliers);
+  const emissionKPIs = calculateEmissionKPIs(emissionsData);
 
-  // Find the most recently active suppliers (for activity feed header)
+  // Find the most recently active suppliers (for activity feed)
   const recentlySubmitted = suppliers
     .filter(s => s.status === 'submitted')
     .slice(0, 3);
@@ -138,7 +204,8 @@ export default async function BuyerDashboard() {
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-3">Start building your supplier list</h2>
           <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed mb-8">
-            Add suppliers manually or upload a CSV. Once invited, they complete their carbon assessment and you track progress here in real time.
+            Add suppliers manually or upload a CSV. Once invited, they complete their carbon assessment
+            and you see real emission data here in real time.
           </p>
           <div className="max-w-lg mx-auto space-y-4">
             <ManualEntry />
@@ -165,16 +232,18 @@ export default async function BuyerDashboard() {
           </p>
         </div>
 
-        {/* Data freshness note */}
-        <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-          Live · Updates when suppliers submit
-        </p>
+        <div className="flex items-center gap-3">
+          {/* Phase 3.2: CSV Export */}
+          <ExportButton csvData={csvData} />
+          <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+            Live · Updates when suppliers submit
+          </p>
+        </div>
       </div>
 
       {/* ================================================================
           KPI CARDS — 4-column grid
           Each card is fully dynamic — calculated from live Supabase data.
-          Previously these all showed hardcoded 0% values.
           ================================================================ */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
@@ -192,9 +261,7 @@ export default async function BuyerDashboard() {
             {kpis.total}
           </div>
           <p className="text-xs text-gray-400 mt-1">
-            {kpis.pending > 0
-              ? `${kpis.pending} not yet invited`
-              : 'All invited'}
+            {kpis.pending > 0 ? `${kpis.pending} not yet invited` : 'All invited'}
           </p>
         </div>
 
@@ -255,6 +322,59 @@ export default async function BuyerDashboard() {
       </div>
 
       {/* ================================================================
+          PHASE 3.1: EMISSION KPI CARDS
+          Only shown once at least one supplier has submitted a report.
+          ================================================================ */}
+      {emissionKPIs.suppliersWithData > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* Total tCO₂e */}
+          <div className="bg-[#0C2918] p-6 rounded-2xl shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold text-[#C9A84C] uppercase tracking-wider">
+                Total Scope 3 Emissions
+              </span>
+              <div className="w-8 h-8 bg-[#122F1E] rounded-lg flex items-center justify-center">
+                <Wind size={15} className="text-[#C9A84C]" />
+              </div>
+            </div>
+            <div className="text-4xl font-extrabold text-white tracking-tight">
+              {emissionKPIs.totalTCO2e.toLocaleString('en-GB')}
+            </div>
+            <p className="text-sm text-[#C9A84C]/70 mt-1">
+              tCO₂e · from {emissionKPIs.suppliersWithData} submitted supplier{emissionKPIs.suppliersWithData !== 1 ? 's' : ''}
+            </p>
+          </div>
+
+          {/* Average Intensity */}
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                Avg Emission Intensity
+              </span>
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                <TrendingUp size={15} className="text-gray-400" />
+              </div>
+            </div>
+            {emissionKPIs.avgIntensity !== null ? (
+              <>
+                <div className="text-4xl font-extrabold text-gray-900 tracking-tight">
+                  {emissionKPIs.avgIntensity.toLocaleString('en-GB')}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">tCO₂e per €M revenue</p>
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-gray-300 mt-2">—</div>
+                <p className="text-xs text-gray-400 mt-1">Revenue data needed from suppliers</p>
+              </>
+            )}
+          </div>
+
+        </div>
+      )}
+
+      {/* ================================================================
           DATA COVERAGE SUMMARY BAR
           Wide card showing overall programme health at a glance.
           ================================================================ */}
@@ -284,7 +404,6 @@ export default async function BuyerDashboard() {
 
           {/* Right: Status breakdown */}
           <div className="flex flex-wrap sm:flex-col gap-4 sm:gap-3">
-
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-gray-300 flex-shrink-0" />
               <span className="text-xs text-gray-500">
@@ -309,49 +428,25 @@ export default async function BuyerDashboard() {
                 <span className="font-bold text-green-600">{kpis.completed}</span> submitted
               </span>
             </div>
-
           </div>
+
         </div>
       </div>
 
       {/* ================================================================
-          EMPTY STATE — shown when buyer has no suppliers yet
-          Replaces the empty table with a helpful call to action
+          PHASE 3.1: PER-SUPPLIER EMISSIONS BREAKDOWN
+          Only shown once there is at least one submitted report with data.
           ================================================================ */}
-      {kpis.total === 0 && (
-        <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-dashed border-gray-200 p-12 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <UserPlus size={28} className="text-gray-400" />
-          </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">
-            Start Your Supplier Programme
-          </h3>
-          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
-            Add your first supplier below — either upload a CSV list or add them manually.
-            They'll receive an email invitation to generate their carbon declaration.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-xs text-gray-600 font-medium">
-              <CheckCircle2 size={12} className="text-green-500" />
-              Free for buyers
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-xs text-gray-600 font-medium">
-              <CheckCircle2 size={12} className="text-green-500" />
-              GHG Protocol compliant reports
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-xs text-gray-600 font-medium">
-              <CheckCircle2 size={12} className="text-green-500" />
-              CSRD ready
-            </div>
-          </div>
-        </div>
+      {emissionKPIs.suppliersWithData > 0 && (
+        <EmissionsPanel emissionsData={emissionsData} />
       )}
 
       {/* ================================================================
           RECENTLY COMPLETED — quick wins panel
-          Only shown when at least one supplier has submitted
+          Only shown when at least one supplier has submitted.
+          Hidden once emission panel is showing (redundant info).
           ================================================================ */}
-      {recentlySubmitted.length > 0 && (
+      {recentlySubmitted.length > 0 && emissionKPIs.suppliersWithData === 0 && (
         <div className="bg-green-50 border border-green-100 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp size={16} className="text-green-600" />
@@ -424,10 +519,10 @@ export default async function BuyerDashboard() {
             {/* Status legend */}
             <div className="hidden sm:flex items-center gap-4">
               {[
-                { label: 'Not Sent',  colour: 'bg-gray-200' },
-                { label: 'Invited',   colour: 'bg-blue-400' },
+                { label: 'Not Sent',    colour: 'bg-gray-200' },
+                { label: 'Invited',     colour: 'bg-blue-400' },
                 { label: 'In Progress', colour: 'bg-amber-400' },
-                { label: 'Complete',  colour: 'bg-green-500' },
+                { label: 'Complete',    colour: 'bg-green-500' },
               ].map(({ label, colour }) => (
                 <div key={label} className="flex items-center gap-1.5">
                   <div className={`w-2 h-2 rounded-full ${colour}`} />

@@ -68,14 +68,28 @@ export async function updateCompanyProfile(data: {
     return { success: false };
   }
 
-  // 2. Create/update assessment record for this user + year
-  //    NO revenue or currency here — those columns were dropped from assessments
+  // 2. Look up the buyer_id from supplier_invites so we can store it on the assessment.
+  //    This is required for the buyers_read_supplier_assessments RLS policy in Phase 3.1.
+  let buyerIdForAssessment: string | null = null;
+  const { data: inviteRow } = await supabase
+    .from('supplier_invites')
+    .select('buyer_id')
+    .eq('supplier_email', email)
+    .maybeSingle();
+  if (inviteRow?.buyer_id) {
+    buyerIdForAssessment = inviteRow.buyer_id;
+  }
+
+  // 3. Create/update assessment record for this user + year.
+  //    NO revenue or currency here — those columns were dropped from assessments.
+  //    buyer_id is stored here so buyers can read submitted assessments via RLS.
   const { error: assessmentError } = await supabase
     .from('assessments')
     .upsert({
       user_id:    userId,
       year:       parseInt(data.year),
       status:     'draft',
+      buyer_id:   buyerIdForAssessment,
       updated_at: new Date().toISOString(),
     }, {
       onConflict: 'user_id, year',

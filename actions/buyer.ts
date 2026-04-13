@@ -210,56 +210,260 @@ export async function updateSupplier(id: string, name: string, email: string) {
 }
 
 // ---------------------------------------------------------
-// 6. Send Invite Email (Real)
+// 7. Get Supplier Emissions (Phase 3.1)
+//    Fetches emissions_totals from submitted assessments where
+//    buyer_id = current buyer. Uses buyers_read_supplier_assessments RLS policy.
+// ---------------------------------------------------------
+export async function getSupplierEmissions() {
+  const { userId, getToken } = await auth();
+  if (!userId) return [];
+
+  const token = await getToken({ template: 'supabase' });
+  if (!token) return [];
+
+  const supabase = createSupabaseClient(token);
+
+  // Step 1: Fetch submitted assessments for this buyer.
+  // No FK join — assessments and supplier_invites are not related by FK in Supabase.
+  const { data: assessments, error } = await supabase
+    .from('assessments')
+    .select('user_id, year, status, emissions_totals, updated_at')
+    .eq('buyer_id', userId)
+    .eq('status', 'submitted')
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    console.error('getSupplierEmissions error:', error);
+    return [];
+  }
+  if (!assessments || assessments.length === 0) return [];
+
+  // Step 2: Fetch submitted supplier invites for this buyer to get names/revenue.
+  // We match by position — each submitted assessment maps to a submitted invite.
+  // This works correctly as long as one supplier = one invite per buyer (current model).
+  const { data: submittedInvites } = await supabase
+    .from('supplier_invites')
+    .select('supplier_email, supplier_name, country, industry, revenue, currency')
+    .eq('buyer_id', userId)
+    .eq('status', 'submitted')
+    .order('updated_at', { ascending: false });
+
+  const inviteList = submittedInvites || [];
+
+  // Step 3: Attach invite metadata to each assessment by position.
+  return assessments.map((assessment, index) => ({
+    ...assessment,
+    supplier_invites: inviteList[index] ? [inviteList[index]] : [{
+      supplier_name: 'Supplier ' + (index + 1),
+      supplier_email: '',
+      country: '',
+      industry: '',
+      revenue: 0,
+      currency: '',
+    }],
+  }));
+}
+
+// ---------------------------------------------------------
+// 8. Get CSV Export Data (Phase 3.2)
+//    Returns all supplier data + emissions for CSV download.
+// ---------------------------------------------------------
+export async function getCSVExportData() {
+  const { userId, getToken } = await auth();
+  if (!userId) return [];
+
+  const token = await getToken({ template: 'supabase' });
+  if (!token) return [];
+
+  const supabase = createSupabaseClient(token);
+
+  // Get all supplier invites (all statuses) for this buyer
+  const { data: invites } = await supabase
+    .from('supplier_invites')
+    .select('supplier_name, supplier_email, status, country, updated_at')
+    .eq('buyer_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (!invites) return [];
+
+  // Get submitted emissions data
+  const { data: emissions } = await supabase
+    .from('assessments')
+    .select('user_id, emissions_totals, updated_at')
+    .eq('buyer_id', userId)
+    .eq('status', 'submitted');
+
+  // Build a map of emissions by user_id for fast lookup
+  const emissionsMap = new Map(
+    (emissions || []).map(e => [e.user_id, e])
+  );
+
+  // Fetch submitted assessments separately (no FK join available).
+  // Match emissions to invites using submitted status — both sets belong to this buyer.
+  const submittedEmissions = (emissions || []);
+
+  // Build emissions map by position — for CSV we just need totals per invite row.
+  // Since we can't join user_id → email, we map submitted emissions to submitted invites.
+  const submittedInvites = invites.filter(i => i.status === 'submitted');
+  const emissionsForSubmitted = new Map<string, any>();
+  submittedInvites.forEach((inv, index) => {
+    if (submittedEmissions[index]) {
+      emissionsForSubmitted.set(inv.supplier_email, submittedEmissions[index]);
+    }
+  });
+
+  return invites.map(invite => {
+    const emRow = emissionsForSubmitted.get(invite.supplier_email);
+    const totals = emRow?.emissions_totals || null;
+    return {
+      supplier_name:  invite.supplier_name,
+      supplier_email: invite.supplier_email,
+      status:         invite.status,
+      country:        invite.country || '',
+      scope1_tco2e:   totals?.scope1Total ?? totals?.scope1 ?? '',
+      scope2_tco2e:   totals?.scope2Total ?? totals?.scope2 ?? '',
+      scope3_tco2e:   totals?.scope3Total ?? totals?.scope3 ?? '',
+      total_tco2e:    totals?.grandTotal  ?? totals?.total  ?? '',
+      report_date:    emRow?.updated_at
+        ? new Date(emRow.updated_at).toLocaleDateString('en-GB')
+        : '',
+    };
+  });
+}
+
+// ---------------------------------------------------------
+// 9. Get/Save Buyer Settings (Phase 3.3)
+// ---------------------------------------------------------
+export async function getBuyerSettings() {
+  const { userId, getToken } = await auth();
+  if (!userId) return null;
+
+  const token = await getToken({ template: 'supabase' });
+  if (!token) return null;
+
+  const supabase = createSupabaseClient(token);
+  const { data } = await supabase
+    .from('buyer_settings')
+    .select('invite_email_subject, invite_email_body')
+    .eq('buyer_id', userId)
+    .maybeSingle();
+
+  return data;
+}
+
+export async function saveBuyerSettings(subject: string, body: string) {
+  const { userId, getToken } = await auth();
+  if (!userId) return { error: 'Unauthorized' };
+
+  const token = await getToken({ template: 'supabase' });
+  if (!token) return { error: 'No auth token' };
+
+  const supabase = createSupabaseClient(token);
+  const { error } = await supabase
+    .from('buyer_settings')
+    .upsert(
+      { buyer_id: userId, invite_email_subject: subject, invite_email_body: body, updated_at: new Date().toISOString() },
+      { onConflict: 'buyer_id' }
+    );
+
+  if (error) {
+    console.error('saveBuyerSettings error:', error);
+    return { error: 'Failed to save settings' };
+  }
+  return { success: true };
+}
+// ---------------------------------------------------------
+// 6. Send Invite Email
+//    Uses custom buyer template from buyer_settings if available,
+//    falls back to default branded template.
 // ---------------------------------------------------------
 export async function sendInviteEmail(id: string, email: string, supplierName: string) {
-  // 1. Auth Check
   const { userId, getToken } = await auth();
-  const user = await currentUser(); 
+  const user = await currentUser();
 
   if (!userId || !user) return { error: 'Unauthorized' };
 
-  // 2. Determine Buyer Name
-  const buyerName = user.firstName 
-    ? `${user.firstName} ${user.lastName || ''}`.trim() 
+  const buyerName = user.firstName
+    ? `${user.firstName} ${user.lastName || ''}`.trim()
     : 'VSME Enterprise';
 
-  // 🟢 3. DYNAMIC URL LOGIC (The Fix)
-  // This checks if we are in production (Vercel) or local development
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  
-  // We send them to /supplier/hub. Middleware will force them to sign up if needed.
-  // Using encodeURIComponent protects against emails with special characters.
   const inviteLink = `${baseUrl}/supplier/hub?email=${encodeURIComponent(email)}`;
+
+  const token = await getToken({ template: 'supabase' });
+
+  // Check for custom email template in buyer_settings
+  let customSubject: string | null = null;
+  let customBody: string | null = null;
+  if (token) {
+    const supabase = createSupabaseClient(token);
+    const { data: settings } = await supabase
+      .from('buyer_settings')
+      .select('invite_email_subject, invite_email_body')
+      .eq('buyer_id', userId)
+      .maybeSingle();
+    if (settings?.invite_email_subject) customSubject = settings.invite_email_subject;
+    if (settings?.invite_email_body)    customBody    = settings.invite_email_body;
+  }
+
+  // Resolve subject: custom or default
+  const subject = customSubject
+    || `Action Required: ${buyerName} invited you to complete your carbon declaration`;
+
+  // Resolve body: custom (with variable substitution) or default HTML
+  let htmlBody: string;
+  if (customBody) {
+    // Replace {{supplier_name}} and {{invite_link}} placeholders
+    const resolvedText = customBody
+      .replace(/\{\{supplier_name\}\}/g, supplierName)
+      .replace(/\{\{invite_link\}\}/g, inviteLink);
+    // Wrap plain text in minimal HTML so it renders correctly in email clients
+    htmlBody = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+        ${resolvedText
+          .split('\n')
+          .map(line => line.trim() ? `<p style="margin: 0 0 12px;">${line}</p>` : '')
+          .join('')}
+        <div style="margin: 28px 0;">
+          <a href="${inviteLink}" style="background-color: #0C2918; color: #C9A84C; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+            Open My Assessment
+          </a>
+        </div>
+      </div>`;
+  } else {
+    htmlBody = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #0C2918; padding: 24px 32px; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 10px;">
+          <div style="width: 32px; height: 32px; background: #C9A84C; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
+            <span style="color: #0C2918; font-size: 16px; font-weight: 900; line-height: 1;">V</span>
+          </div>
+          <span style="color: #C9A84C; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-left: 8px;">VSME <span style="color: rgba(201,168,76,0.6); font-weight: 400;">OS</span></span>
+        </div>
+        <div style="background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px; padding: 32px;">
+          <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hello <strong>${supplierName}</strong>,</p>
+          <p style="font-size: 15px; color: #6b7280; margin: 0 0 16px; line-height: 1.6;">
+            <strong style="color: #111827;">${buyerName}</strong> has invited you to complete a carbon emissions declaration through VSME OS. This is required for supply chain CSRD Scope 3 compliance.
+          </p>
+          <p style="font-size: 15px; color: #6b7280; margin: 0 0 28px; line-height: 1.6;">
+            The process takes around 15–30 minutes. You'll receive a GHG Protocol-compliant PDF report at the end.
+          </p>
+          <a href="${inviteLink}" style="background-color: #0C2918; color: #C9A84C; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-block; font-size: 15px;">
+            Start My Carbon Declaration →
+          </a>
+          <p style="font-size: 12px; color: #9ca3af; margin: 28px 0 0; line-height: 1.5;">
+            Or copy this link into your browser:<br/>
+            <a href="${inviteLink}" style="color: #0C2918;">${inviteLink}</a>
+          </p>
+        </div>
+      </div>`;
+  }
 
   try {
     const { data, error } = await resend.emails.send({
       from: 'VSME OS <hello@vsmeos.fr>',
-      to: email, 
-      subject: `Action Required: ${buyerName} invited you to VSME`, 
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #111;">VSME Enterprise</h1>
-          
-          <p style="font-size: 16px; color: #555;">Hello <strong>${supplierName}</strong>,</p>
-          
-          <p style="font-size: 16px; color: #555;">
-            <strong>${buyerName}</strong> has invited you to join the VSME Supplier Network. 
-            They require your carbon emission data to ensure supply chain compliance.
-          </p>
-          
-          <div style="margin: 30px 0;">
-            <a href="${inviteLink}" style="background-color: #0071E3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
-              Accept Invitation & Start Report
-            </a>
-          </div>
-
-          <p style="font-size: 14px; color: #999;">
-            Or copy this link: <br/>
-            <a href="${inviteLink}" style="color: #0071E3;">${inviteLink}</a>
-          </p>
-        </div>
-      `
+      to: email,
+      subject,
+      html: htmlBody,
     });
 
     if (error) {
@@ -267,21 +471,19 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
       return { error: 'Failed to send email' };
     }
 
-    // 🟢 4. UPDATE STATUS TO 'SENT'
-    const token = await getToken({ template: 'supabase' });
+    // Update status to 'sent'
     if (token) {
-        const supabase = createSupabaseClient(token);
-        await supabase
-          .from('supplier_invites')
-          .update({ status: 'sent' })
-          .eq('id', id);
+      const supabase = createSupabaseClient(token);
+      await supabase
+        .from('supplier_invites')
+        .update({ status: 'sent' })
+        .eq('id', id);
     }
 
-    console.log('Email ID:', data?.id);
+    console.log('Email sent, ID:', data?.id);
     return { success: true };
-
-  } catch (error) {
-    console.error('Resend Error:', error);
+  } catch (err) {
+    console.error('Resend Error:', err);
     return { error: 'Failed to send email' };
   }
 }

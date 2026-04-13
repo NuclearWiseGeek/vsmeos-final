@@ -159,6 +159,23 @@ export default function AssessmentHub() {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Progress + time estimate */}
+          <div className="hidden sm:flex flex-col items-end gap-1">
+            <div className="flex items-center gap-2">
+              <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#0C2918] rounded-full transition-all duration-700"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <span className="text-xs font-bold text-gray-700">{progressPercent}%</span>
+            </div>
+            <span className="text-[10px] text-gray-400">
+              {completedScopes === 3
+                ? 'All scopes complete — ready to generate report'
+                : `${3 - completedScopes} scope${3 - completedScopes !== 1 ? 's' : ''} remaining · ~${(3 - completedScopes) * 8}–${(3 - completedScopes) * 12} min`}
+            </span>
+          </div>
           {lastSaved && (
             <span className="text-xs text-gray-400 flex items-center gap-1">
               <Clock size={12} /> {getLastSavedText()}

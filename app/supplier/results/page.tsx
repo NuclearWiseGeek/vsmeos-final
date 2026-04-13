@@ -150,27 +150,41 @@ export default function ResultsPage() {
         updated_at:   new Date().toISOString(),
       }, { onConflict: 'id' });
 
-      // Save assessment — no revenue/currency (dropped from assessments table)
+      // ── Fetch buyer_id so Phase 3.1 buyer aggregation works ─────────────────
+      // buyers_read_supplier_assessments RLS requires buyer_id on assessments.
+      const supplierEmail = user?.emailAddresses[0]?.emailAddress;
+      let buyerIdForAssessment: string | null = null;
+      if (supplierEmail) {
+        const { data: inviteRow } = await supabase
+          .from('supplier_invites')
+          .select('buyer_id')
+          .eq('supplier_email', supplierEmail)
+          .maybeSingle();
+        if (inviteRow?.buyer_id) buyerIdForAssessment = inviteRow.buyer_id;
+      }
+
+      // Save assessment. Keys use grandTotal/scope1Total/scope2Total/scope3Total
+      // so getSupplierEmissions() reads them without remapping.
+      // No revenue/currency (dropped from assessments table).
       await supabase.from('assessments').upsert({
         user_id:          userId,
         year:             parseInt(companyData.year) || new Date().getFullYear(),
         activity_data:    activityData,
         emissions_totals: {
-          scope1:      totals.scope1,
-          scope2:      totals.scope2,
-          scope3:      totals.scope3,
-          total:       totals.total,
+          scope1Total: totals.scope1,
+          scope2Total: totals.scope2,
+          scope3Total: totals.scope3,
+          grandTotal:  totals.total,
           totalTonnes: totals.totalTonnes,
           intensity:   totals.intensity,
         },
         evidence_links: fileVault,
+        buyer_id:       buyerIdForAssessment,
         status:         'submitted',
         updated_at:     new Date().toISOString(),
       }, { onConflict: 'user_id, year' });
 
-      // ── Update supplier_invites using ACTUAL email from Clerk ──────────────
-      // This is what shows "Complete" in the buyer dashboard
-      const supplierEmail = user?.emailAddresses[0]?.emailAddress;
+      // ── Update supplier_invites status → 'submitted' ─────────────────────
       if (supplierEmail) {
         await supabase
           .from('supplier_invites')
@@ -179,7 +193,7 @@ export default function ResultsPage() {
             updated_at: new Date().toISOString(),
           })
           .eq('supplier_email', supplierEmail)
-          .neq('status', 'submitted'); // don't overwrite if already done
+          .neq('status', 'submitted');
       }
 
       setSaveStatus('success');
