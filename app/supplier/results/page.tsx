@@ -58,6 +58,7 @@ import {
   formatEmissions
 } from '@/utils/calculations';
 import { useAuth, useUser } from '@clerk/nextjs'; // ← added useUser
+import { getBenchmark } from '@/utils/benchmarks';
 import { createSupabaseClient } from '@/utils/supabase';
 
 const DownloadTrigger = dynamic(() => import('@/components/DownloadTrigger'), {
@@ -526,6 +527,106 @@ export default function ResultsPage() {
             }`}>
               {isDown ? '−' : isUp ? '+' : '±'}{absPct}%
             </div>
+          </div>
+        );
+      })()}
+
+      {/* ── INDUSTRY BENCHMARK — Phase 4.3 ──────────────────────────────────── */}
+      {totals.intensity > 0 && companyData.industry && (() => {
+        const bm = getBenchmark(companyData.industry, totals.intensity);
+        if (!bm) return null;
+
+        const absPct    = Math.abs(bm.percentVsMedian).toFixed(1);
+        const fmtInt    = (n: number) =>
+          new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
+
+        const bgClass   = bm.isBelow ? 'bg-blue-50 border-blue-100'
+                        : bm.isAbove ? 'bg-amber-50 border-amber-100'
+                        : 'bg-gray-50 border-gray-100';
+        const textClass = bm.isBelow ? 'text-blue-800'
+                        : bm.isAbove ? 'text-amber-800'
+                        : 'text-gray-700';
+        const subClass  = bm.isBelow ? 'text-blue-600'
+                        : bm.isAbove ? 'text-amber-600'
+                        : 'text-gray-500';
+        const pillClass = bm.isBelow ? 'bg-blue-100 text-blue-700'
+                        : bm.isAbove ? 'bg-amber-100 text-amber-700'
+                        : 'bg-gray-100 text-gray-600';
+
+        return (
+          <div className={`mb-8 rounded-2xl border p-5 sm:p-6 ${bgClass}`}>
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${subClass}`}>
+                  Industry Benchmark
+                </p>
+                <p className={`text-sm font-bold ${textClass}`}>
+                  {bm.isBelow
+                    ? `Your emissions intensity is ${absPct}% below the ${bm.sectorLabel} average ↓`
+                    : bm.isAbove
+                    ? `Your emissions intensity is ${absPct}% above the ${bm.sectorLabel} average ↑`
+                    : `Your emissions intensity is in line with the ${bm.sectorLabel} average`
+                  }
+                </p>
+                <p className={`text-xs mt-1 ${subClass}`}>
+                  Your intensity: <span className="font-semibold">{fmtInt(bm.yourIntensity)} kgCO₂e/€M revenue</span>
+                  {' · '}
+                  Sector median: <span className="font-semibold">{fmtInt(bm.medianIntensity)} kgCO₂e/€M revenue</span>
+                </p>
+              </div>
+              <span className={`flex-shrink-0 px-3 py-1.5 rounded-xl font-bold text-sm ${pillClass}`}>
+                {bm.isFlat ? '≈' : bm.isBelow ? '−' : '+'}{absPct}%
+              </span>
+            </div>
+
+            {/* Visual range bar */}
+            <div className="mb-3">
+              <div className="flex justify-between text-[9px] font-semibold uppercase tracking-widest mb-1.5" style={{color: 'inherit', opacity: 0.5}}>
+                <span>Low (25th pct)</span>
+                <span>Median</span>
+                <span>High (75th pct)</span>
+              </div>
+              <div className="relative h-2 rounded-full bg-white/60 overflow-visible">
+                {/* Range band */}
+                <div
+                  className="absolute top-0 h-2 rounded-full opacity-30"
+                  style={{
+                    left:  `${Math.min(Math.max((bm.lowBound  / bm.highBound) * 80, 5), 80)}%`,
+                    right: '10%',
+                    background: bm.isBelow ? '#3b82f6' : bm.isAbove ? '#f59e0b' : '#6b7280',
+                  }}
+                />
+                {/* Median marker */}
+                <div
+                  className="absolute top-[-2px] w-0.5 h-3 rounded-full opacity-60"
+                  style={{
+                    left: `${Math.min(Math.max(((bm.medianIntensity - bm.lowBound) / (bm.highBound - bm.lowBound)) * 80 + 10, 10), 88)}%`,
+                    background: bm.isBelow ? '#1d4ed8' : bm.isAbove ? '#b45309' : '#374151',
+                  }}
+                />
+                {/* Your dot */}
+                <div
+                  className="absolute top-[-3px] w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                  style={{
+                    left: `${Math.min(Math.max(((bm.yourIntensity - bm.lowBound) / (bm.highBound - bm.lowBound)) * 80 + 10, 5), 92)}%`,
+                    transform: 'translateX(-50%)',
+                    background: bm.isBelow ? '#2563eb' : bm.isAbove ? '#d97706' : '#6b7280',
+                  }}
+                />
+              </div>
+              <p className="text-[9px] mt-2 opacity-50">
+                Typical range: {fmtInt(bm.lowBound)}–{fmtInt(bm.highBound)} kgCO₂e/€M
+                {' · '}
+                {bm.withinTypicalRange ? 'Your result is within the typical range.' : 'Your result is outside the typical range.'}
+              </p>
+            </div>
+
+            {/* Source */}
+            <p className="text-[9px] opacity-40 leading-relaxed">
+              Source: {bm.source}. Benchmarks are Scope 1+2+3 median intensities for SMEs.
+              Comparisons are indicative — actual intensity varies by company size, geography, and operating model.
+            </p>
           </div>
         );
       })()}
