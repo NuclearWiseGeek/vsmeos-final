@@ -439,9 +439,7 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
           <table cellpadding="0" cellspacing="0" border="0">
             <tr>
               <td style="vertical-align: middle; padding-right: 10px;">
-                <div style="width: 34px; height: 34px; background-color: #122F1E; border-radius: 7px; text-align: center; line-height: 34px; border: 1px solid #1A5C3A;">
-                  <span style="color: #C9A84C; font-size: 20px; line-height: 34px; display: inline-block; vertical-align: middle; margin-top: -2px;">&#10003;</span>
-                </div>
+                <img src="https://vsmeos.fr/icon-192.png" alt="VSME OS" width="34" height="34" style="display:block; border-radius: 7px;" />
               </td>
               <td style="vertical-align: middle;">
                 <span style="color: #C9A84C; font-size: 18px; font-weight: 700; letter-spacing: -0.3px;">VSME</span>
