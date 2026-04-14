@@ -33,7 +33,9 @@ import { ArrowRight, Bell, Loader2, Search, Lock, ChevronDown } from 'lucide-rea
 import { useESG } from '@/context/ESGContext';
 import { getPendingInvite, updateCompanyProfile } from '@/actions/supplier';
 import { getSupportedCountries } from '@/utils/calculations';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 // =============================================================================
 // SECTION 1: STATIC DATA — INDUSTRY LIST & CURRENCIES
@@ -199,20 +201,13 @@ function CountryDropdown({ value, onChange }: CountryDropdownProps) {
 // SECTION 3: MAIN COMPONENT
 // =============================================================================
 
-export default function SupplierProfilePage() {
-  const router = useRouter();
+// ─── YearParamReader ──────────────────────────────────────────────────────
+// Tiny component that reads ?year= from the URL and syncs it to ESGContext.
+// Must be in its own component because useSearchParams() requires Suspense.
+function YearParamReader() {
   const searchParams = useSearchParams();
-  const [saving, setSaving] = useState(false);
-  const { companyData, setCompanyData, saveToSupabase } = useESG();
-  const [invite, setInvite] = useState<any>(null);
+  const { companyData, setCompanyData } = useESG();
 
-  // Local display state for formatted revenue (shows "1,000,000" not "1000000")
-  const [displayRevenue, setDisplayRevenue] = useState('');
-
-  // ─── Pre-fill year from URL param ────────────────────────────────────────
-  // Set when navigating from vault ("Start declaration →" passes ?year=2025)
-  // or when a buyer invite includes a financial year.
-  // Only applies if the year in the URL differs from the current profile year.
   useEffect(() => {
     const yearParam = searchParams.get('year');
     if (yearParam && yearParam !== companyData.year) {
@@ -220,6 +215,18 @@ export default function SupplierProfilePage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // run once on mount only
+
+  return null; // renders nothing — side-effect only
+}
+
+export default function SupplierProfilePage() {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const { companyData, setCompanyData, saveToSupabase } = useESG();
+  const [invite, setInvite] = useState<any>(null);
+
+  // Local display state for formatted revenue (shows "1,000,000" not "1000000")
+  const [displayRevenue, setDisplayRevenue] = useState('');
 
   // ─── Check for buyer invite on mount ────────────────────────────────────
   // If a buyer has invited this supplier, we pre-fill the company name
@@ -301,6 +308,10 @@ export default function SupplierProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
+      {/* Read ?year= URL param — wrapped in Suspense as required by Next.js */}
+      <Suspense fallback={null}>
+        <YearParamReader />
+      </Suspense>
 
       {/* ================================================================
           BUYER INVITE BANNER
