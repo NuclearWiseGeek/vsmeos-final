@@ -408,7 +408,7 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
 
   // Resolve subject: custom or default
   const subject = customSubject
-    || `Action Required: ${buyerName} invited you to complete your carbon declaration`;
+    || `Carbon Emissions Declaration Request from ${buyerName} — VSME OS`;
 
   // Resolve body: custom (with variable substitution) or default HTML
   let htmlBody: string;
@@ -432,29 +432,107 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
       </div>`;
   } else {
     htmlBody = `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background: #0C2918; padding: 24px 32px; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 10px;">
-          <div style="width: 32px; height: 32px; background: #C9A84C; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">
-            <span style="color: #0C2918; font-size: 16px; font-weight: 900; line-height: 1;">V</span>
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #f9f9f7; padding: 32px 16px;">
+
+        <!-- HEADER -->
+        <div style="background: #0C2918; padding: 20px 32px; border-radius: 12px 12px 0 0; text-align: left;">
+          <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="vertical-align: middle; padding-right: 10px;">
+                <div style="width: 32px; height: 32px; background: #C9A84C; border-radius: 6px; text-align: center; line-height: 32px;">
+                  <span style="color: #0C2918; font-size: 17px; font-weight: 900; font-family: Georgia, serif;">V</span>
+                </div>
+              </td>
+              <td style="vertical-align: middle;">
+                <span style="color: #C9A84C; font-size: 18px; font-weight: 700; letter-spacing: -0.3px;">VSME</span>
+                <span style="color: rgba(201,168,76,0.5); font-size: 18px; font-weight: 400; letter-spacing: -0.3px;"> OS</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- BODY -->
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px; padding: 36px 32px;">
+
+          <p style="font-size: 16px; color: #111827; margin: 0 0 20px; font-weight: 600;">Hello ${supplierName},</p>
+
+          <p style="font-size: 15px; color: #374151; margin: 0 0 16px; line-height: 1.7;">
+            <strong>${buyerName}</strong> has invited you to complete a carbon emissions declaration
+            through VSME OS to support their supply chain Scope 3 data collection.
+          </p>
+
+          <p style="font-size: 15px; color: #374151; margin: 0 0 16px; line-height: 1.7;">
+            The process typically takes <strong>15–30 minutes</strong>. You will need:
+          </p>
+
+          <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 0 20px; width: 100%;">
+            <tr><td style="padding: 4px 0; font-size: 14px; color: #6b7280;">&#x2022;&nbsp; Recent utility bills (electricity, gas)</td></tr>
+            <tr><td style="padding: 4px 0; font-size: 14px; color: #6b7280;">&#x2022;&nbsp; Fuel usage records (diesel, petrol) if applicable</td></tr>
+            <tr><td style="padding: 4px 0; font-size: 14px; color: #6b7280;">&#x2022;&nbsp; Business travel records (flights, hotels, commuting)</td></tr>
+          </table>
+
+          <p style="font-size: 15px; color: #374151; margin: 0 0 28px; line-height: 1.7;">
+            At the end, you will receive a 4-page PDF report based on the
+            <strong>GHG Protocol Corporate Standard</strong> and
+            <strong>ISO 14064-1:2018</strong> — self-attested, limited assurance —
+            ready to share with ${buyerName}.
+          </p>
+
+          <!-- CTA BUTTON -->
+          <div style="margin: 0 0 28px;">
+            <a href="${inviteLink}"
+               style="background-color: #0C2918; color: #C9A84C; padding: 14px 28px;
+                      text-decoration: none; border-radius: 8px; font-weight: 700;
+                      display: inline-block; font-size: 15px; font-family: sans-serif;">
+              Start My Carbon Declaration &rarr;
+            </a>
           </div>
-          <span style="color: #C9A84C; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-left: 8px;">VSME <span style="color: rgba(201,168,76,0.6); font-weight: 400;">OS</span></span>
+
+          <!-- HOW IT WORKS -->
+          <div style="background: #f9fafb; border-radius: 8px; padding: 20px 24px; margin: 0 0 28px;">
+            <p style="font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 12px;">How it works</p>
+            <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+              <tr>
+                <td style="padding: 4px 0; font-size: 13px; color: #374151;">
+                  <strong style="color: #0C2918;">1.</strong>&nbsp; Enter your energy and travel data across Scope 1, 2 and 3
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; font-size: 13px; color: #374151;">
+                  <strong style="color: #0C2918;">2.</strong>&nbsp; We apply the correct national emission factors for your country
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; font-size: 13px; color: #374151;">
+                  <strong style="color: #0C2918;">3.</strong>&nbsp; Download your signed PDF and upload your supporting evidence
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- FALLBACK LINK -->
+          <p style="font-size: 12px; color: #9ca3af; margin: 0; line-height: 1.6;">
+            Button not working? Copy this link into your browser:<br/>
+            <a href="${inviteLink}" style="color: #0C2918; word-break: break-all;">${inviteLink}</a>
+          </p>
         </div>
-        <div style="background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px; padding: 32px;">
-          <p style="font-size: 16px; color: #374151; margin: 0 0 16px;">Hello <strong>${supplierName}</strong>,</p>
-          <p style="font-size: 15px; color: #6b7280; margin: 0 0 16px; line-height: 1.6;">
-            <strong style="color: #111827;">${buyerName}</strong> has invited you to complete a carbon emissions declaration through VSME OS. This is required for supply chain CSRD Scope 3 compliance.
+
+        <!-- FOOTER -->
+        <div style="padding: 20px 32px 0; text-align: center;">
+          <p style="font-size: 11px; color: #9ca3af; margin: 0 0 4px; line-height: 1.6;">
+            This email was sent by VSME OS on behalf of ${buyerName}.<br/>
+            VSME OS is a carbon data collection tool. Reports are self-attested (limited assurance).<br/>
+            Questions? Reply to this email or contact
+            <a href="mailto:hello@vsmeos.fr" style="color: #6b7280;">hello@vsmeos.fr</a>
           </p>
-          <p style="font-size: 15px; color: #6b7280; margin: 0 0 28px; line-height: 1.6;">
-            The process takes around 15–30 minutes. You'll receive a GHG Protocol-compliant PDF report at the end.
-          </p>
-          <a href="${inviteLink}" style="background-color: #0C2918; color: #C9A84C; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; display: inline-block; font-size: 15px;">
-            Start My Carbon Declaration →
-          </a>
-          <p style="font-size: 12px; color: #9ca3af; margin: 28px 0 0; line-height: 1.5;">
-            Or copy this link into your browser:<br/>
-            <a href="${inviteLink}" style="color: #0C2918;">${inviteLink}</a>
+          <p style="font-size: 11px; color: #d1d5db; margin: 8px 0 0;">
+            &copy; 2026 VSME OS &nbsp;|&nbsp;
+            <a href="https://vsmeos.fr/privacy" style="color: #d1d5db; text-decoration: none;">Privacy</a>
+            &nbsp;|&nbsp;
+            <a href="https://vsmeos.fr/terms" style="color: #d1d5db; text-decoration: none;">Terms</a>
           </p>
         </div>
+
       </div>`;
   }
 
