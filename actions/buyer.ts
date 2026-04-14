@@ -388,15 +388,29 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
     : 'VSME Enterprise';
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const inviteLink = `${baseUrl}/supplier/hub?email=${encodeURIComponent(email)}`;
 
+  // Fetch the invite to get financial_year for the link
+  // This pre-fills the year in the supplier profile form, reducing human error
   const token = await getToken({ template: 'supabase' });
+  let financialYear = '';
+  if (token) {
+    const supabase = createSupabaseClient(token);
+    const { data: inviteRow } = await supabase
+      .from('supplier_invites')
+      .select('financial_year')
+      .eq('id', id)
+      .maybeSingle();
+    if (inviteRow?.financial_year) financialYear = inviteRow.financial_year.toString();
+  }
+
+  const yearParam = financialYear ? `&year=${encodeURIComponent(financialYear)}` : '';
+  const inviteLink = `${baseUrl}/supplier/hub?email=${encodeURIComponent(email)}${yearParam}`;
 
   // Check for custom email template in buyer_settings
   let customSubject: string | null = null;
   let customBody: string | null = null;
   if (token) {
-    const supabase = createSupabaseClient(token);
+    const supabase = createSupabaseClient(token); // reuses singleton from above
     const { data: settings } = await supabase
       .from('buyer_settings')
       .select('invite_email_subject, invite_email_body')

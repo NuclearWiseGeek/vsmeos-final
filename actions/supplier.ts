@@ -58,7 +58,7 @@ export async function updateCompanyProfile(data: {
       financial_year: data.year,
       currency:       data.currency,
       revenue:        data.revenue,
-      status:         'started',      // matches our status vocabulary
+      status:         'started',
       updated_at:     new Date().toISOString(),
     })
     .eq('supplier_email', email);
@@ -68,8 +68,7 @@ export async function updateCompanyProfile(data: {
     return { success: false };
   }
 
-  // 2. Look up the buyer_id from supplier_invites so we can store it on the assessment.
-  //    This is required for the buyers_read_supplier_assessments RLS policy in Phase 3.1.
+  // 2. Look up the buyer_id from supplier_invites
   let buyerIdForAssessment: string | null = null;
   const { data: inviteRow } = await supabase
     .from('supplier_invites')
@@ -81,19 +80,41 @@ export async function updateCompanyProfile(data: {
   }
 
   // 3. Create/update assessment record for this user + year.
-  //    NO revenue or currency here — those columns were dropped from assessments.
-  //    buyer_id is stored here so buyers can read submitted assessments via RLS.
+  //    CRITICAL: never overwrite status if it's already 'submitted'.
+  //    We do this by reading the current status first and only setting
+  //    status: 'draft' if no row exists yet (INSERT path of upsert).
+  //    For existing rows we do NOT include status in the update — Supabase
+  //    upsert with onConflict merges only the supplied columns, so omitting
+  //    status leaves it unchanged.
+  //
+  //    Implementation: check if a submitted row already exists. If so,
+  //    skip the status field entirely. If not, set 'draft'.
+
+  const { data: existing } = await supabase
+    .from('assessments')
+    .select('status')
+    .eq('user_id', userId)
+    .eq('year', parseInt(data.year))
+    .maybeSingle();
+
+  const isAlreadySubmitted = existing?.status === 'submitted';
+
+  const upsertPayload: Record<string, any> = {
+    user_id:    userId,
+    year:       parseInt(data.year),
+    buyer_id:   buyerIdForAssessment,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Only set status to 'draft' if this is a brand-new row.
+  // If it's already 'submitted', leave the status column alone.
+  if (!isAlreadySubmitted) {
+    upsertPayload.status = existing ? 'started' : 'draft';
+  }
+
   const { error: assessmentError } = await supabase
     .from('assessments')
-    .upsert({
-      user_id:    userId,
-      year:       parseInt(data.year),
-      status:     'draft',
-      buyer_id:   buyerIdForAssessment,
-      updated_at: new Date().toISOString(),
-    }, {
-      onConflict: 'user_id, year',
-    });
+    .upsert(upsertPayload, { onConflict: 'user_id, year' });
 
   if (assessmentError) {
     console.error('Assessment Update Error:', assessmentError);

@@ -5,10 +5,14 @@
 // RESPONSIVE:
 //   Desktop → Sticky top nav with VSME OS logo, settings, and user button
 //   Mobile  → Same top nav (compact) + fixed bottom quick-nav bar for
-//             fast access to Hub, Scopes, and Results
+//             fast access to Hub, Scopes, Results, and Vault
 //
 // INCLUDES: ESGProvider (global state), CompanyOnboarding (first-time setup),
 //           AutoSave (debounced saves), SupplierProgress (step indicator)
+//
+// PHASE 4 CHANGE:
+//   - Added "My Reports" (Vault) link to desktop top nav
+//   - Added "Vault" tab to mobile bottom nav
 // =============================================================================
 
 'use client';
@@ -21,7 +25,7 @@ import { useEffect } from 'react';
 import CompanyOnboarding from '@/components/CompanyOnboarding';
 import AutoSave from '@/components/AutoSave';
 import SupplierProgress from '@/components/SupplierProgress';
-import { Settings, LayoutDashboard, Flame, Zap, Plane, FileText } from 'lucide-react';
+import { Settings, LayoutDashboard, Flame, Zap, Plane, FileText, Archive } from 'lucide-react';
 import VsmeLogo from '@/components/VsmeLogo';
 import { createSupabaseClient } from '@/utils/supabase';
 
@@ -31,6 +35,7 @@ const BOTTOM_NAV = [
   { label: 'Scope 2',  href: '/supplier/scope2',  icon: Zap },
   { label: 'Scope 3',  href: '/supplier/scope3',  icon: Plane },
   { label: 'Report',   href: '/supplier/results',  icon: FileText },
+  { label: 'Vault',    href: '/supplier/vault',    icon: Archive },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -51,6 +56,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       } catch (e) { /* non-fatal */ }
     })();
   }, [userId]);
+
+  const isVaultActive = pathname?.startsWith('/supplier/vault');
 
   return (
     <ESGProvider>
@@ -74,6 +81,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="text-xs font-medium text-gray-400 uppercase tracking-widest hidden md:block">
               Supplier Portal
             </span>
+
+            {/* ── My Reports (Vault) link — desktop only ── */}
+            <Link
+              href="/supplier/vault"
+              className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                isVaultActive
+                  ? 'bg-[#0C2918] text-[#C9A84C]'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+              title="My Reports"
+            >
+              <Archive size={14} />
+              My Reports
+            </Link>
+
             <Link
               href="/supplier/settings"
               className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
@@ -104,13 +126,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={href}
                   href={href}
-                  className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-[52px] ${
+                  className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-colors min-w-[44px] ${
                     isActive
                       ? 'text-black'
                       : 'text-gray-400 active:text-gray-600'
                   }`}
                 >
-                  <Icon size={18} strokeWidth={isActive ? 2.5 : 1.5} />
+                  <Icon size={17} strokeWidth={isActive ? 2.5 : 1.5} />
                   <span className={`text-[9px] font-bold tracking-wide ${isActive ? 'text-black' : 'text-gray-400'}`}>
                     {label}
                   </span>

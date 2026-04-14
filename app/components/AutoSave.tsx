@@ -223,6 +223,11 @@ export default function AutoSave() {
         const results = calculateEmissions(ac, co.country || 'France');
         const totals  = summarizeEmissions(results, co.revenue || 0);
 
+        // IMPORTANT: status is deliberately NOT included here.
+        // AutoSave must never overwrite status — it is set only by explicit
+        // user actions: hub sets 'started', results sets 'submitted'.
+        // Including status: 'draft' here would silently revert submitted
+        // assessments every time the supplier navigates within the portal.
         await supabase.from('assessments').upsert({
           user_id:          userId,
           year:             parseInt(co.year) || new Date().getFullYear(),
@@ -235,7 +240,6 @@ export default function AutoSave() {
             totalTonnes: totals.totalTonnes,
             intensity:   totals.intensity,
           },
-          status:           'draft',
           updated_at:       new Date().toISOString(),
         }, { onConflict: 'user_id, year' });
       }

@@ -33,7 +33,7 @@ import { ArrowRight, Bell, Loader2, Search, Lock, ChevronDown } from 'lucide-rea
 import { useESG } from '@/context/ESGContext';
 import { getPendingInvite, updateCompanyProfile } from '@/actions/supplier';
 import { getSupportedCountries } from '@/utils/calculations';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // =============================================================================
 // SECTION 1: STATIC DATA — INDUSTRY LIST & CURRENCIES
@@ -201,12 +201,25 @@ function CountryDropdown({ value, onChange }: CountryDropdownProps) {
 
 export default function SupplierProfilePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [saving, setSaving] = useState(false);
   const { companyData, setCompanyData, saveToSupabase } = useESG();
   const [invite, setInvite] = useState<any>(null);
 
   // Local display state for formatted revenue (shows "1,000,000" not "1000000")
   const [displayRevenue, setDisplayRevenue] = useState('');
+
+  // ─── Pre-fill year from URL param ────────────────────────────────────────
+  // Set when navigating from vault ("Start declaration →" passes ?year=2025)
+  // or when a buyer invite includes a financial year.
+  // Only applies if the year in the URL differs from the current profile year.
+  useEffect(() => {
+    const yearParam = searchParams.get('year');
+    if (yearParam && yearParam !== companyData.year) {
+      setCompanyData((prev: any) => ({ ...prev, year: yearParam }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once on mount only
 
   // ─── Check for buyer invite on mount ────────────────────────────────────
   // If a buyer has invited this supplier, we pre-fill the company name

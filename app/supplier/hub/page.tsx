@@ -50,13 +50,15 @@ function getScopeStatus(activityData: Record<string, number>, scope: 1 | 2 | 3):
 // =============================================================================
 
 export default function AssessmentHub() {
-  const { activityData, companyData, isLoading, lastSaved } = useESG();
+  const { activityData, companyData, setCompanyData, isLoading, lastSaved } = useESG();
   const { getToken } = useAuth();
   const { user } = useUser();
 
-  // ── Mark supplier as 'started' in buyer dashboard ─────────────────────────
+  // ── Mark supplier as 'started' and read financial_year from invite ─────────
+  // Phase 4: also reads financial_year from the invite and auto-sets the year
+  // in ESGContext so the profile form pre-fills correctly.
   useEffect(() => {
-    const markStarted = async () => {
+    const markStartedAndReadYear = async () => {
       const email = user?.emailAddresses[0]?.emailAddress;
       if (!email) return;
 
@@ -65,21 +67,41 @@ export default function AssessmentHub() {
         if (!token) return;
         const supabase = createSupabaseClient(token);
 
-        await supabase
+        // 1. Fetch invite to get financial_year
+        const { data: invite } = await supabase
           .from('supplier_invites')
-          .update({
-            status: 'started',
-            updated_at: new Date().toISOString(),
-          })
+          .select('status, financial_year, supplier_name, country, industry')
           .eq('supplier_email', email)
-          .eq('status', 'sent');
+          .maybeSingle();
+
+        // 2. If invite has a financial_year, auto-set it in ESGContext
+        //    This means the profile form will show the correct year without
+        //    the supplier having to manually change it.
+        if (invite?.financial_year) {
+          setCompanyData((prev: any) => ({
+            ...prev,
+            year: invite.financial_year.toString(),
+          }));
+        }
+
+        // 3. Mark as started (only if currently 'sent')
+        if (invite?.status === 'sent') {
+          await supabase
+            .from('supplier_invites')
+            .update({
+              status: 'started',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('supplier_email', email)
+            .eq('status', 'sent');
+        }
       } catch (err) {
-        console.error('[VSME OS] Could not mark invite as started:', err);
+        console.error('[VSME OS] Hub invite read error:', err);
       }
     };
 
-    if (user) markStarted();
-  }, [user, getToken]);
+    if (user) markStartedAndReadYear();
+  }, [user, getToken, setCompanyData]);
 
   // ── Real-time calculations ────────────────────────────────────────────────
   const results = calculateEmissions(activityData, companyData.country || 'France');
