@@ -49,7 +49,7 @@ import { uploadEvidence } from '../../../actions/uploadEvidence';
 import {
   CheckCircle2, RotateCcw, ArrowLeft, FileText,
   X, File, AlertCircle, Loader2, Save, CloudUpload,
-  TrendingUp, Scale
+  TrendingUp, TrendingDown, Scale
 } from 'lucide-react';
 import { useESG } from '@/context/ESGContext';
 import {
@@ -112,6 +112,8 @@ export default function ResultsPage() {
   const [saveStatus,  setSaveStatus]  = useState<'idle' | 'success' | 'error'>('idle');
   const [fileVault,   setFileVault]   = useState<Record<string, Array<{ name: string; url: string }>>>({});
   const [debouncedSigner, setDebouncedSigner] = useState(companyData.signer || '');
+  // Phase 4.2 — previous year comparison
+  const [prevYearData, setPrevYearData] = useState<{ grandTotal: number; year: number } | null>(null);
 
   const results = calculateEmissions(activityData, companyData.country || 'France');
   const totals  = summarizeEmissions(results, companyData.revenue || 0);
@@ -244,6 +246,33 @@ export default function ResultsPage() {
   };
 
   useEffect(() => { setIsClient(true); }, []);
+
+  // Phase 4.2 — fetch previous year submitted assessment for YoY comparison
+  useEffect(() => {
+    if (!userId || !companyData.year) return;
+    const py = parseInt(companyData.year) - 1;
+    if (isNaN(py)) return;
+
+    (async () => {
+      try {
+        const token = await getToken({ template: 'supabase' });
+        if (!token) return;
+        const supabase = createSupabaseClient(token);
+        const { data } = await supabase
+          .from('assessments')
+          .select('year, emissions_totals')
+          .eq('user_id', userId)
+          .eq('year', py)
+          .eq('status', 'submitted')
+          .maybeSingle();
+
+        if (data?.emissions_totals) {
+          const gt = data.emissions_totals.grandTotal ?? data.emissions_totals.total ?? 0;
+          if (Number(gt) > 0) setPrevYearData({ grandTotal: Number(gt), year: py });
+        }
+      } catch { /* non-fatal */ }
+    })();
+  }, [userId, companyData.year, getToken]);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSigner(companyData.signer || ''), 500);
@@ -442,6 +471,64 @@ export default function ResultsPage() {
           />
         </div>
       </div>
+
+      {/* ── YEAR-ON-YEAR COMPARISON — Phase 4.2 ─────────────────────────────── */}
+      {prevYearData && totals.total > 0 && (() => {
+        const currentKg  = totals.total;
+        const previousKg = prevYearData.grandTotal;
+        const pct        = ((currentKg - previousKg) / previousKg) * 100;
+        const isDown     = pct < -0.5;
+        const isUp       = pct >  0.5;
+        const absPct     = Math.abs(pct).toFixed(1);
+        const currentT   = (currentKg  / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        const previousT  = (previousKg / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+        return (
+          <div className={`mb-8 rounded-2xl border p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 ${
+            isDown ? 'bg-green-50 border-green-100' : isUp ? 'bg-red-50 border-red-100' : 'bg-gray-50 border-gray-100'
+          }`}>
+            {/* Icon */}
+            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              isDown ? 'bg-green-100' : isUp ? 'bg-red-100' : 'bg-gray-100'
+            }`}>
+              {isDown
+                ? <TrendingDown size={20} className="text-green-600" />
+                : isUp
+                ? <TrendingUp   size={20} className="text-red-500"   />
+                : <TrendingUp   size={20} className="text-gray-400"  />
+              }
+            </div>
+
+            {/* Text */}
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-bold mb-0.5 ${
+                isDown ? 'text-green-800' : isUp ? 'text-red-700' : 'text-gray-700'
+              }`}>
+                {isDown
+                  ? `Your emissions decreased ${absPct}% vs ${prevYearData.year} ↓`
+                  : isUp
+                  ? `Your emissions increased ${absPct}% vs ${prevYearData.year} ↑`
+                  : `Your emissions are roughly the same as ${prevYearData.year}`
+                }
+              </p>
+              <p className={`text-xs ${isDown ? 'text-green-600' : isUp ? 'text-red-500' : 'text-gray-500'}`}>
+                {prevYearData.year}: <span className="font-semibold">{previousT} tCO₂e</span>
+                {' '}→{' '}
+                {companyData.year}: <span className="font-semibold">{currentT} tCO₂e</span>
+                {' '}
+                ({isDown ? '-' : isUp ? '+' : ''}{absPct}%)
+              </p>
+            </div>
+
+            {/* Delta pill */}
+            <div className={`flex-shrink-0 px-4 py-2 rounded-xl font-bold text-sm ${
+              isDown ? 'bg-green-100 text-green-700' : isUp ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'
+            }`}>
+              {isDown ? '−' : isUp ? '+' : '±'}{absPct}%
+            </div>
+          </div>
+        );
+      })()}
 
       {/* EVIDENCE VAULT */}
       <div className="mb-10">

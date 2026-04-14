@@ -23,12 +23,12 @@ import {
   getCountryFactors
 } from '@/utils/calculations';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { createSupabaseClient } from '@/utils/supabase';
 import {
   ArrowRight, ArrowLeft, CheckCircle2, Factory,
-  Zap, Plane, TrendingUp, Clock, AlertCircle, Loader2
+  Zap, Plane, TrendingUp, TrendingDown, Clock, AlertCircle, Loader2
 } from 'lucide-react';
 
 // =============================================================================
@@ -51,7 +51,7 @@ function getScopeStatus(activityData: Record<string, number>, scope: 1 | 2 | 3):
 
 export default function AssessmentHub() {
   const { activityData, companyData, setCompanyData, isLoading, lastSaved } = useESG();
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
   const { user } = useUser();
 
   // ── Mark supplier as 'started' and read financial_year from invite ─────────
@@ -102,6 +102,36 @@ export default function AssessmentHub() {
 
     if (user) markStartedAndReadYear();
   }, [user, getToken, setCompanyData]);
+
+  // ── Year-on-Year: fetch previous year's submitted assessment ───────────────
+  // Phase 4.2 — shows % change vs prior year on the total footprint bar
+  const [prevYear, setPrevYear] = useState<{ grandTotal: number; year: number } | null>(null);
+
+  useEffect(() => {
+    if (!userId || !companyData.year) return;
+    const py = parseInt(companyData.year) - 1;
+    if (isNaN(py)) return;
+
+    (async () => {
+      try {
+        const token = await getToken({ template: 'supabase' });
+        if (!token) return;
+        const supabase = createSupabaseClient(token);
+        const { data } = await supabase
+          .from('assessments')
+          .select('year, emissions_totals')
+          .eq('user_id', userId)
+          .eq('year', py)
+          .eq('status', 'submitted')
+          .maybeSingle();
+
+        if (data?.emissions_totals) {
+          const gt = data.emissions_totals.grandTotal ?? data.emissions_totals.total ?? 0;
+          if (gt > 0) setPrevYear({ grandTotal: Number(gt), year: py });
+        }
+      } catch { /* non-fatal */ }
+    })();
+  }, [userId, companyData.year, getToken]);
 
   // ── Real-time calculations ────────────────────────────────────────────────
   const results = calculateEmissions(activityData, companyData.country || 'France');
@@ -389,6 +419,26 @@ export default function AssessmentHub() {
             {formattedTotal.unit === 'tCO2e' && (
               <p className="text-xs text-gray-400 mt-0.5">= {fmt(totals.total)} kgCO₂e</p>
             )}
+            {/* YoY comparison badge — Phase 4.2 */}
+            {prevYear && totals.total > 0 && (() => {
+              const pct = ((totals.total - prevYear.grandTotal) / prevYear.grandTotal) * 100;
+              const isDown = pct < -0.5;
+              const isUp   = pct > 0.5;
+              if (!isDown && !isUp) return (
+                <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1">
+                  <span className="font-semibold">≈</span> Same as {prevYear.year}
+                </p>
+              );
+              return (
+                <p className={`text-xs font-bold mt-1.5 flex items-center gap-1 ${isDown ? 'text-green-600' : 'text-red-500'}`}>
+                  {isDown
+                    ? <TrendingDown size={13} />
+                    : <TrendingUp   size={13} />
+                  }
+                  {Math.abs(pct).toFixed(1)}% {isDown ? 'less' : 'more'} than {prevYear.year}
+                </p>
+              );
+            })()}
           </div>
 
           <div className="flex flex-wrap gap-3">
