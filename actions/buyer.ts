@@ -439,9 +439,12 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
           <table cellpadding="0" cellspacing="0" border="0">
             <tr>
               <td style="vertical-align: middle; padding-right: 10px;">
-                <div style="width: 32px; height: 32px; background: #C9A84C; border-radius: 6px; text-align: center; line-height: 32px;">
-                  <span style="color: #0C2918; font-size: 17px; font-weight: 900; font-family: Georgia, serif;">V</span>
-                </div>
+                <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                  <rect width="34" height="34" rx="7" fill="#0C2918"/>
+                  <rect width="34" height="34" rx="7" fill="#1A3D24" opacity="0.5"/>
+                  <path d="M9 13 L17 25 L27 8" stroke="#C9A84C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M9 13 L17 25 L27 8" stroke="#DFC06A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
+                </svg>
               </td>
               <td style="vertical-align: middle;">
                 <span style="color: #C9A84C; font-size: 18px; font-weight: 700; letter-spacing: -0.3px;">VSME</span>
