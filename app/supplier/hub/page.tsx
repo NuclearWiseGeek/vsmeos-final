@@ -26,9 +26,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { createSupabaseClient } from '@/utils/supabase';
+import { loadTarget, ReductionTarget } from '@/actions/targets';
 import {
   ArrowRight, ArrowLeft, CheckCircle2, Factory,
-  Zap, Plane, TrendingUp, TrendingDown, Clock, AlertCircle, Loader2
+  Zap, Plane, TrendingUp, TrendingDown, Clock, AlertCircle, Loader2, Target
 } from 'lucide-react';
 
 // =============================================================================
@@ -132,6 +133,12 @@ export default function AssessmentHub() {
       } catch { /* non-fatal */ }
     })();
   }, [userId, companyData.year, getToken]);
+
+  // ── Load reduction target ────────────────────────────────────────────────
+  const [target, setTarget] = useState<ReductionTarget | null>(null);
+  useEffect(() => {
+    loadTarget().then(t => { if (t) setTarget(t); });
+  }, []);
 
   // ── Real-time calculations ────────────────────────────────────────────────
   const results = calculateEmissions(activityData, companyData.country || 'France');
@@ -477,6 +484,48 @@ export default function AssessmentHub() {
           </div>
         </div>
       </div>
+
+      {/* ── REDUCTION TARGET PROGRESS — Phase 4.5 ────────────────────────── */}
+      {target && totals.total > 0 && (() => {
+        const targetKg   = target.baselineKg * (1 - target.reductionPct / 100);
+        const saved      = target.baselineKg - targetKg;
+        const sofar      = target.baselineKg - totals.total;
+        const progressPct = saved > 0 ? Math.min(100, Math.max(0, (sofar / saved) * 100)) : 0;
+        const onTrack    = progressPct > 0;
+        const yearsLeft  = target.targetYear - new Date().getFullYear();
+
+        return (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#0C2918] flex items-center justify-center">
+                  <Target size={14} className="text-[#C9A84C]" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Reduction Target</p>
+                  <p className="text-sm font-bold text-gray-900">−{target.reductionPct}% by {target.targetYear}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xl font-black text-[#0C2918] tracking-tight">
+                  {progressPct.toFixed(0)}<span className="text-xs font-normal">%</span>
+                </p>
+                <p className="text-[9px] text-gray-400">on track</p>
+              </div>
+            </div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${progressPct}%`, background: progressPct >= 50 ? '#0C2918' : '#C9A84C' }}
+              />
+            </div>
+            <div className="flex justify-between text-[10px] text-gray-400">
+              <span>{(target.baselineKg / 1000).toFixed(1)}t baseline ({target.baselineYear})</span>
+              <span>{(targetKg / 1000).toFixed(1)}t goal · {yearsLeft > 0 ? `${yearsLeft}yr left` : 'due now'}</span>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* FINALISE CTA */}
       <div className="flex flex-col items-center justify-center py-4">

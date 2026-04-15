@@ -59,6 +59,7 @@ import {
 } from '@/utils/calculations';
 import { useAuth, useUser } from '@clerk/nextjs'; // ← added useUser
 import IntelligenceCards from '@/components/IntelligenceCards';
+import TargetSetter from '@/components/TargetSetter';
 import { getCountryFactors } from '@/utils/calculations';
 import { createSupabaseClient } from '@/utils/supabase';
 
@@ -566,6 +567,17 @@ export default function ResultsPage() {
           </div>
         );
       })()}
+
+      {/* ── REDUCTION TARGET — Phase 4.5 ────────────────────────────────────── */}
+      {totals.total > 0 && (
+        <div className="mb-10">
+          <TargetSetter
+            currentTotalKg={totals.total}
+            currentYear={companyData.year || new Date().getFullYear().toString()}
+            currency={companyData.currency || 'EUR'}
+          />
+        </div>
+      )}
 
       {/* EVIDENCE VAULT */}
       <div className="mb-10">
