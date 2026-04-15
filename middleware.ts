@@ -12,6 +12,7 @@ const isPublicRoute = createRouteMatcher([
   '/methodology',
   '/framework',
   '/alignment',
+  '/api/intelligence',
 ]);
 
 // Supplier-only routes
