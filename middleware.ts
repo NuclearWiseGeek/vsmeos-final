@@ -12,7 +12,6 @@ const isPublicRoute = createRouteMatcher([
   '/methodology',
   '/framework',
   '/alignment',
-  '/api/intelligence',
 ]);
 
 // Supplier-only routes
@@ -66,7 +65,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Supplier trying to access buyer routes → redirect to supplier portal
     if (role === 'supplier' && isBuyerRoute(req)) {
-      return NextResponse.redirect(new URL('/supplier', req.url));
+      return NextResponse.redirect(new URL('/supplier/dashboard', req.url));
     }
 
   } catch (err) {

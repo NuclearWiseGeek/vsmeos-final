@@ -25,12 +25,12 @@ import { useEffect } from 'react';
 import CompanyOnboarding from '@/components/CompanyOnboarding';
 import AutoSave from '@/components/AutoSave';
 import SupplierProgress from '@/components/SupplierProgress';
-import { Settings, LayoutDashboard, Flame, Zap, Plane, FileText, Archive, Grid } from 'lucide-react';
+import { LayoutDashboard, Flame, Zap, Plane, FileText, Archive } from 'lucide-react';
 import VsmeLogo from '@/components/VsmeLogo';
 import { createSupabaseClient } from '@/utils/supabase';
 
 const BOTTOM_NAV = [
-  { label: 'Home',     href: '/supplier/dashboard', icon: Grid },
+  { label: 'Home',     href: '/supplier/dashboard', icon: LayoutDashboard },
   { label: 'Hub',      href: '/supplier/hub',       icon: LayoutDashboard },
   { label: 'Scope 1',  href: '/supplier/scope1',    icon: Flame },
   { label: 'Scope 2',  href: '/supplier/scope2',    icon: Zap },
@@ -67,45 +67,54 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="min-h-screen bg-[#F5F5F7] text-slate-900 font-sans selection:bg-blue-100 pb-16 sm:pb-0">
 
         {/* ── Top Nav ─────────────────────────────────────────────── */}
-        <nav className="sticky top-0 z-50 bg-white/85 backdrop-blur-lg border-b border-gray-100 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+        <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+          {/* Logo */}
           <Link
-            href="/supplier/hub"
-            className="font-bold text-lg sm:text-xl tracking-tighter flex items-center gap-2 sm:gap-2.5 group"
+            href="/supplier/dashboard"
+            className="font-bold text-lg tracking-tighter flex items-center gap-2 group"
           >
-            <VsmeLogo size={28} />
-            <span>VSME</span>
+            <VsmeLogo size={26} />
+            <span className="text-gray-900">VSME</span>
             <span className="text-gray-400 font-medium">OS</span>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs font-medium text-gray-400 uppercase tracking-widest hidden md:block">
-              Supplier Portal
+          {/* Centre nav links — desktop only */}
+          <div className="hidden sm:flex items-center gap-1">
+            {[
+              { label: 'Dashboard',  href: '/supplier/dashboard' },
+              { label: 'Assessment', href: '/supplier/hub'       },
+              { label: 'Reports',    href: '/supplier/vault'     },
+              { label: 'Settings',   href: '/supplier/settings'  },
+            ].map(({ label, href }) => {
+              const active = label === 'Dashboard'
+                ? pathname?.startsWith('/supplier/dashboard')
+                : label === 'Assessment'
+                ? pathname?.startsWith('/supplier/hub') || pathname?.startsWith('/supplier/scope') || pathname?.startsWith('/supplier/results')
+                : label === 'Reports'
+                ? pathname?.startsWith('/supplier/vault')
+                : pathname?.startsWith('/supplier/settings');
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    active
+                      ? 'bg-[#0C2918] text-[#C9A84C]'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Right side */}
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest hidden lg:block">
+              Supplier
             </span>
-
-            {/* ── My Dashboard link — desktop only ── */}
-            <Link
-              href="/supplier/dashboard"
-              className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                pathname?.startsWith('/supplier/dashboard')
-                  ? 'bg-[#0C2918] text-[#C9A84C]'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-              }`}
-              title="My Dashboard"
-            >
-              <Grid size={14} />
-              My Dashboard
-            </Link>
-
-            <Link
-              href="/supplier/settings"
-              className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all"
-              title="Workspace Settings"
-            >
-              <Settings size={18} />
-            </Link>
-            <div className="flex items-center pl-2 border-l border-gray-200 ml-1">
-              <UserButton afterSignOutUrl="/" />
-            </div>
+            <UserButton afterSignOutUrl="/" />
           </div>
         </nav>
 

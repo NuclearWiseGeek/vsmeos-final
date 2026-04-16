@@ -8,7 +8,7 @@ export default function SignInPage() {
       <SignIn 
         path="/sign-in" 
         routing="path" 
-        forceRedirectUrl="/supplier"
+        forceRedirectUrl="/supplier/dashboard"
       />
     </div>
   );

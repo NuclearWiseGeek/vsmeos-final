@@ -115,7 +115,7 @@ export default function LandingPage() {
                     For Buyers
                   </button>
                 </SignInButton>
-                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <SignInButton mode="modal" forceRedirectUrl="/supplier/dashboard">
                   <button className="text-[11px] font-bold uppercase tracking-[0.15em] bg-[#C9A84C] text-[#0C2918] hover:bg-[#DFC06A] px-4 py-2 rounded-lg transition-all">
                     For Suppliers
                   </button>
@@ -145,7 +145,7 @@ export default function LandingPage() {
               <SignInButton mode="modal" forceRedirectUrl="/buyer/dashboard">
                 <button className="text-left text-xs font-bold uppercase tracking-widest text-[#C9A84C]/60 mt-2">For Buyers</button>
               </SignInButton>
-              <SignInButton mode="modal" forceRedirectUrl="/supplier">
+              <SignInButton mode="modal" forceRedirectUrl="/supplier/dashboard">
                 <button className="text-left text-xs font-bold uppercase tracking-widest text-[#C9A84C] mt-1">For Suppliers</button>
               </SignInButton>
             </SignedOut>
@@ -220,7 +220,7 @@ export default function LandingPage() {
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                 </SignInButton>
-                <SignInButton mode="modal" forceRedirectUrl="/supplier">
+                <SignInButton mode="modal" forceRedirectUrl="/supplier/dashboard">
                   <button className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-white text-gray-900 border border-gray-200 rounded-2xl text-base md:text-lg font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
                     I&apos;m a Supplier
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-gray-400" />

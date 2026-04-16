@@ -228,6 +228,16 @@ export default function SupplierProfilePage() {
   // Local display state for formatted revenue (shows "1,000,000" not "1000000")
   const [displayRevenue, setDisplayRevenue] = useState('');
 
+  // ─── Redirect returning suppliers to dashboard ───────────────────────────
+  // If supplier already has a saved company name, skip the profile form
+  // and go straight to their dashboard. New suppliers always see the form.
+  useEffect(() => {
+    if (companyData.name && companyData.name !== 'EMPTY' && companyData.name.trim().length > 1) {
+      router.replace('/supplier/dashboard');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once on mount — companyData loads from Supabase via ESGContext
+
   // ─── Check for buyer invite on mount ────────────────────────────────────
   // If a buyer has invited this supplier, we pre-fill the company name
   // and lock it so it matches exactly what the buyer expects.
