@@ -314,15 +314,15 @@ export async function POST(request: Request) {
     try {
       const result = await getRecommendations(body);
 
-      // Log usage (not cached — each call is unique)
+      // Cache per (userId, year) with stable key so dashboard can load it
       const supabase = adminSupabase();
-      await supabase.from('intelligence_cache').insert({
-        cache_key:  `rec__${userId}__${body.year}__${Date.now()}`,
+      await supabase.from('intelligence_cache').upsert({
+        cache_key:  `rec__${userId}__${body.year}`,
         mode:       'recommendations',
         result,
         created_by: userId,
         created_at: new Date().toISOString(),
-      }).then(() => {}); // fire and forget
+      }, { onConflict: 'cache_key, mode' }).then(() => {}); // fire and forget
 
       return NextResponse.json(result);
 

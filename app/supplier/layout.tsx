@@ -25,17 +25,17 @@ import { useEffect } from 'react';
 import CompanyOnboarding from '@/components/CompanyOnboarding';
 import AutoSave from '@/components/AutoSave';
 import SupplierProgress from '@/components/SupplierProgress';
-import { Settings, LayoutDashboard, Flame, Zap, Plane, FileText, Archive } from 'lucide-react';
+import { Settings, LayoutDashboard, Flame, Zap, Plane, FileText, Archive, Grid } from 'lucide-react';
 import VsmeLogo from '@/components/VsmeLogo';
 import { createSupabaseClient } from '@/utils/supabase';
 
 const BOTTOM_NAV = [
-  { label: 'Hub',      href: '/supplier/hub',     icon: LayoutDashboard },
-  { label: 'Scope 1',  href: '/supplier/scope1',  icon: Flame },
-  { label: 'Scope 2',  href: '/supplier/scope2',  icon: Zap },
-  { label: 'Scope 3',  href: '/supplier/scope3',  icon: Plane },
-  { label: 'Report',   href: '/supplier/results',  icon: FileText },
-  { label: 'Vault',    href: '/supplier/vault',    icon: Archive },
+  { label: 'Home',     href: '/supplier/dashboard', icon: Grid },
+  { label: 'Hub',      href: '/supplier/hub',       icon: LayoutDashboard },
+  { label: 'Scope 1',  href: '/supplier/scope1',    icon: Flame },
+  { label: 'Scope 2',  href: '/supplier/scope2',    icon: Zap },
+  { label: 'Scope 3',  href: '/supplier/scope3',    icon: Plane },
+  { label: 'Report',   href: '/supplier/results',   icon: FileText },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -57,7 +57,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     })();
   }, [userId]);
 
-  const isVaultActive = pathname?.startsWith('/supplier/vault');
+  
 
   return (
     <ESGProvider>
@@ -82,18 +82,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               Supplier Portal
             </span>
 
-            {/* ── My Reports (Vault) link — desktop only ── */}
+            {/* ── My Dashboard link — desktop only ── */}
             <Link
-              href="/supplier/vault"
+              href="/supplier/dashboard"
               className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                isVaultActive
+                pathname?.startsWith('/supplier/dashboard')
                   ? 'bg-[#0C2918] text-[#C9A84C]'
                   : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
               }`}
-              title="My Reports"
+              title="My Dashboard"
             >
-              <Archive size={14} />
-              My Reports
+              <Grid size={14} />
+              My Dashboard
             </Link>
 
             <Link
