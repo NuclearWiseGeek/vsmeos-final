@@ -22,6 +22,15 @@
 
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { createSupabaseClient } from '@/utils/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+// Service role client — needed to read intelligence_cache (RLS blocks user tokens)
+function adminSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+}
 
 export interface DashboardData {
   profile: {
@@ -100,23 +109,25 @@ export async function getDashboardData(): Promise<DashboardData> {
   const latestYear = latestSubmitted?.year || new Date().getFullYear();
 
   // ── Load cached intelligence (benchmark + recommendations) ─────────────────
-  // These are loaded read-only — never auto-triggered from the dashboard
+  // Must use service role client — intelligence_cache RLS blocks user tokens.
+  // Data is read-only here; never auto-triggered from the dashboard.
   let benchmark:       Record<string, any> | null = null;
   let recommendations: Record<string, any> | null = null;
 
   if (profile && latestSubmitted) {
     const bmKey  = `${profile.industry}__${profile.country}__${latestYear}`;
     const recKey = `rec__${userId}__${latestYear}`;
+    const admin  = adminSupabase();
 
     const [bmRes, recRes] = await Promise.all([
-      supabase
+      admin
         .from('intelligence_cache')
         .select('result')
         .eq('cache_key', bmKey)
         .eq('mode', 'benchmark')
         .maybeSingle(),
 
-      supabase
+      admin
         .from('intelligence_cache')
         .select('result')
         .eq('cache_key', recKey)

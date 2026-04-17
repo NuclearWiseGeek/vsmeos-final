@@ -2,20 +2,22 @@
 // FILE: app/layout.tsx
 // PURPOSE: Root layout — ClerkProvider + PageTransition.
 //
-// FONT: System font stack via Tailwind font-sans (no custom import).
-//       The original codebase used system-ui — Geist was never part of the
-//       design. font-sans resolves to: -apple-system, BlinkMacSystemFont,
-//       "Segoe UI", Roboto, Helvetica Neue, Arial, sans-serif.
-//
-// RULES:
-//   - No ESGProvider, no AutoSave, no supplier/buyer-specific code here.
-//   - This file must stay a server component (no 'use client').
+// FONT: Inter (variable font) via next/font/google.
+//       Variable font = one file covers all weights 100–900.
+//       Closest web equivalent to Apple SF Pro.
 // =============================================================================
 
 import type { Metadata, Viewport } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Inter } from 'next/font/google';
 import PageTransition from '@/components/PageTransition';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'VSME OS — Supply Chain Carbon Intelligence',
@@ -44,8 +46,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className="antialiased">
+      <html lang="en" suppressHydrationWarning className={inter.variable}>
+        <body className="antialiased font-inter">
           <PageTransition>
             {children}
           </PageTransition>

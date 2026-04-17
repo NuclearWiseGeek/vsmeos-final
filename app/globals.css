@@ -1,7 +1,57 @@
 @import "tailwindcss";
 
+/* ============================================================
+   APPLE-STYLE TYPOGRAPHY
+   Inter with SF Pro-matched rendering settings.
+   Applies to every element on every page.
+   ============================================================ */
+
+:root {
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
+  /* Optical size axis: 14–32px range for natural spacing rhythm */
+  font-optical-sizing: auto;
+}
+
+body {
+  font-family: var(--font-inter);
+  /* Apple-style subpixel rendering — crisp on all screens */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Inter alternate letterforms: open 'a', open 'g', curved '4' */
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  /* Proportional numbers in body, tabular in data contexts */
+  font-variant-numeric: proportional-nums;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
+}
+
+/* Tailwind utility class added by layout.tsx */
+.font-inter {
+  font-family: var(--font-inter);
+}
+
+/* Numbers in tables, KPI cards, emissions data — always tabular */
+.count-up-number,
+table,
+[class*="font-mono"],
+[class*="tabular"] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Large display headings — tighten tracking like Apple.com */
+h1 {
+  letter-spacing: -0.04em;
+}
+h2 {
+  letter-spacing: -0.025em;
+}
+h3 {
+  letter-spacing: -0.015em;
 }
 
 /* ============================================================
