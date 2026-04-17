@@ -110,7 +110,7 @@ const SCOPE3_UNIVERSAL_FACTORS: Record<string, EmissionFactor> = {
   flight_long_haul:   { key: "flight_long_haul",   value: 0.117,  unit: "kgCO2e/pkm",   source: "DEFRA 2025 (incl. RF x1.9)",    id: "FLIGHT-LH"     },
   hotel_nights:       { key: "hotel_nights",        value: 28.0,   unit: "kgCO2e/night", source: "Cornell/Greenview CHSB 2024 (conservative global estimate)",              id: "HOTEL-AVG"     },
   employee_commuting: { key: "employee_commuting",  value: 0.138,  unit: "kgCO2e/km",    source: "DEFRA 2025 (average commute, mixed modes)", id: "COMMUTE-AVG"   },
-  remote_working:     { key: "remote_working",      value: 2.84,   unit: "kgCO2e/day",   source: "DEFRA 2024 / ADEME 2024",       id: "REMOTE-WFH"    },
+  remote_working:     { key: "remote_working",      value: 2.67,   unit: "kgCO2e/day",   source: "DEFRA 2025 (0.334 kgCO2e/hr × 8hr working day)", id: "REMOTE-WFH"    },
 };
 
 // =============================================================================
@@ -126,11 +126,11 @@ export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
   "France":         { electricityGrid: 0.052, districtHeating: 0.110, districtCooling: 0.015, railTravel: 0.006, primaryCalculator: "ADEME Base Carbone 2024",                          methodologyNote: "Quantified using ADEME Base Carbone v2024. France's nuclear-dominated grid produces among the lowest electricity emissions in Europe (RTE 2023)." },
   "Germany":        { electricityGrid: 0.364, districtHeating: 0.145, districtCooling: 0.109, railTravel: 0.023, primaryCalculator: "Umweltbundesamt (UBA) 2024 / IEA",                  methodologyNote: "Quantified using UBA Germany emission factors. Grid intensity reflects ongoing coal phase-out transition." },
   "United Kingdom": { electricityGrid: 0.196, districtHeating: 0.142, districtCooling: 0.059, railTravel: 0.036, primaryCalculator: "DEFRA 2025 / National Grid ESO",                   methodologyNote: "Quantified using DEFRA 2025 UK Government GHG Conversion Factors (generation 0.177 + T&D 0.019 = 0.196 combined). 14.5% reduction from 2024 driven by reduced natural gas use and increased renewables." },
-  "Spain":          { electricityGrid: 0.181, districtHeating: 0.100, districtCooling: 0.052, railTravel: 0.015, primaryCalculator: "CNMC Spain / REE / IEA 2023",                       methodologyNote: "Quantified using Red Electrica de Espana (REE) emission factors for 2023 grid mix." },
+  "Spain":          { electricityGrid: 0.108, districtHeating: 0.085, districtCooling: 0.031, railTravel: 0.015, primaryCalculator: "Red Eléctrica (REE) / EMBER 2024",                     methodologyNote: "Quantified using Red Eléctrica de España (REE) 2024 generation data and EMBER 2024. Spain's grid reached a historic low in 2024: 76.8% of electricity generated was emission-free, driven by record solar and wind additions." },
   "Italy":          { electricityGrid: 0.251, districtHeating: 0.150, districtCooling: 0.067, railTravel: 0.007, primaryCalculator: "GSE Italy 2024 / IEA",                              methodologyNote: "Quantified using GSE (Gestore dei Servizi Energetici) Italy 2023 emission factors." },
   "Netherlands":    { electricityGrid: 0.298, districtHeating: 0.130, districtCooling: 0.097, railTravel: 0.003, primaryCalculator: "CBS Netherlands / IEA 2024",                        methodologyNote: "Quantified using CBS Netherlands Statline and IEA 2023 grid emission factors. NS trains run on 100% wind power since 2017." },
   "Belgium":        { electricityGrid: 0.144, districtHeating: 0.130, districtCooling: 0.048, railTravel: 0.005, primaryCalculator: "CREG Belgium / IEA 2024",                           methodologyNote: "Quantified using CREG Belgian grid operator and IEA 2023 emission factors." },
-  "Sweden":         { electricityGrid: 0.013, districtHeating: 0.042, districtCooling: 0.004, railTravel: 0.001, primaryCalculator: "Energimyndigheten (SEA) 2023 / IEA",               methodologyNote: "Quantified using Swedish Energy Agency emission factors. Sweden's grid is among Europe's cleanest (hydro + nuclear)." },
+  "Sweden":         { electricityGrid: 0.041, districtHeating: 0.042, districtCooling: 0.012, railTravel: 0.001, primaryCalculator: "Energimyndigheten (SEA) 2023 / IEA",               methodologyNote: "Quantified using Swedish Energy Agency (Energimyndigheten) location-based emission factors for GHG Protocol Scope 2. Sweden's location-based grid factor is ~41 gCO₂e/kWh (hydro + nuclear dominant). Note: the market-based / residual mix factor is ~0.013 — the location-based figure is used here per GHG Protocol dual-reporting guidance." },
   "Norway":         { electricityGrid: 0.017, districtHeating: 0.025, districtCooling: 0.005, railTravel: 0.001, primaryCalculator: "NVE Norway 2023 / IEA",                             methodologyNote: "Quantified using NVE (Norwegian Water Resources and Energy Directorate) 2023. Grid is almost entirely hydroelectric." },
   "Denmark":        { electricityGrid: 0.133, districtHeating: 0.068, districtCooling: 0.038, railTravel: 0.002, primaryCalculator: "Energistyrelsen (DEA) 2023 / IEA",                 methodologyNote: "Quantified using Danish Energy Agency (DEA) 2023 emission factors." },
   "Finland":        { electricityGrid: 0.079, districtHeating: 0.055, districtCooling: 0.023, railTravel: 0.005, primaryCalculator: "Fingrid 2023 / IEA",                               methodologyNote: "Quantified using Fingrid Finland national grid 2023 emission factors." },
@@ -210,12 +210,12 @@ export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
 // =============================================================================
 
 const DEFAULT_COUNTRY_FACTORS: CountryFactors = {
-  electricityGrid: 0.464,
-  districtHeating: 0.200,
-  districtCooling: 0.132,
+  electricityGrid: 0.445,
+  districtHeating: 0.195,
+  districtCooling: 0.127,
   railTravel: 0.041,
-  primaryCalculator: "IEA Emissions Factors 2025 / EMBER 2024",
-  methodologyNote: "Quantified using IEA Emissions Factors 2025 world average emission factors (data year 2023). Country-specific data was not available; IEA world averages have been applied as a conservative estimate. Updated from IEA 2023 edition (0.494)."
+  primaryCalculator: "IEA Emissions Factors 2025 (2024 provisional data)",
+  methodologyNote: "Quantified using IEA Emissions Factors 2025 world average emission factors (provisional 2024 data). Country-specific data was not available; IEA world averages have been applied as a conservative estimate. Updated from IEA 2024 edition (0.464 g/kWh → 0.445 g/kWh, reflecting 3% global grid decarbonisation in 2024)."
 };
 
 const GREEN_ELECTRICITY_FACTOR = 0.000; // Market-based method — GHG Protocol Scope 2 Guidance

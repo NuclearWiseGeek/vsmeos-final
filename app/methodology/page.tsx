@@ -125,7 +125,7 @@ export default function MethodologyPage() {
               than a single global average. The correct national database is selected automatically
               based on the supplier's declared country of operations. This is critical for
               accuracy: France's electricity grid (predominantly nuclear) has a factor of
-              0.052 kgCO₂e/kWh, while Poland's (predominantly coal) is 0.773 kgCO₂e/kWh —
+              0.052 kgCO₂e/kWh, while Poland's (predominantly coal) is 0.695 kgCO₂e/kWh —
               a 15× difference that would produce a fundamentally misleading report if the
               wrong factor were applied.
             </p>
@@ -143,20 +143,20 @@ export default function MethodologyPage() {
                   {[
                     { country: 'France',         db: 'ADEME Base Carbone 2024',           factor: '0.052',  updated: '2024 Q1' },
                     { country: 'United Kingdom', db: 'DEFRA 2025 / National Grid ESO',    factor: '0.196',  updated: '2025 Q2' },
-                    { country: 'Germany',        db: 'Umweltbundesamt (UBA) 2023',        factor: '0.380',  updated: '2024 Q1' },
-                    { country: 'Spain',          db: 'MITECO / REE 2023',                 factor: '0.181',  updated: '2024 Q1' },
-                    { country: 'Italy',          db: 'GSE Italy / IEA 2023',              factor: '0.233',  updated: '2024 Q1' },
-                    { country: 'Netherlands',    db: 'CBS Netherlands / IEA 2023',        factor: '0.341',  updated: '2024 Q1' },
-                    { country: 'Belgium',        db: 'CREG Belgium / IEA 2023',           factor: '0.167',  updated: '2024 Q1' },
-                    { country: 'Sweden',         db: 'Energimyndigheten 2023',            factor: '0.013',  updated: '2024 Q1' },
-                    { country: 'Poland',         db: 'URE / IEA 2023',                    factor: '0.773',  updated: '2024 Q1' },
+                    { country: 'Germany',        db: 'Umweltbundesamt (UBA) 2024',        factor: '0.364',  updated: '2025 Q1' },
+                    { country: 'Spain',          db: 'Red Eléctrica (REE) / EMBER 2024',  factor: '0.108',  updated: '2025 Q1' },
+                    { country: 'Italy',          db: 'GSE Italy 2024',                    factor: '0.251',  updated: '2025 Q1' },
+                    { country: 'Netherlands',    db: 'CBS Netherlands / IEA 2024',        factor: '0.298',  updated: '2025 Q1' },
+                    { country: 'Belgium',        db: 'CREG Belgium / IEA 2024',           factor: '0.144',  updated: '2025 Q1' },
+                    { country: 'Sweden',         db: 'Energimyndigheten (SEA) 2023',      factor: '0.041',  updated: '2024 Q1' },
+                    { country: 'Poland',         db: 'URE Poland / IEA 2024',              factor: '0.695',  updated: '2025 Q1' },
                     { country: 'USA',            db: 'US EPA eGRID2023 (Jan 2025)',       factor: '0.352',  updated: '2026 Q1' },
                     { country: 'Canada',         db: 'ECCC NIR 2023',                     factor: '0.130',  updated: '2024 Q1' },
-                    { country: 'Australia',      db: 'Australian NGA 2023 / Clean Energy Regulator', factor: '0.656',  updated: '2024 Q1' },
+                    { country: 'Australia',      db: 'Australian NGA 2024 / Clean Energy Regulator', factor: '0.610',  updated: '2025 Q1' },
                     { country: 'South Africa',   db: 'DFFE / Eskom 2022',                 factor: '0.928',  updated: '2023 Q4' },
-                    { country: 'India',          db: 'BEE / CEA 2022',                    factor: '0.708',  updated: '2023 Q4' },
-                    { country: 'China',          db: 'NDRC / IEA 2022',                   factor: '0.581',  updated: '2023 Q4' },
-                    { country: 'Other (default)','db': 'IEA Emissions Factors 2025',       factor: '0.464',  updated: '2026 Q1' },
+                    { country: 'India',          db: 'CEA India 2024',                    factor: '0.716',  updated: '2025 Q1' },
+                    { country: 'China',          db: 'CEPCI / IEA 2024 / EMBER 2024',    factor: '0.557',  updated: '2025 Q1' },
+                    { country: 'Other (default)','db': 'IEA Emissions Factors 2025 (provisional 2024)', factor: '0.445',  updated: '2026 Q1' },
                   ].map(({ country, db, factor, updated }) => (
                     <tr key={country} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
                       <td className="px-4 py-2.5 font-medium text-gray-900">{country}</td>
@@ -169,7 +169,7 @@ export default function MethodologyPage() {
               </table>
             </div>
             <p className="text-xs text-gray-400 mt-3">
-              60+ countries are supported. For countries where national grid operators do not
+              69 countries are supported. For countries where national grid operators do not
               publish standalone emission factors, IEA Emissions Factors 2025 averages
               are applied as a conservative estimate and clearly labelled as such in the report.
               Factors are reviewed and updated annually, typically in Q1 following national
@@ -285,8 +285,8 @@ export default function MethodologyPage() {
 
             <SubSection title="5.1 Business Travel — Ground (Category 6)">
               <FactorTable rows={[
-                { source: 'Employee Vehicles (Grey Fleet)', unit: 'km',     factor: '0.218',  db: 'DEFRA 2024', notes: 'Average UK car fleet (petrol+diesel mix). Total annual km across all grey fleet drivers.' },
-                { source: 'Rail / Train Travel',            unit: 'km',     factor: 'Country-specific', db: 'DEFRA 2024 / national rail operator', notes: 'UK: 0.036 · France: 0.006 · Germany: 0.023 · Poland: 0.037. Varies by grid mix.' },
+                { source: 'Employee Vehicles (Grey Fleet)', unit: 'km',     factor: '0.216',  db: 'DEFRA 2025', notes: 'Average UK car fleet (petrol+diesel mix). Total annual km across all grey fleet drivers.' },
+                { source: 'Rail / Train Travel',            unit: 'km',     factor: 'Country-specific', db: 'DEFRA 2025 / national databases', notes: 'UK: 0.036 · France: 0.006 · Germany: 0.023 · Poland: 0.037. Varies by grid mix.' },
                 { source: 'Hotel Stays',                    unit: 'nights', factor: '28.0',   db: 'Cornell/Greenview CHSB 2024', notes: 'kgCO₂e per room-night, conservative global estimate — see disclosure below' },
               ]} />
             </SubSection>
@@ -333,14 +333,14 @@ export default function MethodologyPage() {
                 between their home and their regular workplace. VSME OS covers two sub-categories:
               </p>
               <FactorTable rows={[
-                { source: 'Employee Commuting',  unit: 'km/year (all employees)',  factor: '0.141', db: 'DEFRA 2024 / ADEME 2024', notes: 'Average mixed-mode commute. Total annual km across all commuting employees.' },
-                { source: 'Remote Working Days', unit: 'WFH days/year (all staff)', factor: '2.840', db: 'DEFRA 2024 / ADEME 2024', notes: 'kgCO₂e per WFH day. Covers home heating, cooling, and device energy.' },
+                { source: 'Employee Commuting',  unit: 'km/year (all employees)',  factor: '0.138', db: 'DEFRA 2025 / ADEME 2024', notes: 'Average mixed-mode commute. Total annual km across all commuting employees.' },
+                { source: 'Remote Working Days', unit: 'WFH days/year (all staff)', factor: '2.670', db: 'DEFRA 2025', notes: 'kgCO₂e per WFH day (0.334 kgCO₂e/hr × 8hr day). Covers home heating and device energy. Reduced from 2024 (2.84) due to cleaner UK grid.' },
               ]} />
               <div className="bg-gray-50 border border-gray-100 rounded-lg p-3 mt-3">
                 <p className="text-xs text-gray-600">
-                  <strong>Remote working note:</strong> The 2.840 kgCO₂e/day WFH factor reflects
+                  <strong>Remote working note:</strong> The 2.670 kgCO₂e/day WFH factor reflects
                   additional home energy consumption attributable to work activity (ADEME 2024,
-                  "Empreinte carbone du télétravail"). It is calculated as the marginal energy
+                  "Empreinte carbone du télétravail"). Updated from 2.84 in DEFRA 2024 to 2.67 in DEFRA 2025, reflecting the 14.5% reduction in UK grid intensity. It is calculated as the marginal energy
                   increase vs a non-working day, applied to the French/EU average residential
                   energy mix. This factor will vary by country in a future update.
                 </p>
@@ -416,7 +416,7 @@ export default function MethodologyPage() {
                 ))}
               </div>
               <p className="text-sm text-gray-500 mt-3">
-                These categories are planned for Phase 3 of the VSME OS roadmap. All currently
+                These categories are planned for future phases of the VSME OS roadmap. All currently
                 excluded categories are explicitly listed as boundary exclusions in every
                 generated PDF report (Page 4, Section 5).
               </p>

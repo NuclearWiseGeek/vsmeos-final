@@ -25,12 +25,72 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getDashboardData, DashboardData } from '@/actions/dashboard';
 import { calculateEmissions, summarizeEmissions, getCountryFactors } from '@/utils/calculations';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   BarChart3, Sparkles, FileText, Users, Target,
   TrendingDown, TrendingUp, ArrowRight, Download,
   RefreshCw, CheckCircle2, ChevronDown,
   ChevronUp, Loader2, Lock,
 } from 'lucide-react';
+
+// PDF download — client-only (react-pdf uses browser APIs)
+const DownloadTrigger = dynamic(() => import('@/components/DownloadTrigger'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 bg-gray-100 text-gray-400 rounded-lg animate-pulse">
+      <Download size={10} /> PDF
+    </div>
+  ),
+});
+
+// ─── Compact PDF download button for the Reports card ────────────────────────
+// Uses the same pdf() API as DownloadTrigger but with a minimal inline button.
+// No onDownloadComplete needed here — status is already 'submitted'.
+
+function DashboardPdfButton({ companyData, totals, breakdown, activityData }: {
+  companyData: any; totals: any; breakdown: any[]; activityData: any;
+}) {
+  const [busy, setBusy] = React.useState(false);
+  const [done, setDone] = React.useState(false);
+
+  const handleClick = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const { pdf } = await import('@react-pdf/renderer');
+      const CarbonReportPDF = (await import('@/components/CarbonReportPDF')).default;
+      const doc  = CarbonReportPDF({ company: companyData, totals, breakdown, activityData, files: {} });
+      const blob = await pdf(doc).toBlob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `VSME_Report_${companyData.year || '2024'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setDone(true);
+      setTimeout(() => setDone(false), 2500);
+    } catch (err) {
+      console.error('Dashboard PDF error:', err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={busy}
+      className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 bg-[#0C2918] text-[#C9A84C] rounded-lg hover:bg-[#122F1E] transition-colors disabled:opacity-60"
+    >
+      {busy   ? <Loader2 size={10} className="animate-spin" /> :
+       done   ? <CheckCircle2 size={10} /> :
+                <Download size={10} />}
+      {done ? 'Done!' : 'PDF'}
+    </button>
+  );
+}
 
 // ─── AI branding — change this one constant to rename everywhere ──────────────
 const AI_NAME = 'VESQ3';
@@ -179,7 +239,7 @@ function BenchmarkCard({
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0C2918] text-[#C9A84C] rounded-xl text-[11px] font-bold hover:bg-[#122F1E] transition-colors disabled:opacity-50"
             >
               {refreshing ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-              Generate benchmark · ~$0.006
+              Generate benchmark
             </button>
           </div>
         ) : (
@@ -243,7 +303,7 @@ function BenchmarkCard({
               className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl text-[11px] font-bold text-gray-700 hover:border-[#0C2918] hover:text-[#0C2918] transition-colors disabled:opacity-50"
             >
               {refreshing ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-              {refreshing ? 'Refreshing…' : `Refresh · ~$0.006`}
+              {refreshing ? 'Refreshing…' : `Refresh benchmark`}
             </button>
           </>
         )}
@@ -291,7 +351,7 @@ function RecommendationsCard({
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0C2918] text-[#C9A84C] rounded-xl text-[11px] font-bold hover:bg-[#122F1E] transition-colors disabled:opacity-50"
             >
               {refreshing ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-              Generate roadmap · ~$0.012
+              Generate roadmap
             </button>
           </div>
         ) : (
@@ -354,7 +414,7 @@ function RecommendationsCard({
               className="w-full flex items-center justify-center gap-2 mt-4 py-2.5 border border-gray-200 rounded-xl text-[11px] font-bold text-gray-700 hover:border-[#0C2918] hover:text-[#0C2918] transition-colors disabled:opacity-50"
             >
               {refreshing ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-              {refreshing ? `${AI_NAME} is thinking…` : `Refresh · ~$0.012`}
+              {refreshing ? `${AI_NAME} is thinking…` : `Refresh roadmap`}
             </button>
           </>
         )}
@@ -534,7 +594,7 @@ export default function SupplierDashboard() {
             </span>
           )}
           <Link
-            href="/supplier"
+            href="/supplier?new=true"
             className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-xl bg-[#0C2918] text-[#C9A84C] hover:bg-[#122F1E] transition-colors"
           >
             New declaration <ArrowRight size={11} />
@@ -626,36 +686,54 @@ export default function SupplierDashboard() {
             badgeStyle="green"
           />
           <div className="p-5 space-y-3">
-            {assessments.slice(0, 2).map(a => (
-              <div key={a.id} className={`rounded-xl p-3.5 ${a.status === 'submitted' ? 'bg-gray-50' : 'border border-dashed border-gray-200'}`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[20px] font-[800] text-gray-900 tracking-[-0.05em] leading-none">{a.year}</p>
-                    <p className="text-[10px] text-gray-400 mt-1">
-                      {a.status === 'submitted'
-                        ? `${toT(a.emissions_totals?.grandTotal ?? a.emissions_totals?.total ?? 0)} tCO₂e`
-                        : 'Not submitted'
-                      }
-                    </p>
+            {assessments.slice(0, 2).map(a => {
+              // Reconstruct breakdown from stored activity_data for PDF generation
+              const actData   = a.activity_data   || {};
+              const country   = profile?.country   || 'France';
+              const revenue   = profile?.revenue   || 0;
+              const breakdown = calculateEmissions(actData, country);
+              const totals    = summarizeEmissions(breakdown, revenue);
+              const company   = {
+                name:     profile?.company_name || 'Unknown',
+                country,
+                industry: profile?.industry || '',
+                revenue,
+                currency: profile?.currency || 'EUR',
+                signer:   profile?.signer   || '',
+                year:     a.year,
+              };
+
+              return (
+                <div key={a.id} className={`rounded-xl p-3.5 ${a.status === 'submitted' ? 'bg-gray-50' : 'border border-dashed border-gray-200'}`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[20px] font-[800] text-gray-900 tracking-[-0.05em] leading-none">{a.year}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">
+                        {a.status === 'submitted'
+                          ? `${toT(a.emissions_totals?.grandTotal ?? a.emissions_totals?.total ?? 0)} tCO₂e`
+                          : 'Not submitted'
+                        }
+                      </p>
+                    </div>
+                    {a.status === 'submitted' ? (
+                      <DashboardPdfButton
+                        companyData={company}
+                        totals={totals}
+                        breakdown={breakdown}
+                        activityData={actData}
+                      />
+                    ) : (
+                      <Link
+                        href={`/supplier?year=${a.year}`}
+                        className="text-[10px] font-bold text-[#0C2918] hover:text-[#C9A84C] transition-colors"
+                      >
+                        Continue →
+                      </Link>
+                    )}
                   </div>
-                  {a.status === 'submitted' ? (
-                    <Link
-                      href="/supplier/vault"
-                      className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 bg-[#0C2918] text-[#C9A84C] rounded-lg hover:bg-[#122F1E] transition-colors"
-                    >
-                      <Download size={10} /> PDF
-                    </Link>
-                  ) : (
-                    <Link
-                      href={`/supplier?year=${a.year}`}
-                      className="text-[10px] font-bold text-[#0C2918] hover:text-[#C9A84C] transition-colors"
-                    >
-                      Continue →
-                    </Link>
-                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {assessments.length === 0 && (
               <div className="text-center py-4">
                 <p className="text-[11px] text-gray-400 mb-3">No declarations yet</p>

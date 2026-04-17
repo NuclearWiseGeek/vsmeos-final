@@ -4,8 +4,14 @@ import { createSupabaseClient } from '@/utils/supabase';
 import { auth, currentUser } from '@clerk/nextjs/server'; 
 import { Resend } from 'resend';
 
-// Initialize Resend with your API Key
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-initialize Resend so the constructor is never called at build time.
+// (Next.js static analysis runs actions at build time; env vars are not
+// available then, and Resend throws immediately if RESEND_API_KEY is missing.)
+function getResend(): Resend {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error('RESEND_API_KEY is not set');
+  return new Resend(key);
+}
 
 // ---------------------------------------------------------
 // Helper: Validate email format (RFC 5322 simplified)
@@ -44,6 +50,10 @@ export async function uploadSupplierCSV(formData: FormData) {
   const file = formData.get('file') as File;
   if (!file) return { error: 'No file uploaded' };
 
+  // Financial year passed from the uploader UI
+  const financialYearRaw = formData.get('financialYear') as string | null;
+  const financialYear    = financialYearRaw ? parseInt(financialYearRaw, 10) : null;
+
   // Validate file size (max 1MB for CSV)
   if (file.size > 1024 * 1024) return { error: 'CSV file too large (max 1MB)' };
 
@@ -73,11 +83,12 @@ export async function uploadSupplierCSV(formData: FormData) {
       seenEmails.add(cleanEmail);
 
       return {
-        buyer_id: userId,
-        buyer_name: buyerName, 
+        buyer_id:      userId,
+        buyer_name:    buyerName, 
         supplier_name: sanitize(name?.trim() || 'Unknown Supplier'),
         supplier_email: cleanEmail,
-        status: 'draft',
+        status:        'draft',
+        ...(financialYear ? { financial_year: financialYear } : {}),
       };
     })
     .filter((s) => s !== null);
@@ -123,7 +134,7 @@ export async function getSuppliers() {
 // ---------------------------------------------------------
 // 3. Manual Add
 // ---------------------------------------------------------
-export async function addManualSupplier(name: string, email: string) {
+export async function addManualSupplier(name: string, email: string, financialYear?: string) {
   const { userId, getToken } = await auth();
   const user = await currentUser();
 
@@ -142,11 +153,12 @@ export async function addManualSupplier(name: string, email: string) {
   const supabase = createSupabaseClient(token);
 
   const { error } = await supabase.from('supplier_invites').insert({
-    buyer_id: userId,
-    buyer_name: buyerName, 
-    supplier_name: sanitize(name) || 'Unknown',
+    buyer_id:       userId,
+    buyer_name:     buyerName, 
+    supplier_name:  sanitize(name) || 'Unknown',
     supplier_email: email.trim().toLowerCase(),
-    status: 'draft',
+    status:         'draft',
+    ...(financialYear ? { financial_year: parseInt(financialYear, 10) } : {}),
   });
 
   if (error) {
@@ -549,7 +561,7 @@ export async function sendInviteEmail(id: string, email: string, supplierName: s
   }
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'VSME OS <hello@vsmeos.fr>',
       to: email,
       subject,

@@ -15,6 +15,7 @@
 // =============================================================================
 
 'use client';
+export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Mail, Save, Loader2, CheckCircle2, RotateCcw, Eye, Pencil } from 'lucide-react';

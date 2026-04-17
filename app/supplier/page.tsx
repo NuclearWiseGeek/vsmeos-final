@@ -229,9 +229,16 @@ export default function SupplierProfilePage() {
   const [displayRevenue, setDisplayRevenue] = useState('');
 
   // ─── Redirect returning suppliers to dashboard ───────────────────────────
-  // If supplier already has a saved company name, skip the profile form
-  // and go straight to their dashboard. New suppliers always see the form.
+  // Skip redirect when:
+  //   ?new=true  — supplier clicked "New declaration" in dashboard
+  //   ?year=XXXX — supplier came from a buyer invite link in dashboard
+  // In both cases, show the profile form pre-filled with their saved data.
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hasYear = params.has('year');
+    const isNew   = params.get('new') === 'true';
+    if (hasYear || isNew) return; // stay on form — user wants to fill/review
+
     if (companyData.name && companyData.name !== 'EMPTY' && companyData.name.trim().length > 1) {
       router.replace('/supplier/dashboard');
     }

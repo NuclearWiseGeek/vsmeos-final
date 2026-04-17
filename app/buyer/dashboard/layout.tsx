@@ -1,5 +1,10 @@
 'use client';
 
+// Prevents all pages in /buyer/dashboard/* from being statically prerendered.
+// These pages use Clerk auth (UserButton, usePathname with auth) and live
+// Supabase data — they must always render at request time.
+export const dynamic = 'force-dynamic';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';

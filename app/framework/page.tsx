@@ -107,7 +107,7 @@ export default function FrameworkPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
               <ContentBlock icon={<FileText size={16} className="text-purple-600" />} title="Scope-Grouped Activity Table">
-                <p>A detailed table listing every emission source that had data entered, grouped under their scope header. Each row shows: the activity source name, the quantity entered (e.g. 50,000 kWh), the emission factor with its unit inline (e.g. 0.196 /kWh, 0.218 /km, 28.0 /night), and the resulting kgCO₂e. Subtotals are shown per scope. The unit-labelled factor means every row is self-verifiable without cross-referencing any other document.</p>
+                <p>A detailed table listing every emission source that had data entered, grouped under their scope header. Each row shows: the activity source name, the quantity entered (e.g. 50,000 kWh), the emission factor with its unit inline (e.g. 0.196 /kWh, 0.216 /km, 28.0 /night), and the resulting kgCO₂e. Subtotals are shown per scope. The unit-labelled factor means every row is self-verifiable without cross-referencing any other document.</p>
               </ContentBlock>
 
               <ContentBlock icon={<BarChart3 size={16} className="text-purple-600" />} title="Grand Total Row">

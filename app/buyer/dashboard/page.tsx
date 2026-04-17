@@ -36,6 +36,12 @@
 //   - components/buyer/ExportButton   (Phase 3.2)
 // =============================================================================
 
+// Required: prevents Next.js from statically prerendering this page at build
+// time. The dashboard uses Clerk auth + live Supabase data — it must always
+// render at request time. Without this, build crashes with:
+// "useUser can only be used within <ClerkProvider />"
+export const dynamic = 'force-dynamic';
+
 import React from 'react';
 import CSVUploader from '@/components/buyer/CSVUploader';
 import InviteTable from '@/components/buyer/InviteTable';
@@ -86,25 +92,31 @@ function calculateKPIs(suppliers: any[]) {
  * Handles both new key format (scope1Total/grandTotal) and legacy (scope1/total).
  */
 function calculateEmissionKPIs(emissionsData: any[]) {
-  let totalTCO2e = 0;
+  // Only count the most recent year to avoid double-counting suppliers
+  // who submitted for multiple years (e.g. BumbleCorp FY2023 + FY2024).
+  const years = emissionsData.map((r: any) => r.year).filter(Boolean) as number[];
+  const latestYear = years.length > 0 ? Math.max(...years) : null;
+
+  const relevantRows = latestYear !== null
+    ? emissionsData.filter((r: any) => r.year === latestYear)
+    : emissionsData;
+
+  let totalTCO2e   = 0;
   let totalRevenue = 0;
 
-  for (const row of emissionsData) {
+  for (const row of relevantRows) {
     const totals = row.emissions_totals;
     if (!totals) continue;
-    // Support new keys (grandTotal) and legacy keys (total)
     const grand = typeof totals.grandTotal === 'number' ? totals.grandTotal
                 : typeof totals.total      === 'number' ? totals.total
                 : 0;
     totalTCO2e += grand;
 
-    // Revenue lives on the joined supplier_invites row
     const invite = Array.isArray(row.supplier_invites) ? row.supplier_invites[0] : row.supplier_invites;
-    const rev = invite?.revenue;
+    const rev    = invite?.revenue;
     if (rev && rev > 0) totalRevenue += rev;
   }
 
-  // Avg intensity = tCO₂e per €M revenue
   const avgIntensity = totalRevenue > 0
     ? Math.round((totalTCO2e / (totalRevenue / 1_000_000)) * 10) / 10
     : null;
@@ -112,7 +124,8 @@ function calculateEmissionKPIs(emissionsData: any[]) {
   return {
     totalTCO2e: Math.round(totalTCO2e * 10) / 10,
     avgIntensity,
-    suppliersWithData: emissionsData.length,
+    suppliersWithData: relevantRows.length,
+    latestYear,
   };
 }
 

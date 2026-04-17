@@ -1,36 +1,19 @@
 // =============================================================================
 // FILE: app/api/intelligence/route.ts
-// PURPOSE: Unified Claude-powered intelligence endpoint for Phase 4.3 + 4.4.
+// PURPOSE: Unified VESQ3 intelligence endpoint.
 //
-// TWO MODES (single endpoint, mode selected by request body):
-//
+// TWO MODES:
 //   mode: "benchmark"
 //     → Country-aware + industry-specific carbon intensity benchmark.
-//     → Cached in Supabase by (industry, country, year) — most suppliers
-//       hit the cache instantly after the first call for that combination.
-//     → Claude cites the correct national authority per country (ADEME for
-//       France, UBA for Germany, DEFRA for UK, etc.) using the same
-//       primaryCalculator data already in calculations.ts.
+//     → Claude Sonnet call, ~$0.006/call.
+//     → Cached in intelligence_cache by (industry__country__year).
 //
 //   mode: "recommendations"
 //     → 3 specific, personalised reduction actions for THIS supplier.
-//     → NOT cached — every supplier's breakdown is unique.
-//     → Claude receives the full scope breakdown, biggest single source,
-//       country grid factor, and industry context.
+//     → Claude Sonnet call, ~$0.012/call.
+//     → Cached in intelligence_cache by rec__{userId}__{year}.
 //
-// SECURITY:
-//   - Clerk auth required on all requests
-//   - Supabase cache uses service role (no RLS needed for a read cache table)
-//     but user_id is logged so we can audit usage
-//
-// MODEL: claude-sonnet-4-20250514 (as specified in Phase 4 handover doc)
-//
-// COST ESTIMATE:
-//   Benchmark:       ~$0.006/unique (industry×country×year) combination
-//   Recommendations: ~$0.012/supplier
-//   Both are negligible vs €199/supplier revenue.
-//
-// PHASE 4 — Tasks 4.3 + 4.4
+// MODEL: claude-sonnet-4-20250514
 // =============================================================================
 
 import { auth } from '@clerk/nextjs/server';
@@ -40,15 +23,12 @@ import { NextResponse } from 'next/server';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const MODEL = 'claude-sonnet-4-20250514';
 
-// Admin Supabase client for cache table (no user RLS needed here)
 function adminSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 }
-
-// ─── Claude API call ──────────────────────────────────────────────────────────
 
 async function callClaude(systemPrompt: string, userPrompt: string): Promise<string> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -75,16 +55,73 @@ async function callClaude(systemPrompt: string, userPrompt: string): Promise<str
   }
 
   const data = await response.json();
-  const text = data.content?.find((b: any) => b.type === 'text')?.text || '';
-  return text.trim();
+  return (data.content?.find((b: any) => b.type === 'text')?.text || '').trim();
 }
 
-// ─── JSON extraction helper ───────────────────────────────────────────────────
-
 function extractJSON(raw: string): any {
-  // Strip markdown fences if present
   const clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
   return JSON.parse(clean);
+}
+
+// =============================================================================
+// MODE: BENCHMARK
+// Returns industry intensity benchmarks for the supplier's sector + country.
+// Uses Claude's knowledge of Eurostat, CDP SME data, IEA, DEFRA, ADEME.
+// ~$0.006 per call. Cached per (industry, country, year).
+// =============================================================================
+
+const BENCHMARK_SYSTEM = `You are a carbon accounting expert with deep knowledge of
+industry-specific GHG emission intensity benchmarks from Eurostat ENV_AC_AINAH_R2,
+CDP Supply Chain reports, IEA sector data, ADEME, and DEFRA.
+
+CRITICAL RULES:
+1. Return ONLY valid JSON — no preamble, no markdown, no text outside the JSON.
+2. All intensity figures are in kgCO₂e per million EUR of revenue (kgCO₂e/€M).
+3. Base your figures on real published benchmark data for the industry and country.
+4. p25_intensity = top performer threshold (lower is better for emissions).
+5. p75_intensity = laggard threshold — 75% of companies are below this.
+6. median_intensity is between p25 and p75.
+7. your_percentile: where does yourIntensity fall? 1 = top performer, 99 = worst.
+   Calculate: if yourIntensity < p25 → percentile 10-25.
+              if yourIntensity between p25 and median → percentile 25-50.
+              if yourIntensity between median and p75 → percentile 50-75.
+              if yourIntensity > p75 → percentile 75-95.
+8. headline: max 15 words, specific to their position.
+9. country_factor_note: reference the actual grid emission factor for that country
+   and explain its impact on Scope 2 emissions for this industry.
+10. primary_source: cite the actual data source (e.g. "Eurostat ENV_AC_AINAH_R2 2022 · CDP SME Climate Report 2024").
+11. reduction_opportunity_pct: realistic % reduction if they reached p25 from current position.`;
+
+async function getBenchmark(payload: any): Promise<any> {
+  const { industry, country, year, yourIntensity, gridFactor, primaryCalculator } = payload;
+
+  const userPrompt = `
+Industry: ${industry}
+Country: ${country}
+Reporting year: ${year}
+This company's current carbon intensity: ${Math.round(yourIntensity)} kgCO₂e/€M revenue
+Country electricity grid factor: ${gridFactor} kgCO₂e/kWh (${primaryCalculator})
+
+Provide an industry benchmark for this company's sector in their country.
+Use real data from Eurostat, CDP, IEA, national energy agencies.
+Consider country-specific factors (grid intensity, industrial structure, climate).
+
+Return this EXACT JSON structure (no other text):
+{
+  "median_intensity": <number — kgCO₂e/€M for median company in this sector>,
+  "p25_intensity": <number — intensity of top 25% performers (lower = better)>,
+  "p75_intensity": <number — intensity of bottom 25% (laggards)>,
+  "your_percentile": <number 1-99 — where this company falls>,
+  "headline": "<max 15 words summarising their position vs peers>",
+  "context_sentence": "<2-3 sentences: what drives intensity in this industry + country-specific factors>",
+  "reduction_opportunity_pct": <number — % reduction needed to reach p25>,
+  "primary_source": "<specific data sources used for this benchmark>",
+  "secondary_source": "<secondary source or empty string>",
+  "country_factor_note": "<1 sentence on how the country grid factor affects Scope 2 for this industry>"
+}`;
+
+  const raw = await callClaude(BENCHMARK_SYSTEM, userPrompt);
+  return extractJSON(raw);
 }
 
 // =============================================================================
@@ -112,8 +149,8 @@ async function getRecommendations(payload: any): Promise<any> {
     scope1Kg, scope2Kg, scope3Kg, totalKg,
     intensityKgPerMRevenue,
     gridFactor, primaryCalculator,
-    topSources,   // array of { activity, emissionsKg, pctOfTotal }
-    activityData, // raw inputs for context
+    topSources,
+    activityData,
     currency,
   } = payload;
 
@@ -184,7 +221,6 @@ Return this exact JSON structure:
 // =============================================================================
 
 export async function POST(request: Request) {
-  // 1. Auth check
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -202,33 +238,58 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'mode must be "benchmark" or "recommendations"' }, { status: 400 });
   }
 
-  // ── BENCHMARK MODE — zero cost, reads from pre-computed JSON ──────────────
-  // No Claude API call. Data from Eurostat 2022 + CDP 2024 + DEFRA 2025.
+  // ── BENCHMARK MODE ────────────────────────────────────────────────────────
   if (mode === 'benchmark') {
     const { industry, country, yourIntensity } = body;
-
-    if (!industry || !country || !yourIntensity) {
+    if (!industry || !country || yourIntensity === undefined) {
       return NextResponse.json({ error: 'Missing required fields for benchmark' }, { status: 400 });
     }
 
-    try {
-      // Dynamic import so the JSON is only loaded when needed
-      const { lookupBenchmark } = await import('@/utils/benchmarkLookup');
-      const result = lookupBenchmark(industry, country, Number(yourIntensity));
+    const cacheKey = `${industry}__${country}__${body.year || 'current'}`;
 
-      if (!result) {
-        return NextResponse.json({ error: 'No benchmark data for this industry/country combination' }, { status: 404 });
+    try {
+      // Check cache first
+      const supabase = adminSupabase();
+      const { data: cached } = await supabase
+        .from('intelligence_cache')
+        .select('result')
+        .eq('cache_key', cacheKey)
+        .eq('mode', 'benchmark')
+        .maybeSingle();
+
+      if (cached?.result) {
+        return NextResponse.json({
+          ...cached.result,
+          yourIntensity: Number(yourIntensity),
+          cached: true,
+        });
       }
 
-      return NextResponse.json({ ...result, cached: false });
+      // No cache — call Claude
+      const result = await getBenchmark(body);
+
+      // Store in cache
+      await supabase.from('intelligence_cache').upsert({
+        cache_key:  cacheKey,
+        mode:       'benchmark',
+        result,
+        created_by: userId,
+        created_at: new Date().toISOString(),
+      }, { onConflict: 'cache_key, mode' });
+
+      return NextResponse.json({
+        ...result,
+        yourIntensity: Number(yourIntensity),
+        cached: false,
+      });
 
     } catch (err: any) {
-      console.error('[Intelligence API] Benchmark lookup error:', err);
-      return NextResponse.json({ error: 'Benchmark lookup failed', detail: err.message }, { status: 500 });
+      console.error('[Intelligence API] Benchmark error:', err);
+      return NextResponse.json({ error: 'Benchmark generation failed', detail: err.message }, { status: 500 });
     }
   }
 
-  // ── RECOMMENDATIONS MODE ───────────────────────────────────────────────────
+  // ── RECOMMENDATIONS MODE ──────────────────────────────────────────────────
   if (mode === 'recommendations') {
     const required = ['industry', 'country', 'year', 'scope1Kg', 'scope2Kg', 'scope3Kg', 'totalKg', 'topSources'];
     for (const field of required) {
@@ -240,7 +301,7 @@ export async function POST(request: Request) {
     try {
       const result = await getRecommendations(body);
 
-      // Cache per (userId, year) with stable key so dashboard can load it
+      // Cache per (userId, year)
       const supabase = adminSupabase();
       await supabase.from('intelligence_cache').upsert({
         cache_key:  `rec__${userId}__${body.year}`,
@@ -248,7 +309,7 @@ export async function POST(request: Request) {
         result,
         created_by: userId,
         created_at: new Date().toISOString(),
-      }, { onConflict: 'cache_key, mode' }).then(() => {}); // fire and forget
+      }, { onConflict: 'cache_key, mode' });
 
       return NextResponse.json(result);
 

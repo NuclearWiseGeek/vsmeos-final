@@ -1,6 +1,6 @@
 // =============================================================================
 // FILE: app/components/IntelligenceCards.tsx
-// PURPOSE: Phase 4.3 + 4.4 UI — renders the Claude-powered benchmark card
+// PURPOSE: Phase 4.3 + 4.4 UI — renders the VESQ3-powered benchmark card
 //          and AI reduction recommendations on the results page.
 //
 // ARCHITECTURE:
@@ -406,7 +406,7 @@ export default function IntelligenceCards(props: IntelligenceProps) {
         </h3>
         <p className="text-sm text-gray-500 mb-5 max-w-sm mx-auto">
           Get your country-specific industry benchmark and 3 personalised
-          reduction recommendations — powered by Claude.
+          reduction recommendations — powered by VESQ3.
         </p>
         <button
           onClick={run}
@@ -417,7 +417,7 @@ export default function IntelligenceCards(props: IntelligenceProps) {
           <ArrowRight size={14} />
         </button>
         <p className="text-[10px] text-gray-400 mt-3">
-          Takes ~10 seconds · Uses Claude Sonnet · Results are indicative
+          Takes ~10 seconds · VESQ3 AI Analysis · Results are indicative
         </p>
       </div>
     );
@@ -433,7 +433,7 @@ export default function IntelligenceCards(props: IntelligenceProps) {
         </div>
         <div>
           <h3 className="text-base font-bold text-gray-900">AI Carbon Intelligence</h3>
-          <p className="text-xs text-gray-400">Powered by Claude · Country-specific analysis</p>
+          <p className="text-xs text-gray-400">Powered by VESQ3 · Country-specific analysis</p>
         </div>
       </div>
 
