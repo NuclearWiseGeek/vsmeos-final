@@ -1,0 +1,6383 @@
+{
+  "metadata": {
+    "version": "2025.1",
+    "generated": "2025-04-17",
+    "metric": "kgCO2e per EUR 1 million revenue (Scope 1+2+3 combined)",
+    "methodology": "EU country intensities derived from Eurostat ENV_AC_AINAH_R2 2022 GHG data combined with CDP 2024 Global Disclosure SME sector medians. Country adjustments apply GDP per capita ratios (World Bank 2022) and electricity grid emission factors (DEFRA 2025, ADEME 2024, national agencies). Non-EU countries use global CDP 2024 sector medians as fallback.",
+    "sources": [
+      "Eurostat ENV_AC_AINAH_R2 (GHG by NACE sector, 2022) \u2014 ec.europa.eu/eurostat",
+      "CDP 2024 Global Corporate Disclosure \u2014 cdp.net",
+      "DEFRA 2025 GHG Conversion Factors \u2014 gov.uk/defra",
+      "ADEME Base Empreinte 2024 \u2014 base-empreinte.ademe.fr",
+      "World Bank World Development Indicators 2022 \u2014 data.worldbank.org",
+      "IEA World Energy Statistics 2024 \u2014 iea.org"
+    ],
+    "eu_countries_covered": 32,
+    "industries_covered": 22,
+    "fallback": "Countries not listed use global_median for their industry",
+    "grid_sources": {
+      "United Kingdom": "DEFRA 2025",
+      "United States": "EPA eGRID 2023",
+      "Canada": "ECCC 2024",
+      "Australia": "NGA 2024",
+      "Japan": "MOE Japan 2023",
+      "South Korea": "GIR Korea 2023",
+      "China": "CEPCI 2024",
+      "India": "CEA 2024",
+      "Brazil": "SEEG 2024 (hydro-dominated)",
+      "South Africa": "ESKOM 2024",
+      "Singapore": "EMA 2024",
+      "UAE": "MOCCAE 2024",
+      "Saudi Arabia": "ECRA 2023",
+      "Mexico": "SEMARNAT 2023",
+      "Argentina": "MADS 2023",
+      "Indonesia": "PLN 2023",
+      "Vietnam": "EVN 2024",
+      "Thailand": "EGAT 2024",
+      "Malaysia": "TNB 2024",
+      "New Zealand": "MFE 2024",
+      "Morocco": "ONEE 2023",
+      "Nigeria": "NERC 2023",
+      "Kenya": "EPRA 2024",
+      "Egypt": "EEHC 2023"
+    }
+  },
+  "benchmarks": {
+    "Agriculture & Food Production": {
+      "global_median": 18500,
+      "global_p25": 8325,
+      "global_p75": 35150,
+      "eu_median": 22250,
+      "countries": {
+        "Austria": {
+          "median": 15650,
+          "p25": 7042,
+          "p75": 29735
+        },
+        "Belgium": {
+          "median": 16450,
+          "p25": 7402,
+          "p75": 31255
+        },
+        "Bulgaria": {
+          "median": 48000,
+          "p25": 21600,
+          "p75": 91200
+        },
+        "Switzerland": {
+          "median": 11700,
+          "p25": 5265,
+          "p75": 22230
+        },
+        "Cyprus": {
+          "median": 25000,
+          "p25": 11250,
+          "p75": 47500
+        },
+        "Czech Republic": {
+          "median": 25950,
+          "p25": 11677,
+          "p75": 49305
+        },
+        "Germany": {
+          "median": 17450,
+          "p25": 7852,
+          "p75": 33155
+        },
+        "Denmark": {
+          "median": 14800,
+          "p25": 6660,
+          "p75": 28120
+        },
+        "Estonia": {
+          "median": 31850,
+          "p25": 14332,
+          "p75": 60515
+        },
+        "Greece": {
+          "median": 31300,
+          "p25": 14085,
+          "p75": 59470
+        },
+        "Spain": {
+          "median": 21750,
+          "p25": 9787,
+          "p75": 41325
+        },
+        "Finland": {
+          "median": 16600,
+          "p25": 7470,
+          "p75": 31540
+        },
+        "France": {
+          "median": 17100,
+          "p25": 7695,
+          "p75": 32490
+        },
+        "Croatia": {
+          "median": 29100,
+          "p25": 13095,
+          "p75": 55290
+        },
+        "Hungary": {
+          "median": 30550,
+          "p25": 13747,
+          "p75": 58045
+        },
+        "Ireland": {
+          "median": 13400,
+          "p25": 6030,
+          "p75": 25460
+        },
+        "Iceland": {
+          "median": 14450,
+          "p25": 6502,
+          "p75": 27455
+        },
+        "Italy": {
+          "median": 19700,
+          "p25": 8865,
+          "p75": 37430
+        },
+        "Lithuania": {
+          "median": 26250,
+          "p25": 11812,
+          "p75": 49875
+        },
+        "Luxembourg": {
+          "median": 11150,
+          "p25": 5017,
+          "p75": 21185
+        },
+        "Latvia": {
+          "median": 31000,
+          "p25": 13950,
+          "p75": 58900
+        },
+        "Malta": {
+          "median": 19900,
+          "p25": 8955,
+          "p75": 37810
+        },
+        "Netherlands": {
+          "median": 16250,
+          "p25": 7312,
+          "p75": 30875
+        },
+        "Norway": {
+          "median": 12600,
+          "p25": 5670,
+          "p75": 23940
+        },
+        "Poland": {
+          "median": 32750,
+          "p25": 14737,
+          "p75": 62225
+        },
+        "Portugal": {
+          "median": 24400,
+          "p25": 10980,
+          "p75": 46360
+        },
+        "Romania": {
+          "median": 40200,
+          "p25": 18090,
+          "p75": 76380
+        },
+        "Serbia": {
+          "median": 53850,
+          "p25": 24232,
+          "p75": 102315
+        },
+        "Sweden": {
+          "median": 15000,
+          "p25": 6750,
+          "p75": 28500
+        },
+        "Slovenia": {
+          "median": 22750,
+          "p25": 10237,
+          "p75": 43225
+        },
+        "Slovakia": {
+          "median": 27100,
+          "p25": 12195,
+          "p75": 51490
+        },
+        "Turkey": {
+          "median": 39300,
+          "p25": 17685,
+          "p75": 74670
+        },
+        "United Kingdom": {
+          "median": 17600,
+          "p25": 7920,
+          "p75": 33440
+        },
+        "United States": {
+          "median": 14550,
+          "p25": 6547,
+          "p75": 27645
+        },
+        "Canada": {
+          "median": 15450,
+          "p25": 6952,
+          "p75": 29355
+        },
+        "Australia": {
+          "median": 17850,
+          "p25": 8032,
+          "p75": 33915
+        },
+        "Japan": {
+          "median": 20550,
+          "p25": 9247,
+          "p75": 39045
+        },
+        "South Korea": {
+          "median": 21650,
+          "p25": 9742,
+          "p75": 41135
+        },
+        "China": {
+          "median": 43650,
+          "p25": 19642,
+          "p75": 82935
+        },
+        "India": {
+          "median": 120700,
+          "p25": 54315,
+          "p75": 229330
+        },
+        "Brazil": {
+          "median": 51150,
+          "p25": 23017,
+          "p75": 97185
+        },
+        "South Africa": {
+          "median": 84700,
+          "p25": 38115,
+          "p75": 160930
+        },
+        "Singapore": {
+          "median": 15400,
+          "p25": 6930,
+          "p75": 29260
+        },
+        "UAE": {
+          "median": 19350,
+          "p25": 8707,
+          "p75": 36765
+        },
+        "Saudi Arabia": {
+          "median": 24200,
+          "p25": 10890,
+          "p75": 45980
+        },
+        "Mexico": {
+          "median": 54700,
+          "p25": 24615,
+          "p75": 103930
+        },
+        "Argentina": {
+          "median": 58300,
+          "p25": 26235,
+          "p75": 110770
+        },
+        "Indonesia": {
+          "median": 102400,
+          "p25": 46080,
+          "p75": 194560
+        },
+        "Vietnam": {
+          "median": 132100,
+          "p25": 59445,
+          "p75": 250990
+        },
+        "Thailand": {
+          "median": 74000,
+          "p25": 33300,
+          "p75": 140600
+        },
+        "Malaysia": {
+          "median": 51900,
+          "p25": 23355,
+          "p75": 98610
+        },
+        "New Zealand": {
+          "median": 17900,
+          "p25": 8055,
+          "p75": 34010
+        },
+        "Morocco": {
+          "median": 110200,
+          "p25": 49590,
+          "p75": 209380
+        },
+        "Nigeria": {
+          "median": 147100,
+          "p25": 66195,
+          "p75": 279490
+        },
+        "Kenya": {
+          "median": 146250,
+          "p25": 65812,
+          "p75": 277875
+        },
+        "Egypt": {
+          "median": 119600,
+          "p25": 53820,
+          "p75": 227240
+        }
+      }
+    },
+    "Energy (Oil, Gas, Mining)": {
+      "global_median": 22000,
+      "global_p25": 9900,
+      "global_p75": 41800,
+      "eu_median": 26450,
+      "countries": {
+        "Austria": {
+          "median": 18450,
+          "p25": 8302,
+          "p75": 35055
+        },
+        "Belgium": {
+          "median": 19400,
+          "p25": 8730,
+          "p75": 36860
+        },
+        "Bulgaria": {
+          "median": 57500,
+          "p25": 25875,
+          "p75": 109250
+        },
+        "Switzerland": {
+          "median": 13500,
+          "p25": 6075,
+          "p75": 25650
+        },
+        "Cyprus": {
+          "median": 30550,
+          "p25": 13747,
+          "p75": 58045
+        },
+        "Czech Republic": {
+          "median": 31350,
+          "p25": 14107,
+          "p75": 59565
+        },
+        "Germany": {
+          "median": 21000,
+          "p25": 9450,
+          "p75": 39900
+        },
+        "Denmark": {
+          "median": 17400,
+          "p25": 7830,
+          "p75": 33060
+        },
+        "Estonia": {
+          "median": 38900,
+          "p25": 17505,
+          "p75": 73910
+        },
+        "Greece": {
+          "median": 37550,
+          "p25": 16897,
+          "p75": 71345
+        },
+        "Spain": {
+          "median": 25800,
+          "p25": 11610,
+          "p75": 49020
+        },
+        "Finland": {
+          "median": 19400,
+          "p25": 8730,
+          "p75": 36860
+        },
+        "France": {
+          "median": 20000,
+          "p25": 9000,
+          "p75": 38000
+        },
+        "Croatia": {
+          "median": 34550,
+          "p25": 15547,
+          "p75": 65645
+        },
+        "Hungary": {
+          "median": 36300,
+          "p25": 16335,
+          "p75": 68970
+        },
+        "Ireland": {
+          "median": 16050,
+          "p25": 7222,
+          "p75": 30495
+        },
+        "Iceland": {
+          "median": 16750,
+          "p25": 7537,
+          "p75": 31825
+        },
+        "Italy": {
+          "median": 23450,
+          "p25": 10552,
+          "p75": 44555
+        },
+        "Lithuania": {
+          "median": 31100,
+          "p25": 13995,
+          "p75": 59090
+        },
+        "Luxembourg": {
+          "median": 13100,
+          "p25": 5895,
+          "p75": 24890
+        },
+        "Latvia": {
+          "median": 36650,
+          "p25": 16492,
+          "p75": 69635
+        },
+        "Malta": {
+          "median": 24050,
+          "p25": 10822,
+          "p75": 45695
+        },
+        "Netherlands": {
+          "median": 19450,
+          "p25": 8752,
+          "p75": 36955
+        },
+        "Norway": {
+          "median": 14600,
+          "p25": 6570,
+          "p75": 27740
+        },
+        "Poland": {
+          "median": 39800,
+          "p25": 17910,
+          "p75": 75620
+        },
+        "Portugal": {
+          "median": 29000,
+          "p25": 13050,
+          "p75": 55100
+        },
+        "Romania": {
+          "median": 47850,
+          "p25": 21532,
+          "p75": 90915
+        },
+        "Serbia": {
+          "median": 64850,
+          "p25": 29182,
+          "p75": 123215
+        },
+        "Sweden": {
+          "median": 17450,
+          "p25": 7852,
+          "p75": 33155
+        },
+        "Slovenia": {
+          "median": 27100,
+          "p25": 12195,
+          "p75": 51490
+        },
+        "Slovakia": {
+          "median": 32050,
+          "p25": 14422,
+          "p75": 60895
+        },
+        "Turkey": {
+          "median": 47100,
+          "p25": 21195,
+          "p75": 89490
+        },
+        "United Kingdom": {
+          "median": 20850,
+          "p25": 9382,
+          "p75": 39615
+        },
+        "United States": {
+          "median": 17550,
+          "p25": 7897,
+          "p75": 33345
+        },
+        "Canada": {
+          "median": 18250,
+          "p25": 8212,
+          "p75": 34675
+        },
+        "Australia": {
+          "median": 21950,
+          "p25": 9877,
+          "p75": 41705
+        },
+        "Japan": {
+          "median": 24900,
+          "p25": 11205,
+          "p75": 47310
+        },
+        "South Korea": {
+          "median": 26100,
+          "p25": 11745,
+          "p75": 49590
+        },
+        "China": {
+          "median": 52500,
+          "p25": 23625,
+          "p75": 99750
+        },
+        "India": {
+          "median": 144450,
+          "p25": 65002,
+          "p75": 274455
+        },
+        "Brazil": {
+          "median": 60600,
+          "p25": 27270,
+          "p75": 115140
+        },
+        "South Africa": {
+          "median": 102050,
+          "p25": 45922,
+          "p75": 193895
+        },
+        "Singapore": {
+          "median": 18650,
+          "p25": 8392,
+          "p75": 35435
+        },
+        "UAE": {
+          "median": 23250,
+          "p25": 10462,
+          "p75": 44175
+        },
+        "Saudi Arabia": {
+          "median": 29600,
+          "p25": 13320,
+          "p75": 56240
+        },
+        "Mexico": {
+          "median": 65450,
+          "p25": 29452,
+          "p75": 124355
+        },
+        "Argentina": {
+          "median": 69550,
+          "p25": 31297,
+          "p75": 132145
+        },
+        "Indonesia": {
+          "median": 122800,
+          "p25": 55260,
+          "p75": 233320
+        },
+        "Vietnam": {
+          "median": 157650,
+          "p25": 70942,
+          "p75": 299535
+        },
+        "Thailand": {
+          "median": 88550,
+          "p25": 39847,
+          "p75": 168245
+        },
+        "Malaysia": {
+          "median": 62400,
+          "p25": 28080,
+          "p75": 118560
+        },
+        "New Zealand": {
+          "median": 21050,
+          "p25": 9472,
+          "p75": 39995
+        },
+        "Morocco": {
+          "median": 131800,
+          "p25": 59310,
+          "p75": 250420
+        },
+        "Nigeria": {
+          "median": 175300,
+          "p25": 78885,
+          "p75": 333070
+        },
+        "Kenya": {
+          "median": 173950,
+          "p25": 78277,
+          "p75": 330505
+        },
+        "Egypt": {
+          "median": 142650,
+          "p25": 64192,
+          "p75": 271035
+        }
+      }
+    },
+    "Manufacturing (Heavy)": {
+      "global_median": 9200,
+      "global_p25": 4140,
+      "global_p75": 17480,
+      "eu_median": 11025,
+      "countries": {
+        "Austria": {
+          "median": 7550,
+          "p25": 3397,
+          "p75": 14345
+        },
+        "Belgium": {
+          "median": 7900,
+          "p25": 3555,
+          "p75": 15010
+        },
+        "Bulgaria": {
+          "median": 24500,
+          "p25": 11025,
+          "p75": 46550
+        },
+        "Switzerland": {
+          "median": 5150,
+          "p25": 2317,
+          "p75": 9785
+        },
+        "Cyprus": {
+          "median": 13750,
+          "p25": 6187,
+          "p75": 26125
+        },
+        "Czech Republic": {
+          "median": 13700,
+          "p25": 6165,
+          "p75": 26030
+        },
+        "Germany": {
+          "median": 9100,
+          "p25": 4095,
+          "p75": 17290
+        },
+        "Denmark": {
+          "median": 7050,
+          "p25": 3172,
+          "p75": 13395
+        },
+        "Estonia": {
+          "median": 17600,
+          "p25": 7920,
+          "p75": 33440
+        },
+        "Greece": {
+          "median": 16100,
+          "p25": 7245,
+          "p75": 30590
+        },
+        "Spain": {
+          "median": 10650,
+          "p25": 4792,
+          "p75": 20235
+        },
+        "Finland": {
+          "median": 7750,
+          "p25": 3487,
+          "p75": 14725
+        },
+        "France": {
+          "median": 7950,
+          "p25": 3577,
+          "p75": 15105
+        },
+        "Croatia": {
+          "median": 14400,
+          "p25": 6480,
+          "p75": 27360
+        },
+        "Hungary": {
+          "median": 15200,
+          "p25": 6840,
+          "p75": 28880
+        },
+        "Ireland": {
+          "median": 6850,
+          "p25": 3082,
+          "p75": 13015
+        },
+        "Iceland": {
+          "median": 6500,
+          "p25": 2925,
+          "p75": 12350
+        },
+        "Italy": {
+          "median": 9850,
+          "p25": 4432,
+          "p75": 18715
+        },
+        "Lithuania": {
+          "median": 12850,
+          "p25": 5782,
+          "p75": 24415
+        },
+        "Luxembourg": {
+          "median": 5250,
+          "p25": 2362,
+          "p75": 9975
+        },
+        "Latvia": {
+          "median": 15050,
+          "p25": 6772,
+          "p75": 28595
+        },
+        "Malta": {
+          "median": 10550,
+          "p25": 4747,
+          "p75": 20045
+        },
+        "Netherlands": {
+          "median": 8300,
+          "p25": 3735,
+          "p75": 15770
+        },
+        "Norway": {
+          "median": 5600,
+          "p25": 2520,
+          "p75": 10640
+        },
+        "Poland": {
+          "median": 17750,
+          "p25": 7987,
+          "p75": 33725
+        },
+        "Portugal": {
+          "median": 12100,
+          "p25": 5445,
+          "p75": 22990
+        },
+        "Romania": {
+          "median": 20100,
+          "p25": 9045,
+          "p75": 38190
+        },
+        "Serbia": {
+          "median": 28100,
+          "p25": 12645,
+          "p75": 53390
+        },
+        "Sweden": {
+          "median": 6800,
+          "p25": 3060,
+          "p75": 12920
+        },
+        "Slovenia": {
+          "median": 11400,
+          "p25": 5130,
+          "p75": 21660
+        },
+        "Slovakia": {
+          "median": 13150,
+          "p25": 5917,
+          "p75": 24985
+        },
+        "Turkey": {
+          "median": 20200,
+          "p25": 9090,
+          "p75": 38380
+        },
+        "United Kingdom": {
+          "median": 8650,
+          "p25": 3892,
+          "p75": 16435
+        },
+        "United States": {
+          "median": 7600,
+          "p25": 3420,
+          "p75": 14440
+        },
+        "Canada": {
+          "median": 7450,
+          "p25": 3352,
+          "p75": 14155
+        },
+        "Australia": {
+          "median": 10100,
+          "p25": 4545,
+          "p75": 19190
+        },
+        "Japan": {
+          "median": 10950,
+          "p25": 4927,
+          "p75": 20805
+        },
+        "South Korea": {
+          "median": 11350,
+          "p25": 5107,
+          "p75": 21565
+        },
+        "China": {
+          "median": 22700,
+          "p25": 10215,
+          "p75": 43130
+        },
+        "India": {
+          "median": 61550,
+          "p25": 27697,
+          "p75": 116945
+        },
+        "Brazil": {
+          "median": 25000,
+          "p25": 11250,
+          "p75": 47500
+        },
+        "South Africa": {
+          "median": 44300,
+          "p25": 19935,
+          "p75": 84170
+        },
+        "Singapore": {
+          "median": 8200,
+          "p25": 3690,
+          "p75": 15580
+        },
+        "UAE": {
+          "median": 10000,
+          "p25": 4500,
+          "p75": 19000
+        },
+        "Saudi Arabia": {
+          "median": 13450,
+          "p25": 6052,
+          "p75": 25555
+        },
+        "Mexico": {
+          "median": 27900,
+          "p25": 12555,
+          "p75": 53010
+        },
+        "Argentina": {
+          "median": 29300,
+          "p25": 13185,
+          "p75": 55670
+        },
+        "Indonesia": {
+          "median": 52600,
+          "p25": 23670,
+          "p75": 99940
+        },
+        "Vietnam": {
+          "median": 66600,
+          "p25": 29970,
+          "p75": 126540
+        },
+        "Thailand": {
+          "median": 37700,
+          "p25": 16965,
+          "p75": 71630
+        },
+        "Malaysia": {
+          "median": 27000,
+          "p25": 12150,
+          "p75": 51300
+        },
+        "New Zealand": {
+          "median": 8550,
+          "p25": 3847,
+          "p75": 16245
+        },
+        "Morocco": {
+          "median": 56050,
+          "p25": 25222,
+          "p75": 106495
+        },
+        "Nigeria": {
+          "median": 73750,
+          "p25": 33187,
+          "p75": 140125
+        },
+        "Kenya": {
+          "median": 72750,
+          "p25": 32737,
+          "p75": 138225
+        },
+        "Egypt": {
+          "median": 60250,
+          "p25": 27112,
+          "p75": 114475
+        }
+      }
+    },
+    "Chemicals & Materials": {
+      "global_median": 14200,
+      "global_p25": 6390,
+      "global_p75": 26980,
+      "eu_median": 17025,
+      "countries": {
+        "Austria": {
+          "median": 11750,
+          "p25": 5287,
+          "p75": 22325
+        },
+        "Belgium": {
+          "median": 12300,
+          "p25": 5535,
+          "p75": 23370
+        },
+        "Bulgaria": {
+          "median": 37600,
+          "p25": 16920,
+          "p75": 71440
+        },
+        "Switzerland": {
+          "median": 8200,
+          "p25": 3690,
+          "p75": 15580
+        },
+        "Cyprus": {
+          "median": 20750,
+          "p25": 9337,
+          "p75": 39425
+        },
+        "Czech Republic": {
+          "median": 20850,
+          "p25": 9382,
+          "p75": 39615
+        },
+        "Germany": {
+          "median": 13850,
+          "p25": 6232,
+          "p75": 26315
+        },
+        "Denmark": {
+          "median": 11000,
+          "p25": 4950,
+          "p75": 20900
+        },
+        "Estonia": {
+          "median": 26500,
+          "p25": 11925,
+          "p75": 50350
+        },
+        "Greece": {
+          "median": 24650,
+          "p25": 11092,
+          "p75": 46835
+        },
+        "Spain": {
+          "median": 16500,
+          "p25": 7425,
+          "p75": 31350
+        },
+        "Finland": {
+          "median": 12150,
+          "p25": 5467,
+          "p75": 23085
+        },
+        "France": {
+          "median": 12450,
+          "p25": 5602,
+          "p75": 23655
+        },
+        "Croatia": {
+          "median": 22300,
+          "p25": 10035,
+          "p75": 42370
+        },
+        "Hungary": {
+          "median": 23450,
+          "p25": 10552,
+          "p75": 44555
+        },
+        "Ireland": {
+          "median": 10500,
+          "p25": 4725,
+          "p75": 19950
+        },
+        "Iceland": {
+          "median": 10300,
+          "p25": 4635,
+          "p75": 19570
+        },
+        "Italy": {
+          "median": 15150,
+          "p25": 6817,
+          "p75": 28785
+        },
+        "Lithuania": {
+          "median": 19950,
+          "p25": 8977,
+          "p75": 37905
+        },
+        "Luxembourg": {
+          "median": 8200,
+          "p25": 3690,
+          "p75": 15580
+        },
+        "Latvia": {
+          "median": 23350,
+          "p25": 10507,
+          "p75": 44365
+        },
+        "Malta": {
+          "median": 16050,
+          "p25": 7222,
+          "p75": 30495
+        },
+        "Netherlands": {
+          "median": 12700,
+          "p25": 5715,
+          "p75": 24130
+        },
+        "Norway": {
+          "median": 8900,
+          "p25": 4005,
+          "p75": 16910
+        },
+        "Poland": {
+          "median": 26800,
+          "p25": 12060,
+          "p75": 50920
+        },
+        "Portugal": {
+          "median": 18700,
+          "p25": 8415,
+          "p75": 35530
+        },
+        "Romania": {
+          "median": 31000,
+          "p25": 13950,
+          "p75": 58900
+        },
+        "Serbia": {
+          "median": 42900,
+          "p25": 19305,
+          "p75": 81510
+        },
+        "Sweden": {
+          "median": 10750,
+          "p25": 4837,
+          "p75": 20425
+        },
+        "Slovenia": {
+          "median": 17550,
+          "p25": 7897,
+          "p75": 33345
+        },
+        "Slovakia": {
+          "median": 20400,
+          "p25": 9180,
+          "p75": 38760
+        },
+        "Turkey": {
+          "median": 30950,
+          "p25": 13927,
+          "p75": 58805
+        },
+        "United Kingdom": {
+          "median": 13350,
+          "p25": 6007,
+          "p75": 25365
+        },
+        "United States": {
+          "median": 11600,
+          "p25": 5220,
+          "p75": 22040
+        },
+        "Canada": {
+          "median": 11600,
+          "p25": 5220,
+          "p75": 22040
+        },
+        "Australia": {
+          "median": 15100,
+          "p25": 6795,
+          "p75": 28690
+        },
+        "Japan": {
+          "median": 16600,
+          "p25": 7470,
+          "p75": 31540
+        },
+        "South Korea": {
+          "median": 17300,
+          "p25": 7785,
+          "p75": 32870
+        },
+        "China": {
+          "median": 34650,
+          "p25": 15592,
+          "p75": 65835
+        },
+        "India": {
+          "median": 94400,
+          "p25": 42480,
+          "p75": 179360
+        },
+        "Brazil": {
+          "median": 38800,
+          "p25": 17460,
+          "p75": 73720
+        },
+        "South Africa": {
+          "median": 67550,
+          "p25": 30397,
+          "p75": 128345
+        },
+        "Singapore": {
+          "median": 12450,
+          "p25": 5602,
+          "p75": 23655
+        },
+        "UAE": {
+          "median": 15300,
+          "p25": 6885,
+          "p75": 29070
+        },
+        "Saudi Arabia": {
+          "median": 20250,
+          "p25": 9112,
+          "p75": 38475
+        },
+        "Mexico": {
+          "median": 42750,
+          "p25": 19237,
+          "p75": 81225
+        },
+        "Argentina": {
+          "median": 45100,
+          "p25": 20295,
+          "p75": 85690
+        },
+        "Indonesia": {
+          "median": 80550,
+          "p25": 36247,
+          "p75": 153045
+        },
+        "Vietnam": {
+          "median": 102450,
+          "p25": 46102,
+          "p75": 194655
+        },
+        "Thailand": {
+          "median": 57800,
+          "p25": 26010,
+          "p75": 109820
+        },
+        "Malaysia": {
+          "median": 41200,
+          "p25": 18540,
+          "p75": 78280
+        },
+        "New Zealand": {
+          "median": 13350,
+          "p25": 6007,
+          "p75": 25365
+        },
+        "Morocco": {
+          "median": 86050,
+          "p25": 38722,
+          "p75": 163495
+        },
+        "Nigeria": {
+          "median": 113600,
+          "p25": 51120,
+          "p75": 215840
+        },
+        "Kenya": {
+          "median": 112300,
+          "p25": 50535,
+          "p75": 213370
+        },
+        "Egypt": {
+          "median": 92700,
+          "p25": 41715,
+          "p75": 176130
+        }
+      }
+    },
+    "Manufacturing (Light)": {
+      "global_median": 3600,
+      "global_p25": 1620,
+      "global_p75": 6840,
+      "eu_median": 4325,
+      "countries": {
+        "Austria": {
+          "median": 3000,
+          "p25": 1350,
+          "p75": 5700
+        },
+        "Belgium": {
+          "median": 3100,
+          "p25": 1395,
+          "p75": 5890
+        },
+        "Bulgaria": {
+          "median": 9550,
+          "p25": 4297,
+          "p75": 18145
+        },
+        "Switzerland": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Cyprus": {
+          "median": 5250,
+          "p25": 2362,
+          "p75": 9975
+        },
+        "Czech Republic": {
+          "median": 5300,
+          "p25": 2385,
+          "p75": 10070
+        },
+        "Germany": {
+          "median": 3500,
+          "p25": 1575,
+          "p75": 6650
+        },
+        "Denmark": {
+          "median": 2800,
+          "p25": 1260,
+          "p75": 5320
+        },
+        "Estonia": {
+          "median": 6700,
+          "p25": 3015,
+          "p75": 12730
+        },
+        "Greece": {
+          "median": 6250,
+          "p25": 2812,
+          "p75": 11875
+        },
+        "Spain": {
+          "median": 4200,
+          "p25": 1890,
+          "p75": 7980
+        },
+        "Finland": {
+          "median": 3100,
+          "p25": 1395,
+          "p75": 5890
+        },
+        "France": {
+          "median": 3150,
+          "p25": 1417,
+          "p75": 5985
+        },
+        "Croatia": {
+          "median": 5650,
+          "p25": 2542,
+          "p75": 10735
+        },
+        "Hungary": {
+          "median": 5950,
+          "p25": 2677,
+          "p75": 11305
+        },
+        "Ireland": {
+          "median": 2650,
+          "p25": 1192,
+          "p75": 5035
+        },
+        "Iceland": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "Italy": {
+          "median": 3850,
+          "p25": 1732,
+          "p75": 7315
+        },
+        "Lithuania": {
+          "median": 5050,
+          "p25": 2272,
+          "p75": 9595
+        },
+        "Luxembourg": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Latvia": {
+          "median": 5900,
+          "p25": 2655,
+          "p75": 11210
+        },
+        "Malta": {
+          "median": 4050,
+          "p25": 1822,
+          "p75": 7695
+        },
+        "Netherlands": {
+          "median": 3200,
+          "p25": 1440,
+          "p75": 6080
+        },
+        "Norway": {
+          "median": 2250,
+          "p25": 1012,
+          "p75": 4275
+        },
+        "Poland": {
+          "median": 6800,
+          "p25": 3060,
+          "p75": 12920
+        },
+        "Portugal": {
+          "median": 4750,
+          "p25": 2137,
+          "p75": 9025
+        },
+        "Romania": {
+          "median": 7850,
+          "p25": 3532,
+          "p75": 14915
+        },
+        "Serbia": {
+          "median": 10850,
+          "p25": 4882,
+          "p75": 20615
+        },
+        "Sweden": {
+          "median": 2700,
+          "p25": 1215,
+          "p75": 5130
+        },
+        "Slovenia": {
+          "median": 4450,
+          "p25": 2002,
+          "p75": 8455
+        },
+        "Slovakia": {
+          "median": 5200,
+          "p25": 2340,
+          "p75": 9880
+        },
+        "Turkey": {
+          "median": 7850,
+          "p25": 3532,
+          "p75": 14915
+        },
+        "United Kingdom": {
+          "median": 3400,
+          "p25": 1530,
+          "p75": 6460
+        },
+        "United States": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Canada": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Australia": {
+          "median": 3850,
+          "p25": 1732,
+          "p75": 7315
+        },
+        "Japan": {
+          "median": 4200,
+          "p25": 1890,
+          "p75": 7980
+        },
+        "South Korea": {
+          "median": 4400,
+          "p25": 1980,
+          "p75": 8360
+        },
+        "China": {
+          "median": 8800,
+          "p25": 3960,
+          "p75": 16720
+        },
+        "India": {
+          "median": 23950,
+          "p25": 10777,
+          "p75": 45505
+        },
+        "Brazil": {
+          "median": 9850,
+          "p25": 4432,
+          "p75": 18715
+        },
+        "South Africa": {
+          "median": 17150,
+          "p25": 7717,
+          "p75": 32585
+        },
+        "Singapore": {
+          "median": 3150,
+          "p25": 1417,
+          "p75": 5985
+        },
+        "UAE": {
+          "median": 3900,
+          "p25": 1755,
+          "p75": 7410
+        },
+        "Saudi Arabia": {
+          "median": 5150,
+          "p25": 2317,
+          "p75": 9785
+        },
+        "Mexico": {
+          "median": 10850,
+          "p25": 4882,
+          "p75": 20615
+        },
+        "Argentina": {
+          "median": 11450,
+          "p25": 5152,
+          "p75": 21755
+        },
+        "Indonesia": {
+          "median": 20400,
+          "p25": 9180,
+          "p75": 38760
+        },
+        "Vietnam": {
+          "median": 25950,
+          "p25": 11677,
+          "p75": 49305
+        },
+        "Thailand": {
+          "median": 14650,
+          "p25": 6592,
+          "p75": 27835
+        },
+        "Malaysia": {
+          "median": 10450,
+          "p25": 4702,
+          "p75": 19855
+        },
+        "New Zealand": {
+          "median": 3400,
+          "p25": 1530,
+          "p75": 6460
+        },
+        "Morocco": {
+          "median": 21800,
+          "p25": 9810,
+          "p75": 41420
+        },
+        "Nigeria": {
+          "median": 28800,
+          "p25": 12960,
+          "p75": 54720
+        },
+        "Kenya": {
+          "median": 28450,
+          "p25": 12802,
+          "p75": 54055
+        },
+        "Egypt": {
+          "median": 23500,
+          "p25": 10575,
+          "p75": 44650
+        }
+      }
+    },
+    "Textiles & Apparel": {
+      "global_median": 3100,
+      "global_p25": 1395,
+      "global_p75": 5890,
+      "eu_median": 3700,
+      "countries": {
+        "Austria": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "Belgium": {
+          "median": 2700,
+          "p25": 1215,
+          "p75": 5130
+        },
+        "Bulgaria": {
+          "median": 8150,
+          "p25": 3667,
+          "p75": 15485
+        },
+        "Switzerland": {
+          "median": 1850,
+          "p25": 832,
+          "p75": 3515
+        },
+        "Cyprus": {
+          "median": 4400,
+          "p25": 1980,
+          "p75": 8360
+        },
+        "Czech Republic": {
+          "median": 4500,
+          "p25": 2025,
+          "p75": 8550
+        },
+        "Germany": {
+          "median": 3000,
+          "p25": 1350,
+          "p75": 5700
+        },
+        "Denmark": {
+          "median": 2450,
+          "p25": 1102,
+          "p75": 4655
+        },
+        "Estonia": {
+          "median": 5650,
+          "p25": 2542,
+          "p75": 10735
+        },
+        "Greece": {
+          "median": 5350,
+          "p25": 2407,
+          "p75": 10165
+        },
+        "Spain": {
+          "median": 3600,
+          "p25": 1620,
+          "p75": 6840
+        },
+        "Finland": {
+          "median": 2700,
+          "p25": 1215,
+          "p75": 5130
+        },
+        "France": {
+          "median": 2750,
+          "p25": 1237,
+          "p75": 5225
+        },
+        "Croatia": {
+          "median": 4850,
+          "p25": 2182,
+          "p75": 9215
+        },
+        "Hungary": {
+          "median": 5100,
+          "p25": 2295,
+          "p75": 9690
+        },
+        "Ireland": {
+          "median": 2300,
+          "p25": 1035,
+          "p75": 4370
+        },
+        "Iceland": {
+          "median": 2300,
+          "p25": 1035,
+          "p75": 4370
+        },
+        "Italy": {
+          "median": 3300,
+          "p25": 1485,
+          "p75": 6270
+        },
+        "Lithuania": {
+          "median": 4350,
+          "p25": 1957,
+          "p75": 8265
+        },
+        "Luxembourg": {
+          "median": 1800,
+          "p25": 810,
+          "p75": 3420
+        },
+        "Latvia": {
+          "median": 5150,
+          "p25": 2317,
+          "p75": 9785
+        },
+        "Malta": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "Netherlands": {
+          "median": 2750,
+          "p25": 1237,
+          "p75": 5225
+        },
+        "Norway": {
+          "median": 2000,
+          "p25": 900,
+          "p75": 3800
+        },
+        "Poland": {
+          "median": 5750,
+          "p25": 2587,
+          "p75": 10925
+        },
+        "Portugal": {
+          "median": 4100,
+          "p25": 1845,
+          "p75": 7790
+        },
+        "Romania": {
+          "median": 6750,
+          "p25": 3037,
+          "p75": 12825
+        },
+        "Serbia": {
+          "median": 9250,
+          "p25": 4162,
+          "p75": 17575
+        },
+        "Sweden": {
+          "median": 2400,
+          "p25": 1080,
+          "p75": 4560
+        },
+        "Slovenia": {
+          "median": 3800,
+          "p25": 1710,
+          "p75": 7220
+        },
+        "Slovakia": {
+          "median": 4500,
+          "p25": 2025,
+          "p75": 8550
+        },
+        "Turkey": {
+          "median": 6700,
+          "p25": 3015,
+          "p75": 12730
+        },
+        "United Kingdom": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "United States": {
+          "median": 2500,
+          "p25": 1125,
+          "p75": 4750
+        },
+        "Canada": {
+          "median": 2550,
+          "p25": 1147,
+          "p75": 4845
+        },
+        "Australia": {
+          "median": 3200,
+          "p25": 1440,
+          "p75": 6080
+        },
+        "Japan": {
+          "median": 3550,
+          "p25": 1597,
+          "p75": 6745
+        },
+        "South Korea": {
+          "median": 3700,
+          "p25": 1665,
+          "p75": 7030
+        },
+        "China": {
+          "median": 7500,
+          "p25": 3375,
+          "p75": 14250
+        },
+        "India": {
+          "median": 20500,
+          "p25": 9225,
+          "p75": 38950
+        },
+        "Brazil": {
+          "median": 8500,
+          "p25": 3825,
+          "p75": 16150
+        },
+        "South Africa": {
+          "median": 14550,
+          "p25": 6547,
+          "p75": 27645
+        },
+        "Singapore": {
+          "median": 2650,
+          "p25": 1192,
+          "p75": 5035
+        },
+        "UAE": {
+          "median": 3300,
+          "p25": 1485,
+          "p75": 6270
+        },
+        "Saudi Arabia": {
+          "median": 4300,
+          "p25": 1935,
+          "p75": 8170
+        },
+        "Mexico": {
+          "median": 9300,
+          "p25": 4185,
+          "p75": 17670
+        },
+        "Argentina": {
+          "median": 9800,
+          "p25": 4410,
+          "p75": 18620
+        },
+        "Indonesia": {
+          "median": 17450,
+          "p25": 7852,
+          "p75": 33155
+        },
+        "Vietnam": {
+          "median": 22300,
+          "p25": 10035,
+          "p75": 42370
+        },
+        "Thailand": {
+          "median": 12550,
+          "p25": 5647,
+          "p75": 23845
+        },
+        "Malaysia": {
+          "median": 8900,
+          "p25": 4005,
+          "p75": 16910
+        },
+        "New Zealand": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Morocco": {
+          "median": 18700,
+          "p25": 8415,
+          "p75": 35530
+        },
+        "Nigeria": {
+          "median": 24750,
+          "p25": 11137,
+          "p75": 47025
+        },
+        "Kenya": {
+          "median": 24500,
+          "p25": 11025,
+          "p75": 46550
+        },
+        "Egypt": {
+          "median": 20150,
+          "p25": 9067,
+          "p75": 38285
+        }
+      }
+    },
+    "Automotive & Transportation": {
+      "global_median": 7800,
+      "global_p25": 3510,
+      "global_p75": 14820,
+      "eu_median": 9375,
+      "countries": {
+        "Austria": {
+          "median": 6550,
+          "p25": 2947,
+          "p75": 12445
+        },
+        "Belgium": {
+          "median": 6900,
+          "p25": 3105,
+          "p75": 13110
+        },
+        "Bulgaria": {
+          "median": 20400,
+          "p25": 9180,
+          "p75": 38760
+        },
+        "Switzerland": {
+          "median": 4800,
+          "p25": 2160,
+          "p75": 9120
+        },
+        "Cyprus": {
+          "median": 10850,
+          "p25": 4882,
+          "p75": 20615
+        },
+        "Czech Republic": {
+          "median": 11100,
+          "p25": 4995,
+          "p75": 21090
+        },
+        "Germany": {
+          "median": 7450,
+          "p25": 3352,
+          "p75": 14155
+        },
+        "Denmark": {
+          "median": 6150,
+          "p25": 2767,
+          "p75": 11685
+        },
+        "Estonia": {
+          "median": 13800,
+          "p25": 6210,
+          "p75": 26220
+        },
+        "Greece": {
+          "median": 13300,
+          "p25": 5985,
+          "p75": 25270
+        },
+        "Spain": {
+          "median": 9150,
+          "p25": 4117,
+          "p75": 17385
+        },
+        "Finland": {
+          "median": 6900,
+          "p25": 3105,
+          "p75": 13110
+        },
+        "France": {
+          "median": 7100,
+          "p25": 3195,
+          "p75": 13490
+        },
+        "Croatia": {
+          "median": 12250,
+          "p25": 5512,
+          "p75": 23275
+        },
+        "Hungary": {
+          "median": 12850,
+          "p25": 5782,
+          "p75": 24415
+        },
+        "Ireland": {
+          "median": 5700,
+          "p25": 2565,
+          "p75": 10830
+        },
+        "Iceland": {
+          "median": 5950,
+          "p25": 2677,
+          "p75": 11305
+        },
+        "Italy": {
+          "median": 8300,
+          "p25": 3735,
+          "p75": 15770
+        },
+        "Lithuania": {
+          "median": 11050,
+          "p25": 4972,
+          "p75": 20995
+        },
+        "Luxembourg": {
+          "median": 4650,
+          "p25": 2092,
+          "p75": 8835
+        },
+        "Latvia": {
+          "median": 13000,
+          "p25": 5850,
+          "p75": 24700
+        },
+        "Malta": {
+          "median": 8550,
+          "p25": 3847,
+          "p75": 16245
+        },
+        "Netherlands": {
+          "median": 6900,
+          "p25": 3105,
+          "p75": 13110
+        },
+        "Norway": {
+          "median": 5150,
+          "p25": 2317,
+          "p75": 9785
+        },
+        "Poland": {
+          "median": 14100,
+          "p25": 6345,
+          "p75": 26790
+        },
+        "Portugal": {
+          "median": 10300,
+          "p25": 4635,
+          "p75": 19570
+        },
+        "Romania": {
+          "median": 16950,
+          "p25": 7627,
+          "p75": 32205
+        },
+        "Serbia": {
+          "median": 23000,
+          "p25": 10350,
+          "p75": 43700
+        },
+        "Sweden": {
+          "median": 6200,
+          "p25": 2790,
+          "p75": 11780
+        },
+        "Slovenia": {
+          "median": 9600,
+          "p25": 4320,
+          "p75": 18240
+        },
+        "Slovakia": {
+          "median": 11350,
+          "p25": 5107,
+          "p75": 21565
+        },
+        "Turkey": {
+          "median": 16700,
+          "p25": 7515,
+          "p75": 31730
+        },
+        "United Kingdom": {
+          "median": 7400,
+          "p25": 3330,
+          "p75": 14060
+        },
+        "United States": {
+          "median": 6200,
+          "p25": 2790,
+          "p75": 11780
+        },
+        "Canada": {
+          "median": 6450,
+          "p25": 2902,
+          "p75": 12255
+        },
+        "Australia": {
+          "median": 7800,
+          "p25": 3510,
+          "p75": 14820
+        },
+        "Japan": {
+          "median": 8800,
+          "p25": 3960,
+          "p75": 16720
+        },
+        "South Korea": {
+          "median": 9250,
+          "p25": 4162,
+          "p75": 17575
+        },
+        "China": {
+          "median": 18600,
+          "p25": 8370,
+          "p75": 35340
+        },
+        "India": {
+          "median": 51200,
+          "p25": 23040,
+          "p75": 97280
+        },
+        "Brazil": {
+          "median": 21500,
+          "p25": 9675,
+          "p75": 40850
+        },
+        "South Africa": {
+          "median": 36200,
+          "p25": 16290,
+          "p75": 68780
+        },
+        "Singapore": {
+          "median": 6600,
+          "p25": 2970,
+          "p75": 12540
+        },
+        "UAE": {
+          "median": 8250,
+          "p25": 3712,
+          "p75": 15675
+        },
+        "Saudi Arabia": {
+          "median": 10500,
+          "p25": 4725,
+          "p75": 19950
+        },
+        "Mexico": {
+          "median": 23200,
+          "p25": 10440,
+          "p75": 44080
+        },
+        "Argentina": {
+          "median": 24650,
+          "p25": 11092,
+          "p75": 46835
+        },
+        "Indonesia": {
+          "median": 43550,
+          "p25": 19597,
+          "p75": 82745
+        },
+        "Vietnam": {
+          "median": 55900,
+          "p25": 25155,
+          "p75": 106210
+        },
+        "Thailand": {
+          "median": 31400,
+          "p25": 14130,
+          "p75": 59660
+        },
+        "Malaysia": {
+          "median": 22150,
+          "p25": 9967,
+          "p75": 42085
+        },
+        "New Zealand": {
+          "median": 7450,
+          "p25": 3352,
+          "p75": 14155
+        },
+        "Morocco": {
+          "median": 46750,
+          "p25": 21037,
+          "p75": 88825
+        },
+        "Nigeria": {
+          "median": 62150,
+          "p25": 27967,
+          "p75": 118085
+        },
+        "Kenya": {
+          "median": 61650,
+          "p25": 27742,
+          "p75": 117135
+        },
+        "Egypt": {
+          "median": 50600,
+          "p25": 22770,
+          "p75": 96140
+        }
+      }
+    },
+    "Utilities & Waste Management": {
+      "global_median": 16800,
+      "global_p25": 7560,
+      "global_p75": 31920,
+      "eu_median": 20575,
+      "countries": {
+        "Austria": {
+          "median": 13450,
+          "p25": 6052,
+          "p75": 25555
+        },
+        "Belgium": {
+          "median": 14050,
+          "p25": 6322,
+          "p75": 26695
+        },
+        "Bulgaria": {
+          "median": 45650,
+          "p25": 20542,
+          "p75": 86735
+        },
+        "Switzerland": {
+          "median": 8500,
+          "p25": 3825,
+          "p75": 16150
+        },
+        "Cyprus": {
+          "median": 26950,
+          "p25": 12127,
+          "p75": 51205
+        },
+        "Czech Republic": {
+          "median": 26150,
+          "p25": 11767,
+          "p75": 49685
+        },
+        "Germany": {
+          "median": 17150,
+          "p25": 7717,
+          "p75": 32585
+        },
+        "Denmark": {
+          "median": 12450,
+          "p25": 5602,
+          "p75": 23655
+        },
+        "Estonia": {
+          "median": 34550,
+          "p25": 15547,
+          "p75": 65645
+        },
+        "Greece": {
+          "median": 30100,
+          "p25": 13545,
+          "p75": 57190
+        },
+        "Spain": {
+          "median": 19250,
+          "p25": 8662,
+          "p75": 36575
+        },
+        "Finland": {
+          "median": 13500,
+          "p25": 6075,
+          "p75": 25650
+        },
+        "France": {
+          "median": 13700,
+          "p25": 6165,
+          "p75": 26030
+        },
+        "Croatia": {
+          "median": 26250,
+          "p25": 11812,
+          "p75": 49875
+        },
+        "Hungary": {
+          "median": 27750,
+          "p25": 12487,
+          "p75": 52725
+        },
+        "Ireland": {
+          "median": 12800,
+          "p25": 5760,
+          "p75": 24320
+        },
+        "Iceland": {
+          "median": 10950,
+          "p25": 4927,
+          "p75": 20805
+        },
+        "Italy": {
+          "median": 18050,
+          "p25": 8122,
+          "p75": 34295
+        },
+        "Lithuania": {
+          "median": 23250,
+          "p25": 10462,
+          "p75": 44175
+        },
+        "Luxembourg": {
+          "median": 9150,
+          "p25": 4117,
+          "p75": 17385
+        },
+        "Latvia": {
+          "median": 26950,
+          "p25": 12127,
+          "p75": 51205
+        },
+        "Malta": {
+          "median": 20250,
+          "p25": 9112,
+          "p75": 38475
+        },
+        "Netherlands": {
+          "median": 15400,
+          "p25": 6930,
+          "p75": 29260
+        },
+        "Norway": {
+          "median": 9250,
+          "p25": 4162,
+          "p75": 17575
+        },
+        "Poland": {
+          "median": 34400,
+          "p25": 15480,
+          "p75": 65360
+        },
+        "Portugal": {
+          "median": 22000,
+          "p25": 9900,
+          "p75": 41800
+        },
+        "Romania": {
+          "median": 36850,
+          "p25": 16582,
+          "p75": 70015
+        },
+        "Serbia": {
+          "median": 53200,
+          "p25": 23940,
+          "p75": 101080
+        },
+        "Sweden": {
+          "median": 11400,
+          "p25": 5130,
+          "p75": 21660
+        },
+        "Slovenia": {
+          "median": 20900,
+          "p25": 9405,
+          "p75": 39710
+        },
+        "Slovakia": {
+          "median": 23600,
+          "p25": 10620,
+          "p75": 44840
+        },
+        "Turkey": {
+          "median": 37900,
+          "p25": 17055,
+          "p75": 72010
+        },
+        "United Kingdom": {
+          "median": 15600,
+          "p25": 7020,
+          "p75": 29640
+        },
+        "United States": {
+          "median": 14450,
+          "p25": 6502,
+          "p75": 27455
+        },
+        "Canada": {
+          "median": 13300,
+          "p25": 5985,
+          "p75": 25270
+        },
+        "Australia": {
+          "median": 20050,
+          "p25": 9022,
+          "p75": 38095
+        },
+        "Japan": {
+          "median": 21000,
+          "p25": 9450,
+          "p75": 39900
+        },
+        "South Korea": {
+          "median": 21500,
+          "p25": 9675,
+          "p75": 40850
+        },
+        "China": {
+          "median": 42900,
+          "p25": 19305,
+          "p75": 81510
+        },
+        "India": {
+          "median": 114500,
+          "p25": 51525,
+          "p75": 217550
+        },
+        "Brazil": {
+          "median": 45100,
+          "p25": 20295,
+          "p75": 85690
+        },
+        "South Africa": {
+          "median": 83950,
+          "p25": 37777,
+          "p75": 159505
+        },
+        "Singapore": {
+          "median": 15750,
+          "p25": 7087,
+          "p75": 29925
+        },
+        "UAE": {
+          "median": 18850,
+          "p25": 8482,
+          "p75": 35815
+        },
+        "Saudi Arabia": {
+          "median": 26550,
+          "p25": 11947,
+          "p75": 50445
+        },
+        "Mexico": {
+          "median": 51850,
+          "p25": 23332,
+          "p75": 98515
+        },
+        "Argentina": {
+          "median": 53950,
+          "p25": 24277,
+          "p75": 102505
+        },
+        "Indonesia": {
+          "median": 98300,
+          "p25": 44235,
+          "p75": 186770
+        },
+        "Vietnam": {
+          "median": 122850,
+          "p25": 55282,
+          "p75": 233415
+        },
+        "Thailand": {
+          "median": 70000,
+          "p25": 31500,
+          "p75": 133000
+        },
+        "Malaysia": {
+          "median": 50950,
+          "p25": 22927,
+          "p75": 96805
+        },
+        "New Zealand": {
+          "median": 15150,
+          "p25": 6817,
+          "p75": 28785
+        },
+        "Morocco": {
+          "median": 104100,
+          "p25": 46845,
+          "p75": 197790
+        },
+        "Nigeria": {
+          "median": 135550,
+          "p25": 60997,
+          "p75": 257545
+        },
+        "Kenya": {
+          "median": 132950,
+          "p25": 59827,
+          "p75": 252605
+        },
+        "Egypt": {
+          "median": 111100,
+          "p25": 49995,
+          "p75": 211090
+        }
+      }
+    },
+    "Energy (Renewables)": {
+      "global_median": 1100,
+      "global_p25": 495,
+      "global_p75": 2090,
+      "eu_median": 1325,
+      "countries": {
+        "Austria": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Belgium": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Bulgaria": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Switzerland": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Cyprus": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "Czech Republic": {
+          "median": 1650,
+          "p25": 742,
+          "p75": 3135
+        },
+        "Germany": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Denmark": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Estonia": {
+          "median": 2150,
+          "p25": 967,
+          "p75": 4085
+        },
+        "Greece": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "Spain": {
+          "median": 1250,
+          "p25": 562,
+          "p75": 2375
+        },
+        "Finland": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "France": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Croatia": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "Hungary": {
+          "median": 1800,
+          "p25": 810,
+          "p75": 3420
+        },
+        "Ireland": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Iceland": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Italy": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Lithuania": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Luxembourg": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Latvia": {
+          "median": 1800,
+          "p25": 810,
+          "p75": 3420
+        },
+        "Malta": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Netherlands": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "Norway": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "Poland": {
+          "median": 2150,
+          "p25": 967,
+          "p75": 4085
+        },
+        "Portugal": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "Romania": {
+          "median": 2400,
+          "p25": 1080,
+          "p75": 4560
+        },
+        "Serbia": {
+          "median": 3400,
+          "p25": 1530,
+          "p75": 6460
+        },
+        "Sweden": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Slovenia": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "Slovakia": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Turkey": {
+          "median": 2450,
+          "p25": 1102,
+          "p75": 4655
+        },
+        "United Kingdom": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "United States": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Canada": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Australia": {
+          "median": 1250,
+          "p25": 562,
+          "p75": 2375
+        },
+        "Japan": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "South Korea": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "China": {
+          "median": 2750,
+          "p25": 1237,
+          "p75": 5225
+        },
+        "India": {
+          "median": 7400,
+          "p25": 3330,
+          "p75": 14060
+        },
+        "Brazil": {
+          "median": 3000,
+          "p25": 1350,
+          "p75": 5700
+        },
+        "South Africa": {
+          "median": 5350,
+          "p25": 2407,
+          "p75": 10165
+        },
+        "Singapore": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "UAE": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Saudi Arabia": {
+          "median": 1650,
+          "p25": 742,
+          "p75": 3135
+        },
+        "Mexico": {
+          "median": 3350,
+          "p25": 1507,
+          "p75": 6365
+        },
+        "Argentina": {
+          "median": 3500,
+          "p25": 1575,
+          "p75": 6650
+        },
+        "Indonesia": {
+          "median": 6350,
+          "p25": 2857,
+          "p75": 12065
+        },
+        "Vietnam": {
+          "median": 8000,
+          "p25": 3600,
+          "p75": 15200
+        },
+        "Thailand": {
+          "median": 4550,
+          "p25": 2047,
+          "p75": 8645
+        },
+        "Malaysia": {
+          "median": 3250,
+          "p25": 1462,
+          "p75": 6175
+        },
+        "New Zealand": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "Morocco": {
+          "median": 6750,
+          "p25": 3037,
+          "p75": 12825
+        },
+        "Nigeria": {
+          "median": 8850,
+          "p25": 3982,
+          "p75": 16815
+        },
+        "Kenya": {
+          "median": 8700,
+          "p25": 3915,
+          "p75": 16530
+        },
+        "Egypt": {
+          "median": 7250,
+          "p25": 3262,
+          "p75": 13775
+        }
+      }
+    },
+    "Construction & Real Estate": {
+      "global_median": 3900,
+      "global_p25": 1755,
+      "global_p75": 7410,
+      "eu_median": 4675,
+      "countries": {
+        "Austria": {
+          "median": 3250,
+          "p25": 1462,
+          "p75": 6175
+        },
+        "Belgium": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "Bulgaria": {
+          "median": 10200,
+          "p25": 4590,
+          "p75": 19380
+        },
+        "Switzerland": {
+          "median": 2400,
+          "p25": 1080,
+          "p75": 4560
+        },
+        "Cyprus": {
+          "median": 5400,
+          "p25": 2430,
+          "p75": 10260
+        },
+        "Czech Republic": {
+          "median": 5550,
+          "p25": 2497,
+          "p75": 10545
+        },
+        "Germany": {
+          "median": 3700,
+          "p25": 1665,
+          "p75": 7030
+        },
+        "Denmark": {
+          "median": 3100,
+          "p25": 1395,
+          "p75": 5890
+        },
+        "Estonia": {
+          "median": 6900,
+          "p25": 3105,
+          "p75": 13110
+        },
+        "Greece": {
+          "median": 6650,
+          "p25": 2992,
+          "p75": 12635
+        },
+        "Spain": {
+          "median": 4550,
+          "p25": 2047,
+          "p75": 8645
+        },
+        "Finland": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "France": {
+          "median": 3550,
+          "p25": 1597,
+          "p75": 6745
+        },
+        "Croatia": {
+          "median": 6150,
+          "p25": 2767,
+          "p75": 11685
+        },
+        "Hungary": {
+          "median": 6450,
+          "p25": 2902,
+          "p75": 12255
+        },
+        "Ireland": {
+          "median": 2850,
+          "p25": 1282,
+          "p75": 5415
+        },
+        "Iceland": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Italy": {
+          "median": 4150,
+          "p25": 1867,
+          "p75": 7885
+        },
+        "Lithuania": {
+          "median": 5500,
+          "p25": 2475,
+          "p75": 10450
+        },
+        "Luxembourg": {
+          "median": 2300,
+          "p25": 1035,
+          "p75": 4370
+        },
+        "Latvia": {
+          "median": 6500,
+          "p25": 2925,
+          "p75": 12350
+        },
+        "Malta": {
+          "median": 4250,
+          "p25": 1912,
+          "p75": 8075
+        },
+        "Netherlands": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "Norway": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "Poland": {
+          "median": 7050,
+          "p25": 3172,
+          "p75": 13395
+        },
+        "Portugal": {
+          "median": 5150,
+          "p25": 2317,
+          "p75": 9785
+        },
+        "Romania": {
+          "median": 8500,
+          "p25": 3825,
+          "p75": 16150
+        },
+        "Serbia": {
+          "median": 11500,
+          "p25": 5175,
+          "p75": 21850
+        },
+        "Sweden": {
+          "median": 3100,
+          "p25": 1395,
+          "p75": 5890
+        },
+        "Slovenia": {
+          "median": 4800,
+          "p25": 2160,
+          "p75": 9120
+        },
+        "Slovakia": {
+          "median": 5700,
+          "p25": 2565,
+          "p75": 10830
+        },
+        "Turkey": {
+          "median": 8350,
+          "p25": 3757,
+          "p75": 15865
+        },
+        "United Kingdom": {
+          "median": 3700,
+          "p25": 1665,
+          "p75": 7030
+        },
+        "United States": {
+          "median": 3100,
+          "p25": 1395,
+          "p75": 5890
+        },
+        "Canada": {
+          "median": 3250,
+          "p25": 1462,
+          "p75": 6175
+        },
+        "Australia": {
+          "median": 3900,
+          "p25": 1755,
+          "p75": 7410
+        },
+        "Japan": {
+          "median": 4400,
+          "p25": 1980,
+          "p75": 8360
+        },
+        "South Korea": {
+          "median": 4600,
+          "p25": 2070,
+          "p75": 8740
+        },
+        "China": {
+          "median": 9300,
+          "p25": 4185,
+          "p75": 17670
+        },
+        "India": {
+          "median": 25600,
+          "p25": 11520,
+          "p75": 48640
+        },
+        "Brazil": {
+          "median": 10750,
+          "p25": 4837,
+          "p75": 20425
+        },
+        "South Africa": {
+          "median": 18100,
+          "p25": 8145,
+          "p75": 34390
+        },
+        "Singapore": {
+          "median": 3300,
+          "p25": 1485,
+          "p75": 6270
+        },
+        "UAE": {
+          "median": 4100,
+          "p25": 1845,
+          "p75": 7790
+        },
+        "Saudi Arabia": {
+          "median": 5250,
+          "p25": 2362,
+          "p75": 9975
+        },
+        "Mexico": {
+          "median": 11600,
+          "p25": 5220,
+          "p75": 22040
+        },
+        "Argentina": {
+          "median": 12350,
+          "p25": 5557,
+          "p75": 23465
+        },
+        "Indonesia": {
+          "median": 21750,
+          "p25": 9787,
+          "p75": 41325
+        },
+        "Vietnam": {
+          "median": 27950,
+          "p25": 12577,
+          "p75": 53105
+        },
+        "Thailand": {
+          "median": 15700,
+          "p25": 7065,
+          "p75": 29830
+        },
+        "Malaysia": {
+          "median": 11050,
+          "p25": 4972,
+          "p75": 20995
+        },
+        "New Zealand": {
+          "median": 3750,
+          "p25": 1687,
+          "p75": 7125
+        },
+        "Morocco": {
+          "median": 23350,
+          "p25": 10507,
+          "p75": 44365
+        },
+        "Nigeria": {
+          "median": 31050,
+          "p25": 13972,
+          "p75": 58995
+        },
+        "Kenya": {
+          "median": 30850,
+          "p25": 13882,
+          "p75": 58615
+        },
+        "Egypt": {
+          "median": 25300,
+          "p25": 11385,
+          "p75": 48070
+        }
+      }
+    },
+    "Retail & E-Commerce": {
+      "global_median": 1450,
+      "global_p25": 652,
+      "global_p75": 2755,
+      "eu_median": 1750,
+      "countries": {
+        "Austria": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Belgium": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Bulgaria": {
+          "median": 3800,
+          "p25": 1710,
+          "p75": 7220
+        },
+        "Switzerland": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Cyprus": {
+          "median": 2000,
+          "p25": 900,
+          "p75": 3800
+        },
+        "Czech Republic": {
+          "median": 2050,
+          "p25": 922,
+          "p75": 3895
+        },
+        "Germany": {
+          "median": 1400,
+          "p25": 630,
+          "p75": 2660
+        },
+        "Denmark": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Estonia": {
+          "median": 2550,
+          "p25": 1147,
+          "p75": 4845
+        },
+        "Greece": {
+          "median": 2500,
+          "p25": 1125,
+          "p75": 4750
+        },
+        "Spain": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "Finland": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "France": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Croatia": {
+          "median": 2300,
+          "p25": 1035,
+          "p75": 4370
+        },
+        "Hungary": {
+          "median": 2400,
+          "p25": 1080,
+          "p75": 4560
+        },
+        "Ireland": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Iceland": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Italy": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Lithuania": {
+          "median": 2050,
+          "p25": 922,
+          "p75": 3895
+        },
+        "Luxembourg": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Latvia": {
+          "median": 2400,
+          "p25": 1080,
+          "p75": 4560
+        },
+        "Malta": {
+          "median": 1600,
+          "p25": 720,
+          "p75": 3040
+        },
+        "Netherlands": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Norway": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Poland": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "Portugal": {
+          "median": 1900,
+          "p25": 855,
+          "p75": 3610
+        },
+        "Romania": {
+          "median": 3150,
+          "p25": 1417,
+          "p75": 5985
+        },
+        "Serbia": {
+          "median": 4250,
+          "p25": 1912,
+          "p75": 8075
+        },
+        "Sweden": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Slovenia": {
+          "median": 1800,
+          "p25": 810,
+          "p75": 3420
+        },
+        "Slovakia": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Turkey": {
+          "median": 3100,
+          "p25": 1395,
+          "p75": 5890
+        },
+        "United Kingdom": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "United States": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Canada": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Australia": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "Japan": {
+          "median": 1650,
+          "p25": 742,
+          "p75": 3135
+        },
+        "South Korea": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "China": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "India": {
+          "median": 9500,
+          "p25": 4275,
+          "p75": 18050
+        },
+        "Brazil": {
+          "median": 4000,
+          "p25": 1800,
+          "p75": 7600
+        },
+        "South Africa": {
+          "median": 6750,
+          "p25": 3037,
+          "p75": 12825
+        },
+        "Singapore": {
+          "median": 1250,
+          "p25": 562,
+          "p75": 2375
+        },
+        "UAE": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Saudi Arabia": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "Mexico": {
+          "median": 4300,
+          "p25": 1935,
+          "p75": 8170
+        },
+        "Argentina": {
+          "median": 4600,
+          "p25": 2070,
+          "p75": 8740
+        },
+        "Indonesia": {
+          "median": 8100,
+          "p25": 3645,
+          "p75": 15390
+        },
+        "Vietnam": {
+          "median": 10400,
+          "p25": 4680,
+          "p75": 19760
+        },
+        "Thailand": {
+          "median": 5850,
+          "p25": 2632,
+          "p75": 11115
+        },
+        "Malaysia": {
+          "median": 4100,
+          "p25": 1845,
+          "p75": 7790
+        },
+        "New Zealand": {
+          "median": 1400,
+          "p25": 630,
+          "p75": 2660
+        },
+        "Morocco": {
+          "median": 8700,
+          "p25": 3915,
+          "p75": 16530
+        },
+        "Nigeria": {
+          "median": 11550,
+          "p25": 5197,
+          "p75": 21945
+        },
+        "Kenya": {
+          "median": 11450,
+          "p25": 5152,
+          "p75": 21755
+        },
+        "Egypt": {
+          "median": 9400,
+          "p25": 4230,
+          "p75": 17860
+        }
+      }
+    },
+    "Consumer Goods (FMCG)": {
+      "global_median": 2200,
+      "global_p25": 990,
+      "global_p75": 4180,
+      "eu_median": 2650,
+      "countries": {
+        "Austria": {
+          "median": 1850,
+          "p25": 832,
+          "p75": 3515
+        },
+        "Belgium": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "Bulgaria": {
+          "median": 5750,
+          "p25": 2587,
+          "p75": 10925
+        },
+        "Switzerland": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "Cyprus": {
+          "median": 3050,
+          "p25": 1372,
+          "p75": 5795
+        },
+        "Czech Republic": {
+          "median": 3150,
+          "p25": 1417,
+          "p75": 5985
+        },
+        "Germany": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Denmark": {
+          "median": 1750,
+          "p25": 787,
+          "p75": 3325
+        },
+        "Estonia": {
+          "median": 3900,
+          "p25": 1755,
+          "p75": 7410
+        },
+        "Greece": {
+          "median": 3750,
+          "p25": 1687,
+          "p75": 7125
+        },
+        "Spain": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "Finland": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "France": {
+          "median": 2000,
+          "p25": 900,
+          "p75": 3800
+        },
+        "Croatia": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "Hungary": {
+          "median": 3650,
+          "p25": 1642,
+          "p75": 6935
+        },
+        "Ireland": {
+          "median": 1600,
+          "p25": 720,
+          "p75": 3040
+        },
+        "Iceland": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "Italy": {
+          "median": 2350,
+          "p25": 1057,
+          "p75": 4465
+        },
+        "Lithuania": {
+          "median": 3100,
+          "p25": 1395,
+          "p75": 5890
+        },
+        "Luxembourg": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Latvia": {
+          "median": 3650,
+          "p25": 1642,
+          "p75": 6935
+        },
+        "Malta": {
+          "median": 2400,
+          "p25": 1080,
+          "p75": 4560
+        },
+        "Netherlands": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "Norway": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "Poland": {
+          "median": 4000,
+          "p25": 1800,
+          "p75": 7600
+        },
+        "Portugal": {
+          "median": 2900,
+          "p25": 1305,
+          "p75": 5510
+        },
+        "Romania": {
+          "median": 4800,
+          "p25": 2160,
+          "p75": 9120
+        },
+        "Serbia": {
+          "median": 6500,
+          "p25": 2925,
+          "p75": 12350
+        },
+        "Sweden": {
+          "median": 1750,
+          "p25": 787,
+          "p75": 3325
+        },
+        "Slovenia": {
+          "median": 2700,
+          "p25": 1215,
+          "p75": 5130
+        },
+        "Slovakia": {
+          "median": 3200,
+          "p25": 1440,
+          "p75": 6080
+        },
+        "Turkey": {
+          "median": 4700,
+          "p25": 2115,
+          "p75": 8930
+        },
+        "United Kingdom": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "United States": {
+          "median": 1750,
+          "p25": 787,
+          "p75": 3325
+        },
+        "Canada": {
+          "median": 1800,
+          "p25": 810,
+          "p75": 3420
+        },
+        "Australia": {
+          "median": 2200,
+          "p25": 990,
+          "p75": 4180
+        },
+        "Japan": {
+          "median": 2500,
+          "p25": 1125,
+          "p75": 4750
+        },
+        "South Korea": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "China": {
+          "median": 5250,
+          "p25": 2362,
+          "p75": 9975
+        },
+        "India": {
+          "median": 14450,
+          "p25": 6502,
+          "p75": 27455
+        },
+        "Brazil": {
+          "median": 6050,
+          "p25": 2722,
+          "p75": 11495
+        },
+        "South Africa": {
+          "median": 10200,
+          "p25": 4590,
+          "p75": 19380
+        },
+        "Singapore": {
+          "median": 1850,
+          "p25": 832,
+          "p75": 3515
+        },
+        "UAE": {
+          "median": 2300,
+          "p25": 1035,
+          "p75": 4370
+        },
+        "Saudi Arabia": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Mexico": {
+          "median": 6550,
+          "p25": 2947,
+          "p75": 12445
+        },
+        "Argentina": {
+          "median": 6950,
+          "p25": 3127,
+          "p75": 13205
+        },
+        "Indonesia": {
+          "median": 12300,
+          "p25": 5535,
+          "p75": 23370
+        },
+        "Vietnam": {
+          "median": 15750,
+          "p25": 7087,
+          "p75": 29925
+        },
+        "Thailand": {
+          "median": 8850,
+          "p25": 3982,
+          "p75": 16815
+        },
+        "Malaysia": {
+          "median": 6250,
+          "p25": 2812,
+          "p75": 11875
+        },
+        "New Zealand": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Morocco": {
+          "median": 13200,
+          "p25": 5940,
+          "p75": 25080
+        },
+        "Nigeria": {
+          "median": 17550,
+          "p25": 7897,
+          "p75": 33345
+        },
+        "Kenya": {
+          "median": 17400,
+          "p25": 7830,
+          "p75": 33060
+        },
+        "Egypt": {
+          "median": 14250,
+          "p25": 6412,
+          "p75": 27075
+        }
+      }
+    },
+    "Logistics & Supply Chain": {
+      "global_median": 5400,
+      "global_p25": 2430,
+      "global_p75": 10260,
+      "eu_median": 6500,
+      "countries": {
+        "Austria": {
+          "median": 4550,
+          "p25": 2047,
+          "p75": 8645
+        },
+        "Belgium": {
+          "median": 4800,
+          "p25": 2160,
+          "p75": 9120
+        },
+        "Bulgaria": {
+          "median": 14000,
+          "p25": 6300,
+          "p75": 26600
+        },
+        "Switzerland": {
+          "median": 3400,
+          "p25": 1530,
+          "p75": 6460
+        },
+        "Cyprus": {
+          "median": 7300,
+          "p25": 3285,
+          "p75": 13870
+        },
+        "Czech Republic": {
+          "median": 7600,
+          "p25": 3420,
+          "p75": 14440
+        },
+        "Germany": {
+          "median": 5100,
+          "p25": 2295,
+          "p75": 9690
+        },
+        "Denmark": {
+          "median": 4300,
+          "p25": 1935,
+          "p75": 8170
+        },
+        "Estonia": {
+          "median": 9300,
+          "p25": 4185,
+          "p75": 17670
+        },
+        "Greece": {
+          "median": 9150,
+          "p25": 4117,
+          "p75": 17385
+        },
+        "Spain": {
+          "median": 6350,
+          "p25": 2857,
+          "p75": 12065
+        },
+        "Finland": {
+          "median": 4850,
+          "p25": 2182,
+          "p75": 9215
+        },
+        "France": {
+          "median": 5000,
+          "p25": 2250,
+          "p75": 9500
+        },
+        "Croatia": {
+          "median": 8500,
+          "p25": 3825,
+          "p75": 16150
+        },
+        "Hungary": {
+          "median": 8900,
+          "p25": 4005,
+          "p75": 16910
+        },
+        "Ireland": {
+          "median": 3900,
+          "p25": 1755,
+          "p75": 7410
+        },
+        "Iceland": {
+          "median": 4200,
+          "p25": 1890,
+          "p75": 7980
+        },
+        "Italy": {
+          "median": 5750,
+          "p25": 2587,
+          "p75": 10925
+        },
+        "Lithuania": {
+          "median": 7650,
+          "p25": 3442,
+          "p75": 14535
+        },
+        "Luxembourg": {
+          "median": 3250,
+          "p25": 1462,
+          "p75": 6175
+        },
+        "Latvia": {
+          "median": 9050,
+          "p25": 4072,
+          "p75": 17195
+        },
+        "Malta": {
+          "median": 5800,
+          "p25": 2610,
+          "p75": 11020
+        },
+        "Netherlands": {
+          "median": 4750,
+          "p25": 2137,
+          "p75": 9025
+        },
+        "Norway": {
+          "median": 3700,
+          "p25": 1665,
+          "p75": 7030
+        },
+        "Poland": {
+          "median": 9550,
+          "p25": 4297,
+          "p75": 18145
+        },
+        "Portugal": {
+          "median": 7100,
+          "p25": 3195,
+          "p75": 13490
+        },
+        "Romania": {
+          "median": 11750,
+          "p25": 5287,
+          "p75": 22325
+        },
+        "Serbia": {
+          "median": 15700,
+          "p25": 7065,
+          "p75": 29830
+        },
+        "Sweden": {
+          "median": 4400,
+          "p25": 1980,
+          "p75": 8360
+        },
+        "Slovenia": {
+          "median": 6650,
+          "p25": 2992,
+          "p75": 12635
+        },
+        "Slovakia": {
+          "median": 7900,
+          "p25": 3555,
+          "p75": 15010
+        },
+        "Turkey": {
+          "median": 11450,
+          "p25": 5152,
+          "p75": 21755
+        },
+        "United Kingdom": {
+          "median": 5150,
+          "p25": 2317,
+          "p75": 9785
+        },
+        "United States": {
+          "median": 4250,
+          "p25": 1912,
+          "p75": 8075
+        },
+        "Canada": {
+          "median": 4500,
+          "p25": 2025,
+          "p75": 8550
+        },
+        "Australia": {
+          "median": 5200,
+          "p25": 2340,
+          "p75": 9880
+        },
+        "Japan": {
+          "median": 6000,
+          "p25": 2700,
+          "p75": 11400
+        },
+        "South Korea": {
+          "median": 6300,
+          "p25": 2835,
+          "p75": 11970
+        },
+        "China": {
+          "median": 12750,
+          "p25": 5737,
+          "p75": 24225
+        },
+        "India": {
+          "median": 35250,
+          "p25": 15862,
+          "p75": 66975
+        },
+        "Brazil": {
+          "median": 14950,
+          "p25": 6727,
+          "p75": 28405
+        },
+        "South Africa": {
+          "median": 24750,
+          "p25": 11137,
+          "p75": 47025
+        },
+        "Singapore": {
+          "median": 4500,
+          "p25": 2025,
+          "p75": 8550
+        },
+        "UAE": {
+          "median": 5650,
+          "p25": 2542,
+          "p75": 10735
+        },
+        "Saudi Arabia": {
+          "median": 7050,
+          "p25": 3172,
+          "p75": 13395
+        },
+        "Mexico": {
+          "median": 15950,
+          "p25": 7177,
+          "p75": 30305
+        },
+        "Argentina": {
+          "median": 17000,
+          "p25": 7650,
+          "p75": 32300
+        },
+        "Indonesia": {
+          "median": 29900,
+          "p25": 13455,
+          "p75": 56810
+        },
+        "Vietnam": {
+          "median": 38550,
+          "p25": 17347,
+          "p75": 73245
+        },
+        "Thailand": {
+          "median": 21600,
+          "p25": 9720,
+          "p75": 41040
+        },
+        "Malaysia": {
+          "median": 15150,
+          "p25": 6817,
+          "p75": 28785
+        },
+        "New Zealand": {
+          "median": 5200,
+          "p25": 2340,
+          "p75": 9880
+        },
+        "Morocco": {
+          "median": 32150,
+          "p25": 14467,
+          "p75": 61085
+        },
+        "Nigeria": {
+          "median": 42950,
+          "p25": 19327,
+          "p75": 81605
+        },
+        "Kenya": {
+          "median": 42700,
+          "p25": 19215,
+          "p75": 81130
+        },
+        "Egypt": {
+          "median": 34900,
+          "p25": 15705,
+          "p75": 66310
+        }
+      }
+    },
+    "Hospitality, Tourism & Leisure": {
+      "global_median": 1350,
+      "global_p25": 607,
+      "global_p75": 2565,
+      "eu_median": 1625,
+      "countries": {
+        "Austria": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Belgium": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Bulgaria": {
+          "median": 3550,
+          "p25": 1597,
+          "p75": 6745
+        },
+        "Switzerland": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Cyprus": {
+          "median": 1900,
+          "p25": 855,
+          "p75": 3610
+        },
+        "Czech Republic": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "Germany": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Denmark": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Estonia": {
+          "median": 2450,
+          "p25": 1102,
+          "p75": 4655
+        },
+        "Greece": {
+          "median": 2300,
+          "p25": 1035,
+          "p75": 4370
+        },
+        "Spain": {
+          "median": 1600,
+          "p25": 720,
+          "p75": 3040
+        },
+        "Finland": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "France": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Croatia": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Hungary": {
+          "median": 2250,
+          "p25": 1012,
+          "p75": 4275
+        },
+        "Ireland": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "Iceland": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "Italy": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "Lithuania": {
+          "median": 1900,
+          "p25": 855,
+          "p75": 3610
+        },
+        "Luxembourg": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Latvia": {
+          "median": 2250,
+          "p25": 1012,
+          "p75": 4275
+        },
+        "Malta": {
+          "median": 1500,
+          "p25": 675,
+          "p75": 2850
+        },
+        "Netherlands": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Norway": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Poland": {
+          "median": 2500,
+          "p25": 1125,
+          "p75": 4750
+        },
+        "Portugal": {
+          "median": 1800,
+          "p25": 810,
+          "p75": 3420
+        },
+        "Romania": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Serbia": {
+          "median": 4050,
+          "p25": 1822,
+          "p75": 7695
+        },
+        "Sweden": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Slovenia": {
+          "median": 1650,
+          "p25": 742,
+          "p75": 3135
+        },
+        "Slovakia": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "Turkey": {
+          "median": 2900,
+          "p25": 1305,
+          "p75": 5510
+        },
+        "United Kingdom": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "United States": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Canada": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Australia": {
+          "median": 1400,
+          "p25": 630,
+          "p75": 2660
+        },
+        "Japan": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "South Korea": {
+          "median": 1600,
+          "p25": 720,
+          "p75": 3040
+        },
+        "China": {
+          "median": 3250,
+          "p25": 1462,
+          "p75": 6175
+        },
+        "India": {
+          "median": 8900,
+          "p25": 4005,
+          "p75": 16910
+        },
+        "Brazil": {
+          "median": 3700,
+          "p25": 1665,
+          "p75": 7030
+        },
+        "South Africa": {
+          "median": 6350,
+          "p25": 2857,
+          "p75": 12065
+        },
+        "Singapore": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "UAE": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "Saudi Arabia": {
+          "median": 1850,
+          "p25": 832,
+          "p75": 3515
+        },
+        "Mexico": {
+          "median": 4050,
+          "p25": 1822,
+          "p75": 7695
+        },
+        "Argentina": {
+          "median": 4300,
+          "p25": 1935,
+          "p75": 8170
+        },
+        "Indonesia": {
+          "median": 7600,
+          "p25": 3420,
+          "p75": 14440
+        },
+        "Vietnam": {
+          "median": 9700,
+          "p25": 4365,
+          "p75": 18430
+        },
+        "Thailand": {
+          "median": 5450,
+          "p25": 2452,
+          "p75": 10355
+        },
+        "Malaysia": {
+          "median": 3850,
+          "p25": 1732,
+          "p75": 7315
+        },
+        "New Zealand": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Morocco": {
+          "median": 8150,
+          "p25": 3667,
+          "p75": 15485
+        },
+        "Nigeria": {
+          "median": 10800,
+          "p25": 4860,
+          "p75": 20520
+        },
+        "Kenya": {
+          "median": 10650,
+          "p25": 4792,
+          "p75": 20235
+        },
+        "Egypt": {
+          "median": 8800,
+          "p25": 3960,
+          "p75": 16720
+        }
+      }
+    },
+    "Information Technology & SaaS": {
+      "global_median": 145,
+      "global_p25": 65,
+      "global_p75": 275,
+      "eu_median": 175,
+      "countries": {
+        "Austria": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Belgium": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Bulgaria": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Switzerland": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Cyprus": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Czech Republic": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Germany": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Denmark": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Estonia": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Greece": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Spain": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Finland": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "France": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Croatia": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Hungary": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Ireland": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Iceland": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Italy": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Lithuania": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Luxembourg": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Latvia": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Malta": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Netherlands": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Norway": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Poland": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Portugal": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Romania": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Serbia": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Sweden": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Slovenia": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Slovakia": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Turkey": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "United Kingdom": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "United States": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Canada": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Australia": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Japan": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "South Korea": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "China": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "India": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Brazil": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "South Africa": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Singapore": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "UAE": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Saudi Arabia": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Mexico": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Argentina": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Indonesia": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Vietnam": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Thailand": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Malaysia": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "New Zealand": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Morocco": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Nigeria": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Kenya": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Egypt": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        }
+      }
+    },
+    "Media & Telecommunications": {
+      "global_median": 265,
+      "global_p25": 119,
+      "global_p75": 503,
+      "eu_median": 325,
+      "countries": {
+        "Austria": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Belgium": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Bulgaria": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Switzerland": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Cyprus": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Czech Republic": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Germany": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Denmark": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Estonia": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "Greece": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Spain": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Finland": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "France": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Croatia": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Hungary": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Ireland": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Iceland": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Italy": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Lithuania": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Luxembourg": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Latvia": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Malta": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Netherlands": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Norway": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Poland": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "Portugal": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Romania": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Serbia": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Sweden": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Slovenia": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Slovakia": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Turkey": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "United Kingdom": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "United States": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Canada": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Australia": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Japan": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "South Korea": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "China": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "India": {
+          "median": 1750,
+          "p25": 787,
+          "p75": 3325
+        },
+        "Brazil": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "South Africa": {
+          "median": 1250,
+          "p25": 562,
+          "p75": 2375
+        },
+        "Singapore": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "UAE": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Saudi Arabia": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Mexico": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Argentina": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Indonesia": {
+          "median": 1500,
+          "p25": 675,
+          "p75": 2850
+        },
+        "Vietnam": {
+          "median": 1900,
+          "p25": 855,
+          "p75": 3610
+        },
+        "Thailand": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Malaysia": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "New Zealand": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Morocco": {
+          "median": 1600,
+          "p25": 720,
+          "p75": 3040
+        },
+        "Nigeria": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Kenya": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Egypt": {
+          "median": 1750,
+          "p25": 787,
+          "p75": 3325
+        }
+      }
+    },
+    "Banking & Financial Services": {
+      "global_median": 95,
+      "global_p25": 42,
+      "global_p75": 180,
+      "eu_median": 100,
+      "countries": {
+        "Austria": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Belgium": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Bulgaria": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Switzerland": {
+          "median": 50,
+          "p25": 22,
+          "p75": 95
+        },
+        "Cyprus": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Czech Republic": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Germany": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Denmark": {
+          "median": 50,
+          "p25": 22,
+          "p75": 95
+        },
+        "Estonia": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Greece": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Spain": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Finland": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "France": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Croatia": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Hungary": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Ireland": {
+          "median": 50,
+          "p25": 22,
+          "p75": 95
+        },
+        "Iceland": {
+          "median": 50,
+          "p25": 22,
+          "p75": 95
+        },
+        "Italy": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Lithuania": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Luxembourg": {
+          "median": 50,
+          "p25": 22,
+          "p75": 95
+        },
+        "Latvia": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Malta": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Netherlands": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Norway": {
+          "median": 50,
+          "p25": 22,
+          "p75": 95
+        },
+        "Poland": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Portugal": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Romania": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Serbia": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Sweden": {
+          "median": 50,
+          "p25": 22,
+          "p75": 95
+        },
+        "Slovenia": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Slovakia": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Turkey": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "United Kingdom": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "United States": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Canada": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Australia": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Japan": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "South Korea": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "China": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "India": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "Brazil": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "South Africa": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Singapore": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "UAE": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Saudi Arabia": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Mexico": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Argentina": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Indonesia": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Vietnam": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Thailand": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Malaysia": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "New Zealand": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Morocco": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Nigeria": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Kenya": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Egypt": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        }
+      }
+    },
+    "Professional Services (Consulting, Legal)": {
+      "global_median": 195,
+      "global_p25": 87,
+      "global_p75": 370,
+      "eu_median": 250,
+      "countries": {
+        "Austria": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Belgium": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Bulgaria": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "Switzerland": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Cyprus": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Czech Republic": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Germany": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Denmark": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Estonia": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Greece": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Spain": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Finland": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "France": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Croatia": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Hungary": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Ireland": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Iceland": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Italy": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Lithuania": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Luxembourg": {
+          "median": 100,
+          "p25": 45,
+          "p75": 190
+        },
+        "Latvia": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Malta": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Netherlands": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Norway": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Poland": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Portugal": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Romania": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Serbia": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Sweden": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Slovenia": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Slovakia": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Turkey": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "United Kingdom": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "United States": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Canada": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "Australia": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Japan": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "South Korea": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "China": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "India": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Brazil": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "South Africa": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Singapore": {
+          "median": 150,
+          "p25": 67,
+          "p75": 285
+        },
+        "UAE": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Saudi Arabia": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Mexico": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Argentina": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Indonesia": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Vietnam": {
+          "median": 1400,
+          "p25": 630,
+          "p75": 2660
+        },
+        "Thailand": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Malaysia": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "New Zealand": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Morocco": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Nigeria": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Kenya": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Egypt": {
+          "median": 1250,
+          "p25": 562,
+          "p75": 2375
+        }
+      }
+    },
+    "Public Sector & Government": {
+      "global_median": 520,
+      "global_p25": 234,
+      "global_p75": 988,
+      "eu_median": 625,
+      "countries": {
+        "Austria": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Belgium": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Bulgaria": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "Switzerland": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Cyprus": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Czech Republic": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Germany": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "Denmark": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Estonia": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Greece": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Spain": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Finland": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "France": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Croatia": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Hungary": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Ireland": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Iceland": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Italy": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Lithuania": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Luxembourg": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Latvia": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Malta": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Netherlands": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Norway": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Poland": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Portugal": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Romania": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Serbia": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Sweden": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Slovenia": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "Slovakia": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Turkey": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "United Kingdom": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "United States": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Canada": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Australia": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Japan": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "South Korea": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "China": {
+          "median": 1250,
+          "p25": 562,
+          "p75": 2375
+        },
+        "India": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "Brazil": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "South Africa": {
+          "median": 2450,
+          "p25": 1102,
+          "p75": 4655
+        },
+        "Singapore": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "UAE": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Saudi Arabia": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Mexico": {
+          "median": 1550,
+          "p25": 697,
+          "p75": 2945
+        },
+        "Argentina": {
+          "median": 1650,
+          "p25": 742,
+          "p75": 3135
+        },
+        "Indonesia": {
+          "median": 2950,
+          "p25": 1327,
+          "p75": 5605
+        },
+        "Vietnam": {
+          "median": 3750,
+          "p25": 1687,
+          "p75": 7125
+        },
+        "Thailand": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Malaysia": {
+          "median": 1500,
+          "p25": 675,
+          "p75": 2850
+        },
+        "New Zealand": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "Morocco": {
+          "median": 3150,
+          "p25": 1417,
+          "p75": 5985
+        },
+        "Nigeria": {
+          "median": 4150,
+          "p25": 1867,
+          "p75": 7885
+        },
+        "Kenya": {
+          "median": 4100,
+          "p25": 1845,
+          "p75": 7790
+        },
+        "Egypt": {
+          "median": 3400,
+          "p25": 1530,
+          "p75": 6460
+        }
+      }
+    },
+    "Education & Training": {
+      "global_median": 320,
+      "global_p25": 144,
+      "global_p75": 608,
+      "eu_median": 375,
+      "countries": {
+        "Austria": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Belgium": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Bulgaria": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Switzerland": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Cyprus": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Czech Republic": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Germany": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Denmark": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Estonia": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Greece": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Spain": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Finland": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "France": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Croatia": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "Hungary": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Ireland": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Iceland": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Italy": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Lithuania": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Luxembourg": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Latvia": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Malta": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Netherlands": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Norway": {
+          "median": 200,
+          "p25": 90,
+          "p75": 380
+        },
+        "Poland": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Portugal": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Romania": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Serbia": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Sweden": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Slovenia": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "Slovakia": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Turkey": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "United Kingdom": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "United States": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Canada": {
+          "median": 250,
+          "p25": 112,
+          "p75": 475
+        },
+        "Australia": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Japan": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "South Korea": {
+          "median": 400,
+          "p25": 180,
+          "p75": 760
+        },
+        "China": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "India": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        },
+        "Brazil": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "South Africa": {
+          "median": 1500,
+          "p25": 675,
+          "p75": 2850
+        },
+        "Singapore": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "UAE": {
+          "median": 350,
+          "p25": 157,
+          "p75": 665
+        },
+        "Saudi Arabia": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Mexico": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Argentina": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "Indonesia": {
+          "median": 1800,
+          "p25": 810,
+          "p75": 3420
+        },
+        "Vietnam": {
+          "median": 2300,
+          "p25": 1035,
+          "p75": 4370
+        },
+        "Thailand": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Malaysia": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "New Zealand": {
+          "median": 300,
+          "p25": 135,
+          "p75": 570
+        },
+        "Morocco": {
+          "median": 1950,
+          "p25": 877,
+          "p75": 3705
+        },
+        "Nigeria": {
+          "median": 2550,
+          "p25": 1147,
+          "p75": 4845
+        },
+        "Kenya": {
+          "median": 2550,
+          "p25": 1147,
+          "p75": 4845
+        },
+        "Egypt": {
+          "median": 2100,
+          "p25": 945,
+          "p75": 3990
+        }
+      }
+    },
+    "Healthcare & Pharmaceuticals": {
+      "global_median": 780,
+      "global_p25": 351,
+      "global_p75": 1482,
+      "eu_median": 925,
+      "countries": {
+        "Austria": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "Belgium": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Bulgaria": {
+          "median": 2050,
+          "p25": 922,
+          "p75": 3895
+        },
+        "Switzerland": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Cyprus": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Czech Republic": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Germany": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Denmark": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Estonia": {
+          "median": 1400,
+          "p25": 630,
+          "p75": 2660
+        },
+        "Greece": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "Spain": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Finland": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "France": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Croatia": {
+          "median": 1200,
+          "p25": 540,
+          "p75": 2280
+        },
+        "Hungary": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Ireland": {
+          "median": 550,
+          "p25": 247,
+          "p75": 1045
+        },
+        "Iceland": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Italy": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Lithuania": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Luxembourg": {
+          "median": 450,
+          "p25": 202,
+          "p75": 855
+        },
+        "Latvia": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Malta": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Netherlands": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Norway": {
+          "median": 500,
+          "p25": 225,
+          "p75": 950
+        },
+        "Poland": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "Portugal": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Romania": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "Serbia": {
+          "median": 2350,
+          "p25": 1057,
+          "p75": 4465
+        },
+        "Sweden": {
+          "median": 600,
+          "p25": 270,
+          "p75": 1140
+        },
+        "Slovenia": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Slovakia": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Turkey": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "United Kingdom": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "United States": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "Canada": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "Australia": {
+          "median": 800,
+          "p25": 360,
+          "p75": 1520
+        },
+        "Japan": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "South Korea": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "China": {
+          "median": 1900,
+          "p25": 855,
+          "p75": 3610
+        },
+        "India": {
+          "median": 5150,
+          "p25": 2317,
+          "p75": 9785
+        },
+        "Brazil": {
+          "median": 2150,
+          "p25": 967,
+          "p75": 4085
+        },
+        "South Africa": {
+          "median": 3650,
+          "p25": 1642,
+          "p75": 6935
+        },
+        "Singapore": {
+          "median": 650,
+          "p25": 292,
+          "p75": 1235
+        },
+        "UAE": {
+          "median": 850,
+          "p25": 382,
+          "p75": 1615
+        },
+        "Saudi Arabia": {
+          "median": 1100,
+          "p25": 495,
+          "p75": 2090
+        },
+        "Mexico": {
+          "median": 2350,
+          "p25": 1057,
+          "p75": 4465
+        },
+        "Argentina": {
+          "median": 2450,
+          "p25": 1102,
+          "p75": 4655
+        },
+        "Indonesia": {
+          "median": 4400,
+          "p25": 1980,
+          "p75": 8360
+        },
+        "Vietnam": {
+          "median": 5600,
+          "p25": 2520,
+          "p75": 10640
+        },
+        "Thailand": {
+          "median": 3150,
+          "p25": 1417,
+          "p75": 5985
+        },
+        "Malaysia": {
+          "median": 2250,
+          "p25": 1012,
+          "p75": 4275
+        },
+        "New Zealand": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Morocco": {
+          "median": 4700,
+          "p25": 2115,
+          "p75": 8930
+        },
+        "Nigeria": {
+          "median": 6250,
+          "p25": 2812,
+          "p75": 11875
+        },
+        "Kenya": {
+          "median": 6150,
+          "p25": 2767,
+          "p75": 11685
+        },
+        "Egypt": {
+          "median": 5050,
+          "p25": 2272,
+          "p75": 9595
+        }
+      }
+    },
+    "Other": {
+      "global_median": 1200,
+      "global_p25": 540,
+      "global_p75": 2280,
+      "eu_median": 1450,
+      "countries": {
+        "Austria": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "Belgium": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Bulgaria": {
+          "median": 3150,
+          "p25": 1417,
+          "p75": 5985
+        },
+        "Switzerland": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Cyprus": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "Czech Republic": {
+          "median": 1750,
+          "p25": 787,
+          "p75": 3325
+        },
+        "Germany": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Denmark": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Estonia": {
+          "median": 2200,
+          "p25": 990,
+          "p75": 4180
+        },
+        "Greece": {
+          "median": 2050,
+          "p25": 922,
+          "p75": 3895
+        },
+        "Spain": {
+          "median": 1400,
+          "p25": 630,
+          "p75": 2660
+        },
+        "Finland": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "France": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Croatia": {
+          "median": 1900,
+          "p25": 855,
+          "p75": 3610
+        },
+        "Hungary": {
+          "median": 2000,
+          "p25": 900,
+          "p75": 3800
+        },
+        "Ireland": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Iceland": {
+          "median": 900,
+          "p25": 405,
+          "p75": 1710
+        },
+        "Italy": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Lithuania": {
+          "median": 1700,
+          "p25": 765,
+          "p75": 3230
+        },
+        "Luxembourg": {
+          "median": 700,
+          "p25": 315,
+          "p75": 1330
+        },
+        "Latvia": {
+          "median": 2000,
+          "p25": 900,
+          "p75": 3800
+        },
+        "Malta": {
+          "median": 1350,
+          "p25": 607,
+          "p75": 2565
+        },
+        "Netherlands": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "Norway": {
+          "median": 750,
+          "p25": 337,
+          "p75": 1425
+        },
+        "Poland": {
+          "median": 2200,
+          "p25": 990,
+          "p75": 4180
+        },
+        "Portugal": {
+          "median": 1600,
+          "p25": 720,
+          "p75": 3040
+        },
+        "Romania": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "Serbia": {
+          "median": 3600,
+          "p25": 1620,
+          "p75": 6840
+        },
+        "Sweden": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Slovenia": {
+          "median": 1500,
+          "p25": 675,
+          "p75": 2850
+        },
+        "Slovakia": {
+          "median": 1750,
+          "p25": 787,
+          "p75": 3325
+        },
+        "Turkey": {
+          "median": 2600,
+          "p25": 1170,
+          "p75": 4940
+        },
+        "United Kingdom": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "United States": {
+          "median": 950,
+          "p25": 427,
+          "p75": 1805
+        },
+        "Canada": {
+          "median": 1000,
+          "p25": 450,
+          "p75": 1900
+        },
+        "Australia": {
+          "median": 1250,
+          "p25": 562,
+          "p75": 2375
+        },
+        "Japan": {
+          "median": 1400,
+          "p25": 630,
+          "p75": 2660
+        },
+        "South Korea": {
+          "median": 1450,
+          "p25": 652,
+          "p75": 2755
+        },
+        "China": {
+          "median": 2900,
+          "p25": 1305,
+          "p75": 5510
+        },
+        "India": {
+          "median": 7950,
+          "p25": 3577,
+          "p75": 15105
+        },
+        "Brazil": {
+          "median": 3300,
+          "p25": 1485,
+          "p75": 6270
+        },
+        "South Africa": {
+          "median": 5650,
+          "p25": 2542,
+          "p75": 10735
+        },
+        "Singapore": {
+          "median": 1050,
+          "p25": 472,
+          "p75": 1995
+        },
+        "UAE": {
+          "median": 1300,
+          "p25": 585,
+          "p75": 2470
+        },
+        "Saudi Arabia": {
+          "median": 1650,
+          "p25": 742,
+          "p75": 3135
+        },
+        "Mexico": {
+          "median": 3600,
+          "p25": 1620,
+          "p75": 6840
+        },
+        "Argentina": {
+          "median": 3800,
+          "p25": 1710,
+          "p75": 7220
+        },
+        "Indonesia": {
+          "median": 6750,
+          "p25": 3037,
+          "p75": 12825
+        },
+        "Vietnam": {
+          "median": 8650,
+          "p25": 3892,
+          "p75": 16435
+        },
+        "Thailand": {
+          "median": 4850,
+          "p25": 2182,
+          "p75": 9215
+        },
+        "Malaysia": {
+          "median": 3450,
+          "p25": 1552,
+          "p75": 6555
+        },
+        "New Zealand": {
+          "median": 1150,
+          "p25": 517,
+          "p75": 2185
+        },
+        "Morocco": {
+          "median": 7250,
+          "p25": 3262,
+          "p75": 13775
+        },
+        "Nigeria": {
+          "median": 9600,
+          "p25": 4320,
+          "p75": 18240
+        },
+        "Kenya": {
+          "median": 9500,
+          "p25": 4275,
+          "p75": 18050
+        },
+        "Egypt": {
+          "median": 7800,
+          "p25": 3510,
+          "p75": 14820
+        }
+      }
+    }
+  }
+}

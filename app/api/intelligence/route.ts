@@ -88,60 +88,6 @@ function extractJSON(raw: string): any {
 }
 
 // =============================================================================
-// MODE: BENCHMARK
-// =============================================================================
-
-const BENCHMARK_SYSTEM = `You are a senior carbon accounting expert with deep knowledge of
-sector-specific GHG emission intensities across different countries.
-
-Your task: provide an accurate, country-aware carbon intensity benchmark for a given
-industry and country combination.
-
-CRITICAL RULES:
-1. Return ONLY valid JSON — no preamble, no markdown, no explanation outside the JSON.
-2. All intensity figures are in kgCO₂e per €1 million revenue (Scope 1+2+3 combined).
-3. Use the correct national statistical authority for the country (e.g. ADEME for France,
-   UBA for Germany, DEFRA for UK, EPA for USA, CPCB for India, etc.).
-4. Account for country-specific factors: grid carbon intensity, industrial energy mix,
-   regulatory context, typical fuel types used in that country.
-5. Figures must be for SMEs (10–500 employees), not large corporates.
-6. The percentile estimate is where a company with this exact intensity sits vs sector peers.
-7. context_sentence must be 1-2 sentences explaining WHY this country's benchmark differs
-   from the global average — be specific (cite grid factor, fuel mix, regulation).
-8. Never invent sources. Only cite real national agencies and published datasets.`;
-
-async function getBenchmark(payload: any): Promise<any> {
-  const { industry, country, year, yourIntensity, gridFactor, primaryCalculator } = payload;
-
-  const userPrompt = `
-Industry: ${industry}
-Country: ${country}
-Reporting year: ${year}
-Company's actual intensity: ${Math.round(yourIntensity)} kgCO₂e/€M revenue
-Country electricity grid factor: ${gridFactor} kgCO₂e/kWh
-Primary national emission authority: ${primaryCalculator}
-
-Provide a benchmark for ${industry} SMEs in ${country} for ${year}.
-
-Return this exact JSON structure:
-{
-  "median_intensity": <number — median kgCO₂e/€M for this industry+country>,
-  "p25_intensity": <number — 25th percentile (good performers)>,
-  "p75_intensity": <number — 75th percentile (poor performers)>,
-  "your_percentile": <number 1-99 — where ${Math.round(yourIntensity)} sits vs peers>,
-  "headline": "<one sentence: e.g. 'Your intensity is 23% below the median for Light Manufacturing in France'>",
-  "context_sentence": "<1-2 sentences explaining country-specific factors affecting this benchmark>",
-  "reduction_opportunity_pct": <number — estimated % reduction possible with best available practices>,
-  "primary_source": "<exact citation: agency name + report + year>",
-  "secondary_source": "<second citation or empty string>",
-  "country_factor_note": "<one sentence on how ${country}'s grid/fuel mix affects this sector specifically>"
-}`;
-
-  const raw = await callClaude(BENCHMARK_SYSTEM, userPrompt);
-  return extractJSON(raw);
-}
-
-// =============================================================================
 // MODE: RECOMMENDATIONS
 // =============================================================================
 
@@ -256,49 +202,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'mode must be "benchmark" or "recommendations"' }, { status: 400 });
   }
 
-  // ── BENCHMARK MODE ─────────────────────────────────────────────────────────
+  // ── BENCHMARK MODE — zero cost, reads from pre-computed JSON ──────────────
+  // No Claude API call. Data from Eurostat 2022 + CDP 2024 + DEFRA 2025.
   if (mode === 'benchmark') {
-    const { industry, country, year, yourIntensity, gridFactor, primaryCalculator } = body;
+    const { industry, country, yourIntensity } = body;
 
-    if (!industry || !country || !year || !yourIntensity) {
+    if (!industry || !country || !yourIntensity) {
       return NextResponse.json({ error: 'Missing required fields for benchmark' }, { status: 400 });
     }
 
-    const supabase = adminSupabase();
-    const cacheKey = `${industry}__${country}__${year}`;
-
-    // Check cache first
-    const { data: cached } = await supabase
-      .from('intelligence_cache')
-      .select('result')
-      .eq('cache_key', cacheKey)
-      .eq('mode', 'benchmark')
-      .maybeSingle();
-
-    if (cached?.result) {
-      // Cache hit — return immediately, personalise headline with their intensity
-      const result = { ...cached.result, cached: true, yourIntensity };
-      return NextResponse.json(result);
-    }
-
-    // Cache miss — call Claude
     try {
-      const result = await getBenchmark({ industry, country, year, yourIntensity, gridFactor, primaryCalculator });
+      // Dynamic import so the JSON is only loaded when needed
+      const { lookupBenchmark } = await import('@/utils/benchmarkLookup');
+      const result = lookupBenchmark(industry, country, Number(yourIntensity));
 
-      // Store in cache
-      await supabase.from('intelligence_cache').upsert({
-        cache_key:  cacheKey,
-        mode:       'benchmark',
-        result,
-        created_by: userId,
-        created_at: new Date().toISOString(),
-      }, { onConflict: 'cache_key, mode' });
+      if (!result) {
+        return NextResponse.json({ error: 'No benchmark data for this industry/country combination' }, { status: 404 });
+      }
 
-      return NextResponse.json({ ...result, cached: false, yourIntensity });
+      return NextResponse.json({ ...result, cached: false });
 
     } catch (err: any) {
-      console.error('[Intelligence API] Benchmark error:', err);
-      return NextResponse.json({ error: 'Benchmark generation failed', detail: err.message }, { status: 500 });
+      console.error('[Intelligence API] Benchmark lookup error:', err);
+      return NextResponse.json({ error: 'Benchmark lookup failed', detail: err.message }, { status: 500 });
     }
   }
 
