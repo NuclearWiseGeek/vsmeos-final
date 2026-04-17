@@ -12,6 +12,10 @@
 //              adding new data collection features (e.g. OCR in Phase 4)
 // =============================================================================
 
+
+// Required: prevents static prerendering so Clerk context is available
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, Shield } from 'lucide-react';

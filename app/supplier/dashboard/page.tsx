@@ -389,7 +389,6 @@ export default function SupplierDashboard() {
     const latest = data.assessments.find(a => a.status === 'submitted');
     if (!latest) { setRefreshingBm(false); return; }
 
-    const cf = getCountryFactors(data.profile.country || 'France');
     const intensity = latest.emissions_totals?.intensity || 0;
 
     try {
@@ -397,13 +396,10 @@ export default function SupplierDashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode:              'benchmark',
-          industry:          data.profile.industry || 'Other',
-          country:           data.profile.country  || 'France',
-          year:              latest.year,
-          yourIntensity:     intensity,
-          gridFactor:        cf.electricityGrid,
-          primaryCalculator: cf.primaryCalculator,
+          mode:          'benchmark',
+          industry:      data.profile.industry || 'Other',
+          country:       data.profile.country  || 'France',
+          yourIntensity: intensity,
         }),
       });
       if (res.ok) {

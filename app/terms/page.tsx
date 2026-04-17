@@ -18,6 +18,10 @@
 // UPDATE WHEN: Adding new features, changing pricing, changing liability terms.
 // =============================================================================
 
+
+// Required: prevents static prerendering so Clerk context is available
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, FileText } from 'lucide-react';

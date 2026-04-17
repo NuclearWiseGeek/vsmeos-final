@@ -17,6 +17,10 @@
 //   - When new standards emerge (e.g. SBTi SME pathway updates)
 // =============================================================================
 
+
+// Required: prevents static prerendering so Clerk context is available
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, ArrowRight, CheckCircle2, AlertCircle, Building2, Globe, FileText, TrendingUp } from 'lucide-react';

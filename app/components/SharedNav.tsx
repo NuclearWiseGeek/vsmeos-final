@@ -56,14 +56,14 @@ export default function SharedNav() {
           {/* Desktop auth links */}
           <SignedIn>
             <Link
-              href="/supplier/hub"
+              href="/supplier/dashboard"
               className="hidden md:flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors"
             >
               <ArrowLeft size={12} /> Back to App
             </Link>
           </SignedIn>
           <SignedOut>
-            <SignInButton mode="modal" forceRedirectUrl="/supplier">
+            <SignInButton mode="modal" forceRedirectUrl="/supplier/dashboard">
               <button className="hidden md:block text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-black transition-colors">
                 Sign In
               </button>
@@ -99,7 +99,7 @@ export default function SharedNav() {
           <div className="pt-3 border-t border-gray-100">
             <SignedIn>
               <Link
-                href="/supplier/hub"
+                href="/supplier/dashboard"
                 onClick={() => setMobileOpen(false)}
                 className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]"
               >
@@ -107,7 +107,7 @@ export default function SharedNav() {
               </Link>
             </SignedIn>
             <SignedOut>
-              <SignInButton mode="modal" forceRedirectUrl="/supplier">
+              <SignInButton mode="modal" forceRedirectUrl="/supplier/dashboard">
                 <button
                   onClick={() => setMobileOpen(false)}
                   className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]"

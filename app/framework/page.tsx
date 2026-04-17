@@ -13,6 +13,10 @@
 //   - Phase 3: Update to reflect expanded Scope 3 categories
 // =============================================================================
 
+
+// Required: prevents static prerendering so Clerk context is available
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, ArrowRight, FileText, CheckCircle2, BarChart3, Shield, Building2, Users, Zap, Plane } from 'lucide-react';

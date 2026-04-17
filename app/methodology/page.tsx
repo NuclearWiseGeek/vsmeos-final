@@ -20,6 +20,10 @@
 //   - When adding third-party verification support (Phase 7)
 // =============================================================================
 
+
+// Required: prevents static prerendering so Clerk context is available
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, ArrowRight, BookOpen, Database, Globe, Zap, Plane, TrendingUp, CheckCircle2, AlertCircle } from 'lucide-react';
