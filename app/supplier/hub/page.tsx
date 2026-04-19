@@ -196,7 +196,7 @@ export default function AssessmentHub() {
             </p>
           </div>
           <a
-            href="/supplier"
+            href="/supplier?new=true"
             className="flex-shrink-0 px-5 py-2.5 bg-white text-black rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors flex items-center gap-2"
           >
             Set up profile <ArrowRight size={14} />
@@ -241,7 +241,7 @@ export default function AssessmentHub() {
             </span>
           )}
           <Link
-            href="/supplier"
+            href="/supplier?new=true"
             className="text-sm text-gray-500 hover:text-black flex items-center gap-1 font-medium transition-colors"
           >
             <ArrowLeft size={14} /> Edit Profile
