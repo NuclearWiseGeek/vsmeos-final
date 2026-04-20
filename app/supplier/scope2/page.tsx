@@ -6,7 +6,7 @@
 //
 // GHG PROTOCOL SCOPE 2 — TWO METHODS:
 //   1. Location-Based:  Uses the average grid emission factor for the country
-//                       (e.g. France = 0.052 kgCO2e/kWh, UK = 0.207 kgCO2e/kWh)
+//                       (e.g. France = 0.052 kgCO2e/kWh, UK = 0.196 kgCO2e/kWh — DEFRA 2025)
 //   2. Market-Based:    Uses the factor from the specific energy contract.
 //                       If you have a green tariff or GoO certificate → 0.000
 //

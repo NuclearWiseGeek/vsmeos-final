@@ -492,7 +492,7 @@ export default function VaultPage() {
           Complete and submit a GHG declaration to see it here for safe-keeping.
         </p>
         <Link
-          href="/supplier"
+          href="/supplier?new=true"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0C2918] text-[#C9A84C] text-sm font-semibold hover:bg-[#122F1E] transition-colors"
         >
           <FileText size={14} />

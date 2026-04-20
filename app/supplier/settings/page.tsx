@@ -1,22 +1,13 @@
 // =============================================================================
 // FILE: app/supplier/settings/page.tsx
-// PURPOSE: Workspace Settings — allows the supplier to update their company
-//          name, notification preferences, and manage their account.
+// PURPOSE: Workspace Settings — company name edit + account info + danger zone.
 //
-// FIXES IN THIS VERSION:
-//   - Fixed typo: back link was "/suppliyer" (404) → now "/supplier" ✓
-//   - Save button now actually writes to Supabase via saveToSupabase()
-//   - Added danger zone: reset assessment data
-//   - Added account info section (read-only Clerk data)
-//
-// WHEN TO MODIFY:
-//   - Phase 3: Add notification preferences (email on buyer request, etc.)
-//   - Phase 4: Add OCR preferences, default currency per user
-//   - Phase 5: Add reduction target settings
-//
-// DEPENDENCIES:
-//   - ESGContext (useESG) — companyData, setCompanyData, saveToSupabase, resetAssessment
-//   - Clerk (useUser) — for displaying account email / name
+// FIXES (April 18, 2026):
+//   - Save now writes ONLY to profiles table — never touches assessments.status
+//   - Old saveToSupabase() wrote status:'draft', silently resetting submitted reports.
+//   - All bare /supplier links → /supplier?new=true to prevent dashboard bounce.
+//   - Post-save redirect → /supplier?new=true (profile form, pre-filled).
+//   - Auth pages bg matched to site palette.
 // =============================================================================
 
 'use client';
@@ -24,7 +15,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useESG } from '@/context/ESGContext';
-import { useUser } from '@clerk/nextjs';
+import { useUser, useAuth } from '@clerk/nextjs';
+import { createSupabaseClient } from '@/utils/supabase';
 import {
   ArrowLeft, Building2, Save, CheckCircle2,
   User, AlertTriangle, Loader2, Shield
@@ -32,38 +24,49 @@ import {
 import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
-  const { companyData, setCompanyData, saveToSupabase, resetAssessment } = useESG();
+  const { companyData, setCompanyData, resetAssessment } = useESG();
   const { user } = useUser();
+  const { getToken, userId } = useAuth();
   const router = useRouter();
 
-  // UI state
   const [isSaving, setIsSaving]   = useState(false);
   const [isSaved,  setIsSaved]    = useState(false);
   const [saveError, setSaveError] = useState(false);
-
-  // Local copy of name so we don't update context on every keystroke
   const [nameInput, setNameInput] = useState(companyData.name || '');
 
-  // =============================================================================
-  // SAVE HANDLER — writes to Supabase then shows success/error state
-  // =============================================================================
+  // ==========================================================================
+  // SAVE HANDLER — writes ONLY to profiles table, never touches assessments.
+  // The old saveToSupabase() from ESGContext wrote status:'draft' to assessments,
+  // which silently reset submitted reports. This version is safe.
+  // ==========================================================================
   const handleSave = async () => {
     if (!nameInput.trim() || nameInput.trim().length < 2) return;
-
     setIsSaving(true);
     setSaveError(false);
 
     try {
-      // 1. Update the context with the new name
+      const token = await getToken({ template: 'supabase' });
+      if (!token) throw new Error('No auth token');
+      const supabase = createSupabaseClient(token);
+
+      // Update profiles table ONLY — never write to assessments here.
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          company_name: nameInput.trim(),
+          updated_at:   new Date().toISOString(),
+        })
+          .eq('id', userId || '');
+
+      if (error) throw error;
+
+      // Update local context so the rest of the UI reflects the new name immediately
       setCompanyData(prev => ({ ...prev, name: nameInput.trim() }));
 
-      // 2. Persist to Supabase (profiles + assessments table)
-      await saveToSupabase();
-
-      // 3. Show success state briefly, then redirect back to supplier profile
       setIsSaved(true);
       setTimeout(() => {
-        router.push('/supplier'); // ← FIXED: was "/suppliyer" (typo → 404)
+        // ?new=true bypasses the dashboard redirect so the supplier sees the form
+        router.push('/supplier?new=true');
       }, 800);
 
     } catch (err) {
@@ -77,13 +80,10 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto py-12 px-4 sm:px-6">
 
-      {/* ================================================================
-          HEADER
-          ================================================================ */}
+      {/* HEADER */}
       <div className="flex items-center gap-4 mb-8">
-        {/* FIXED: back link was "/suppliyer" — now correctly "/supplier" */}
         <Link
-          href="/supplier"
+          href="/supplier?new=true"
           className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
           title="Back to profile"
         >
@@ -99,9 +99,7 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
 
-        {/* ================================================================
-            SECTION 1: ACCOUNT INFO (Read-only — from Clerk)
-            ================================================================ */}
+        {/* SECTION 1: ACCOUNT INFO (Read-only — from Clerk) */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-8 py-5 border-b border-gray-100">
             <div className="flex items-center gap-3">
@@ -111,8 +109,6 @@ export default function SettingsPage() {
           </div>
 
           <div className="p-8 space-y-4">
-
-            {/* User's full name from Clerk */}
             <div className="space-y-1">
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400">
                 Full Name
@@ -122,7 +118,6 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            {/* Email from Clerk */}
             <div className="space-y-1">
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400">
                 Email Address
@@ -132,7 +127,6 @@ export default function SettingsPage() {
               </p>
             </div>
 
-            {/* Account created date */}
             <div className="space-y-1">
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-400">
                 Account Created
@@ -152,29 +146,23 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ================================================================
-            SECTION 2: ORGANISATION IDENTITY
-            The one field that is editable here — company name.
-            Other profile fields (country, industry, year) are edited on
-            the main /supplier profile page.
-            ================================================================ */}
+        {/* SECTION 2: ORGANISATION IDENTITY */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-8 py-5 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <Building2 size={16} className="text-blue-600" />
+              <Building2 size={16} className="text-[#C9A84C]" />
               <h3 className="font-semibold text-gray-900">Organisation Identity</h3>
             </div>
           </div>
 
           <div className="p-8 space-y-6">
-
             <div className="space-y-2">
               <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">
                 Legal Company Name
               </label>
               <p className="text-xs text-gray-400">
-                This is the official name that appears on all generated PDF reports.
-                Make sure it matches your legal registration exactly.
+                This name appears on all generated PDF reports. Make sure it matches
+                your legal registration exactly.
               </p>
               <input
                 type="text"
@@ -184,12 +172,12 @@ export default function SettingsPage() {
                   setIsSaved(false);
                   setSaveError(false);
                 }}
-                className="w-full p-4 bg-white border border-gray-200 rounded-lg font-bold text-gray-900 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all"
+                className="w-full p-4 bg-white border border-gray-200 rounded-lg font-bold text-gray-900 focus:ring-2 focus:ring-[#0C2918]/20 focus:border-[#0C2918] outline-none transition-all"
                 placeholder="e.g. Dupont Industries SAS"
               />
             </div>
 
-            {/* Current profile summary — links to full profile for other edits */}
+            {/* Current profile summary */}
             <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
               <p className="text-xs text-gray-500 leading-relaxed">
                 <span className="font-bold text-gray-700">Current profile:</span>{' '}
@@ -198,23 +186,21 @@ export default function SettingsPage() {
                 {companyData.year && <span> · FY {companyData.year}</span>}
                 {companyData.currency && <span> · {companyData.currency}</span>}
                 {' '}
-                <Link href="/supplier" className="text-blue-600 hover:underline font-medium">
+                <Link href="/supplier?new=true" className="text-[#0C2918] hover:underline font-bold">
                   Edit full profile →
                 </Link>
               </p>
             </div>
 
-            {/* Error message */}
             {saveError && (
               <p className="text-xs text-red-600 font-medium">
                 ⚠️ Failed to save. Please try again or check your connection.
               </p>
             )}
 
-            {/* Action buttons */}
             <div className="flex justify-end gap-3">
               <Link
-                href="/supplier"
+                href="/supplier?new=true"
                 className="px-6 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-50 transition-colors text-sm"
               >
                 Cancel
@@ -222,11 +208,11 @@ export default function SettingsPage() {
               <button
                 onClick={handleSave}
                 disabled={isSaving || nameInput.trim().length < 2}
-                className={`flex items-center gap-2 px-8 py-3 rounded-lg font-bold text-white text-sm transition-all shadow-lg active:scale-95 ${
+                className={`flex items-center gap-2 px-8 py-3 rounded-lg font-bold text-sm transition-all shadow-lg active:scale-95 ${
                   isSaved
-                    ? 'bg-green-600 shadow-green-200'
+                    ? 'bg-green-600 text-white shadow-green-200'
                     : nameInput.trim().length >= 2
-                    ? 'bg-black hover:bg-[#122F1E] shadow-gray-200'
+                    ? 'bg-[#0C2918] text-[#C9A84C] hover:bg-[#122F1E] shadow-gray-200'
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
                 }`}
               >
@@ -242,9 +228,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ================================================================
-            SECTION 3: DATA & PRIVACY
-            ================================================================ */}
+        {/* SECTION 3: DATA & PRIVACY */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-8 py-5 border-b border-gray-100">
             <div className="flex items-center gap-3">
@@ -260,22 +244,17 @@ export default function SettingsPage() {
               Your emission data is never shared with third parties without your explicit consent.
             </p>
             <div className="flex gap-4 pt-2">
-              <Link href="/privacy" className="text-xs text-blue-600 hover:underline font-medium">
+              <Link href="/privacy" className="text-xs text-[#0C2918] hover:underline font-bold">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-xs text-blue-600 hover:underline font-medium">
+              <Link href="/terms" className="text-xs text-[#0C2918] hover:underline font-bold">
                 Terms of Service
               </Link>
             </div>
           </div>
         </div>
 
-        {/* ================================================================
-            SECTION 4: DANGER ZONE — Reset Assessment
-            Placed last and styled in red so it's clearly destructive.
-            Uses the resetAssessment() function from ESGContext which
-            has a confirm() dialog guard before clearing anything.
-            ================================================================ */}
+        {/* SECTION 4: DANGER ZONE */}
         <div className="bg-white rounded-2xl border border-red-100 shadow-sm overflow-hidden">
           <div className="px-8 py-5 border-b border-red-50">
             <div className="flex items-center gap-3">
