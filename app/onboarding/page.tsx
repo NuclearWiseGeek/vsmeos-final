@@ -1,13 +1,23 @@
 // =============================================================================
 // FILE: app/onboarding/page.tsx
-// PURPOSE: Role selection screen. Shown to any user who has no role set yet.
-//          They pick "Buyer" or "Supplier" — saved to profiles.role.
-//          Middleware then redirects them correctly on all future logins.
+// PURPOSE: Role selection screen for NEW users only.
+//          On mount, checks if user already has a role saved (returning user
+//          who landed here by accident or after sign-in). If role exists,
+//          immediately redirects to the correct dashboard — no UI shown.
+//
+// FLOW:
+//   New user  → no role in DB → shows picker → saves role → goes to dashboard
+//   Returning → role in DB    → silently redirects to correct dashboard
+//
+// REDIRECTS:
+//   buyer    → /buyer/dashboard
+//   supplier → /supplier/dashboard  (they've already set up profile)
+//   new supplier → /supplier        (profile form first, then dashboard)
 // =============================================================================
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { createSupabaseClient } from '@/utils/supabase';
@@ -16,12 +26,57 @@ import VsmeLogo from '@/components/VsmeLogo';
 
 export default function OnboardingPage() {
   const { user } = useUser();
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
   const router = useRouter();
-  const [selected, setSelected] = useState<'buyer' | 'supplier' | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
+  const [selected, setSelected]       = useState<'buyer' | 'supplier' | null>(null);
+  const [saving,   setSaving]         = useState(false);
+  const [checking, setChecking]       = useState(true); // true while we check existing role
+  const [error,    setError]          = useState<string | null>(null);
+
+  // ── On mount: check if user already has a role ──────────────────────────
+  // Returning users who land here (e.g. after sign-in forceRedirect to a
+  // protected route that bounced them here) should be sent straight to their
+  // dashboard without seeing the picker again.
+  useEffect(() => {
+    if (!userId) return;
+
+    (async () => {
+      try {
+        const token = await getToken({ template: 'supabase' });
+        if (!token) { setChecking(false); return; }
+
+        const supabase = createSupabaseClient(token);
+        const { data } = await supabase
+          .from('profiles')
+          .select('role, company_name')
+          .eq('id', userId)
+          .maybeSingle();
+
+        if (data?.role === 'buyer') {
+          router.replace('/buyer/dashboard');
+          return;
+        }
+        if (data?.role === 'supplier') {
+          // Returning supplier with profile → dashboard
+          // New supplier with no name yet → profile form
+          if (data.company_name && data.company_name.trim().length > 1) {
+            router.replace('/supplier/dashboard');
+          } else {
+            router.replace('/supplier');
+          }
+          return;
+        }
+
+        // No role yet — show the picker
+        setChecking(false);
+      } catch {
+        setChecking(false);
+      }
+    })();
+  }, [userId, getToken, router]);
+
+  // ── Save role and redirect ───────────────────────────────────────────────
   async function handleContinue() {
     if (!selected || !user) return;
     setSaving(true);
@@ -33,7 +88,6 @@ export default function OnboardingPage() {
 
       const supabase = createSupabaseClient(token);
 
-      // Save role to profiles table
       const { error: dbError } = await supabase
         .from('profiles')
         .upsert({
@@ -44,10 +98,10 @@ export default function OnboardingPage() {
 
       if (dbError) throw new Error(dbError.message);
 
-      // Redirect based on role
       if (selected === 'buyer') {
         router.push('/buyer/dashboard');
       } else {
+        // New supplier → profile form first (no profile yet)
         router.push('/supplier');
       }
     } catch (err: any) {
@@ -56,8 +110,17 @@ export default function OnboardingPage() {
     }
   }
 
+  // Show nothing while checking existing role (avoids flash of picker)
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
+        <Loader2 size={24} className="animate-spin text-[#0C2918]" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center px-4">
 
       {/* Logo */}
       <div className="mb-10">
