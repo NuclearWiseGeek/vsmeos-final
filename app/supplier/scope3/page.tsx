@@ -254,7 +254,7 @@ export default function Scope3() {
           <NumberInput
             label="Remote Working Days"
             unit="Days"
-            helpText={`How to find this number: Total number of days ALL employees worked from home during FY ${companyData.year}. Formula: (Number of employees who WFH) × (average WFH days per week) × (weeks in the year). 💡 Example: 10 employees each working from home 2 days/week for 48 weeks = 10 × 2 × 48 = 960 days. Remote working has a carbon cost (home heating/electricity) of 2.84 kgCO₂e per day (DEFRA 2024), but usually much less than commuting. This data also helps reduce your commuting total if you do a detailed calculation.`}
+            helpText={`How to find this number: Total number of days ALL employees worked from home during FY ${companyData.year}. Formula: (Number of employees who WFH) × (average WFH days per week) × (weeks in the year). 💡 Example: 10 employees each working from home 2 days/week for 48 weeks = 10 × 2 × 48 = 960 days. Remote working has a carbon cost (home heating/electricity) of 2.67 kgCO₂e per day (DEFRA 2025), but usually much less than commuting. This data also helps reduce your commuting total if you do a detailed calculation.`}
             value={activityData['remote_working'] || 0}
             onChange={(v) => updateActivity('remote_working', v)}
           />

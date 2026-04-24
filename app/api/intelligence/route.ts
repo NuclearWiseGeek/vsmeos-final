@@ -218,6 +218,28 @@ Return this exact JSON structure:
 
 // =============================================================================
 // ROUTE HANDLER
+//
+// CACHE CONTRACT (applies to both modes):
+//   1. Cache is checked FIRST using a deterministic key.
+//   2. If a cached result exists AND body.force !== true → return cached, free.
+//   3. Otherwise → call Claude → write result to cache → return fresh.
+//   4. Every response includes a `cached` boolean so the UI can signal to users.
+//
+// CACHE KEYS (must stay in sync with actions/dashboard.ts):
+//   benchmark       : `{industry}__{country}__{year}`
+//   recommendations : `rec__{userId}__{year}`
+//
+// YEAR NORMALISATION:
+//   Year is normalised to a number at the top of the handler. If missing,
+//   we default to the current calendar year. This guarantees the cache key
+//   produced when writing matches the cache key the dashboard uses when
+//   reading — regardless of whether the caller sent a year or not.
+//
+// COST CONTROL:
+//   - Initial generation on the results page: 1 Claude call (pays once).
+//   - Every subsequent dashboard load: 0 Claude calls (cache hits).
+//   - Explicit "Refresh" click from dashboard: 1 Claude call (user-initiated).
+//   - Next reporting year: fresh cache key → 1 Claude call automatically.
 // =============================================================================
 
 export async function POST(request: Request) {
@@ -238,6 +260,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'mode must be "benchmark" or "recommendations"' }, { status: 400 });
   }
 
+  // ── Normalise year + force flag for both modes ───────────────────────────
+  // Year is coerced to a number so cache keys are deterministic regardless of
+  // whether the caller sent "2024" (string) or 2024 (integer). Defaults to
+  // the current calendar year if missing.
+  const year  = Number(body.year) || new Date().getFullYear();
+  const force = body.force === true;
+
   // ── BENCHMARK MODE ────────────────────────────────────────────────────────
   if (mode === 'benchmark') {
     const { industry, country, yourIntensity } = body;
@@ -245,30 +274,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields for benchmark' }, { status: 400 });
     }
 
-    const cacheKey = `${industry}__${country}__${body.year || 'current'}`;
+    const cacheKey = `${industry}__${country}__${year}`;
 
     try {
-      // Check cache first
       const supabase = adminSupabase();
-      const { data: cached } = await supabase
-        .from('intelligence_cache')
-        .select('result')
-        .eq('cache_key', cacheKey)
-        .eq('mode', 'benchmark')
-        .maybeSingle();
 
-      if (cached?.result) {
-        return NextResponse.json({
-          ...cached.result,
-          yourIntensity: Number(yourIntensity),
-          cached: true,
-        });
+      // 1. Check cache unless caller explicitly requested a fresh result
+      if (!force) {
+        const { data: cached } = await supabase
+          .from('intelligence_cache')
+          .select('result')
+          .eq('cache_key', cacheKey)
+          .eq('mode', 'benchmark')
+          .maybeSingle();
+
+        if (cached?.result) {
+          return NextResponse.json({
+            ...cached.result,
+            yourIntensity: Number(yourIntensity),
+            cached: true,
+          });
+        }
       }
 
-      // No cache — call Claude
-      const result = await getBenchmark(body);
+      // 2. Cache miss OR force=true → call Claude
+      const result = await getBenchmark({ ...body, year });
 
-      // Store in cache
+      // 3. Persist
       await supabase.from('intelligence_cache').upsert({
         cache_key:  cacheKey,
         mode:       'benchmark',
@@ -291,27 +323,51 @@ export async function POST(request: Request) {
 
   // ── RECOMMENDATIONS MODE ──────────────────────────────────────────────────
   if (mode === 'recommendations') {
-    const required = ['industry', 'country', 'year', 'scope1Kg', 'scope2Kg', 'scope3Kg', 'totalKg', 'topSources'];
+    const required = ['industry', 'country', 'scope1Kg', 'scope2Kg', 'scope3Kg', 'totalKg', 'topSources'];
     for (const field of required) {
       if (body[field] === undefined) {
         return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 });
       }
     }
 
-    try {
-      const result = await getRecommendations(body);
+    const cacheKey = `rec__${userId}__${year}`;
 
-      // Cache per (userId, year)
+    try {
       const supabase = adminSupabase();
+
+      // 1. Check cache unless caller explicitly requested a fresh result
+      if (!force) {
+        const { data: cached } = await supabase
+          .from('intelligence_cache')
+          .select('result')
+          .eq('cache_key', cacheKey)
+          .eq('mode', 'recommendations')
+          .maybeSingle();
+
+        if (cached?.result) {
+          return NextResponse.json({
+            ...cached.result,
+            cached: true,
+          });
+        }
+      }
+
+      // 2. Cache miss OR force=true → call Claude
+      const result = await getRecommendations({ ...body, year });
+
+      // 3. Persist
       await supabase.from('intelligence_cache').upsert({
-        cache_key:  `rec__${userId}__${body.year}`,
+        cache_key:  cacheKey,
         mode:       'recommendations',
         result,
         created_by: userId,
         created_at: new Date().toISOString(),
       }, { onConflict: 'cache_key, mode' });
 
-      return NextResponse.json(result);
+      return NextResponse.json({
+        ...result,
+        cached: false,
+      });
 
     } catch (err: any) {
       console.error('[Intelligence API] Recommendations error:', err);

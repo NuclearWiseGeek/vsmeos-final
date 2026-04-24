@@ -30,7 +30,7 @@ const FAQS = [
   },
   {
     q: 'My company is based outside France. Does it still work?',
-    a: 'Yes. VSME OS uses country-specific emission factors for 60+ countries. A UK supplier\'s electricity is calculated using DEFRA 2025 factors (0.196 kgCO₂e/kWh). A German supplier uses UBA 2023 (0.380 kgCO₂e/kWh). Your country is selected on the profile page and drives the correct factors throughout.'
+    a: 'Yes. VSME OS uses country-specific emission factors for 60+ countries. A UK supplier\'s electricity is calculated using DEFRA 2025 factors (0.196 kgCO₂e/kWh). A German supplier uses UBA 2024 (0.364 kgCO₂e/kWh). Your country is selected on the profile page and drives the correct factors throughout.'
   },
 ];
 
@@ -125,7 +125,7 @@ export default function LandingPage() {
                 <Link href="/buyer/dashboard" className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#C9A84C]/60 hover:text-[#C9A84C] border border-[#C9A84C]/20 hover:border-[#C9A84C]/50 px-4 py-2 rounded-lg transition-all">
                   Buyer Dashboard
                 </Link>
-                <Link href="/supplier" className="text-[11px] font-bold uppercase tracking-[0.15em] bg-[#C9A84C] text-[#0C2918] hover:bg-[#DFC06A] px-4 py-2 rounded-lg transition-all">
+                <Link href="/supplier/dashboard" className="text-[11px] font-bold uppercase tracking-[0.15em] bg-[#C9A84C] text-[#0C2918] hover:bg-[#DFC06A] px-4 py-2 rounded-lg transition-all">
                   Supplier Portal
                 </Link>
               </SignedIn>
@@ -153,7 +153,7 @@ export default function LandingPage() {
               <Link href="/buyer/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]/60">
                 Buyer Dashboard
               </Link>
-              <Link href="/supplier" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]">
+              <Link href="/supplier/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-xs font-bold uppercase tracking-widest text-[#C9A84C]">
                 Supplier Portal
               </Link>
             </SignedIn>
@@ -232,7 +232,7 @@ export default function LandingPage() {
                   Buyer Dashboard
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link href="/supplier" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-white text-gray-900 border border-gray-200 rounded-2xl text-base md:text-lg font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
+                <Link href="/supplier/dashboard" className="group w-full sm:w-auto px-8 py-4 md:px-10 md:py-5 bg-white text-gray-900 border border-gray-200 rounded-2xl text-base md:text-lg font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
                   Supplier Portal
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-gray-400" />
                 </Link>

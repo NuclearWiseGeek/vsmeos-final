@@ -141,7 +141,7 @@ export default function MethodologyPage() {
                 </thead>
                 <tbody>
                   {[
-                    { country: 'France',         db: 'ADEME Base Carbone 2024',           factor: '0.052',  updated: '2024 Q1' },
+                    { country: 'France',         db: 'ADEME Base Carbone V23.6 (2025)',   factor: '0.052',  updated: '2024 Q1' },
                     { country: 'United Kingdom', db: 'DEFRA 2025 / National Grid ESO',    factor: '0.196',  updated: '2025 Q2' },
                     { country: 'Germany',        db: 'Umweltbundesamt (UBA) 2024',        factor: '0.364',  updated: '2025 Q1' },
                     { country: 'Spain',          db: 'Red Eléctrica (REE) / EMBER 2024',  factor: '0.108',  updated: '2025 Q1' },
@@ -150,7 +150,7 @@ export default function MethodologyPage() {
                     { country: 'Belgium',        db: 'CREG Belgium / IEA 2024',           factor: '0.144',  updated: '2025 Q1' },
                     { country: 'Sweden',         db: 'Energimyndigheten (SEA) 2023',      factor: '0.041',  updated: '2024 Q1' },
                     { country: 'Poland',         db: 'URE Poland / IEA 2024',              factor: '0.695',  updated: '2025 Q1' },
-                    { country: 'USA',            db: 'US EPA eGRID2023 (Jan 2025)',       factor: '0.352',  updated: '2026 Q1' },
+                    { country: 'USA',            db: 'US EPA eGRID2023 (Jan 2025)',       factor: '0.350',  updated: '2026 Q1' },
                     { country: 'Canada',         db: 'ECCC NIR 2023',                     factor: '0.130',  updated: '2024 Q1' },
                     { country: 'Australia',      db: 'Australian NGA 2024 / Clean Energy Regulator', factor: '0.610',  updated: '2025 Q1' },
                     { country: 'South Africa',   db: 'DFFE / Eskom 2022',                 factor: '0.928',  updated: '2023 Q4' },
@@ -188,20 +188,20 @@ export default function MethodologyPage() {
 
             <SubSection title="3.1 Stationary Combustion (Fuels for heating/energy)">
               <FactorTable rows={[
-                { source: 'Natural Gas',    unit: 'kWh',    factor: '0.244',  db: 'ADEME Base Carbone 2024', notes: 'Full lifecycle (combustion 0.205 + upstream 0.039). Conservative approach per GHG Protocol.' },
-                { source: 'Heating Oil',    unit: 'litres', factor: '3.200',  db: 'ADEME Base Carbone 2024', notes: 'Full lifecycle. Gas oil / fuel oil.' },
-                { source: 'Propane / LPG',  unit: 'litres', factor: '1.510',  db: 'ADEME Base Carbone 2024', notes: 'Full lifecycle. Liquefied petroleum gas.' },
+                { source: 'Natural Gas',    unit: 'kWh',    factor: '0.244',  db: 'ADEME Base Carbone V23.6 (2025)', notes: 'Full lifecycle (combustion 0.205 + upstream 0.039). Conservative approach per GHG Protocol.' },
+                { source: 'Heating Oil',    unit: 'litres', factor: '3.200',  db: 'ADEME Base Carbone V23.6 (2025)', notes: 'Full lifecycle. Gas oil / fuel oil.' },
+                { source: 'Propane / LPG',  unit: 'litres', factor: '1.510',  db: 'ADEME Base Carbone V23.6 (2025)', notes: 'Full lifecycle. Liquefied petroleum gas.' },
               ]} />
               <p className="text-xs text-gray-500 mt-2">
-                All fuel factors use ADEME Base Carbone 2024 full lifecycle methodology, which includes combustion CO₂, CH₄, N₂O (IPCC AR5 GWP100) plus upstream extraction and transport emissions. This is more conservative than DEFRA combustion-only Scope 1 factors and is the standard approach in French/EU GHG accounting.
+                All fuel factors use ADEME Base Carbone V23.6 (2025) full lifecycle methodology, which includes combustion CO₂, CH₄, N₂O (IPCC AR5 GWP100) plus upstream extraction and transport emissions. This is more conservative than DEFRA combustion-only Scope 1 factors and is the standard approach in French/EU GHG accounting.
               </p>
             </SubSection>
 
             <SubSection title="3.2 Mobile Combustion (Company-owned vehicles)">
               <p>Covers fuel used in vehicles owned or leased by the company (fleet vehicles). Employee personal vehicles reimbursed per km are reported in Scope 3.</p>
               <FactorTable rows={[
-                { source: 'Diesel (fleet)',    unit: 'litres', factor: '3.160', db: 'ADEME Base Carbone 2024', notes: 'Full lifecycle incl. upstream extraction and transport.' },
-                { source: 'Petrol / Gasoline', unit: 'litres', factor: '2.800', db: 'ADEME Base Carbone 2024', notes: 'Full lifecycle incl. upstream extraction and transport.' },
+                { source: 'Diesel (fleet)',    unit: 'litres', factor: '3.160', db: 'ADEME Base Carbone V23.6 (2025)', notes: 'Full lifecycle incl. upstream extraction and transport.' },
+                { source: 'Petrol / Gasoline', unit: 'litres', factor: '2.800', db: 'ADEME Base Carbone V23.6 (2025)', notes: 'Full lifecycle incl. upstream extraction and transport.' },
               ]} />
             </SubSection>
 
@@ -333,7 +333,7 @@ export default function MethodologyPage() {
                 between their home and their regular workplace. VSME OS covers two sub-categories:
               </p>
               <FactorTable rows={[
-                { source: 'Employee Commuting',  unit: 'km/year (all employees)',  factor: '0.138', db: 'DEFRA 2025 / ADEME 2024', notes: 'Average mixed-mode commute. Total annual km across all commuting employees.' },
+                { source: 'Employee Commuting',  unit: 'km/year (all employees)',  factor: '0.138', db: 'DEFRA 2025', notes: 'Average mixed-mode commute. Total annual km across all commuting employees.' },
                 { source: 'Remote Working Days', unit: 'WFH days/year (all staff)', factor: '2.670', db: 'DEFRA 2025', notes: 'kgCO₂e per WFH day (0.334 kgCO₂e/hr × 8hr day). Covers home heating and device energy. Reduced from 2024 (2.84) due to cleaner UK grid.' },
               ]} />
               <div className="bg-gray-50 border border-gray-100 rounded-lg p-3 mt-3">
@@ -459,8 +459,8 @@ export default function MethodologyPage() {
             </p>
             <div className="mt-4 space-y-3">
               {[
-                { db: 'DEFRA UK (2025)', cycle: 'Released June 2025',            sources: 'Used for: UK electricity grid (0.196 combined), flights (major revision), grey fleet, commuting. Next: DEFRA 2026 expected June 2026.' },
-                { db: 'ADEME Base Carbone 2024', cycle: 'Updated July 2025 (v23.6)', sources: 'Used for: All Scope 1 fuel combustion factors (full lifecycle), French electricity, remote working factor.' },
+                { db: 'DEFRA UK (2025)', cycle: 'Released June 2025',            sources: 'Used for: UK electricity grid (0.196 combined), flights (major revision), grey fleet, commuting, remote working factor. Next: DEFRA 2026 expected June 2026.' },
+                { db: 'ADEME Base Carbone V23.6', cycle: 'Released July 2025', sources: 'Used for: All Scope 1 fuel combustion factors (full lifecycle), French electricity grid factor.' },
                 { db: 'IEA / EMBER',     cycle: 'Annual, typically Q2',          sources: 'Used for: 40+ country grid factors where no national database is available' },
                 { db: 'IPCC AR5 GWP100', cycle: 'Published 2013, stable',        sources: 'Used for: All refrigerant GWP values' },
                 { db: 'Cornell/Greenview CHSB 2024', cycle: 'Annual',                        sources: 'Used for: Hotel night emission factor (conservative global estimate)' },

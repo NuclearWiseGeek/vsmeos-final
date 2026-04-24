@@ -13,6 +13,11 @@ import { Inter } from 'next/font/google';
 import PageTransition from '@/components/PageTransition';
 import './globals.css';
 
+// Every page uses Clerk auth (ClerkProvider wraps root layout).
+// Disable static prerendering — Clerk requires CLERK_PUBLISHABLE_KEY at runtime,
+// which isn't available during `next build`. All pages render at request time.
+export const dynamic = 'force-dynamic';
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -46,7 +51,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <html lang="en" suppressHydrationWarning className={inter.variable} data-scroll-behavior="smooth">
         <body className="antialiased font-inter">
           <PageTransition>
             {children}

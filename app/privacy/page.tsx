@@ -20,7 +20,7 @@ import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, Shield } from 'lucide-react';
 
-const LAST_UPDATED  = '22 March 2026';
+const LAST_UPDATED  = '21 April 2026';
 const CONTACT_EMAIL = 'privacy@vsmeos.fr';
 // NOTE: Update to 'VSME OS SAS' + add SIRET once incorporation is complete
 const COMPANY_NAME  = 'VSME OS';
@@ -41,6 +41,7 @@ export default function PrivacyPage() {
             <span className="text-[10px] font-bold text-[#C9A84C] uppercase tracking-widest">GDPR Compliant</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-3">Privacy Policy</h1>
+          <p className="text-xs text-gray-400 mb-4">Last updated: {LAST_UPDATED}</p>
           <p className="text-gray-500 text-lg leading-relaxed">
             What data {COMPANY_NAME} collects when you use VSME OS, how we use it,
             and your rights under the GDPR.
@@ -56,6 +57,13 @@ export default function PrivacyPage() {
               For privacy enquiries contact{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="text-blue-600 hover:underline">{CONTACT_EMAIL}</a>.
               Our supervisory authority is the <strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés).
+            </p>
+            <p className="text-xs text-gray-500 italic mt-3">
+              Note: {COMPANY_NAME} is currently pre-incorporation. This Privacy Policy
+              will be updated to reference the registered legal entity (with SIRET number)
+              immediately following incorporation. In the meantime, all GDPR obligations
+              under this Policy are binding; data subject requests are actioned under the
+              same Article 12 timelines described below.
             </p>
           </Section>
 
@@ -73,10 +81,7 @@ export default function PrivacyPage() {
             <SubSection title="2.4 Evidence Files">
               <p>PDFs, images, spreadsheets uploaded to the Evidence Vault (utility invoices, maintenance logs, etc.). Stored in encrypted EU-based storage. <strong>Legal basis:</strong> Contract — supports audit verification.</p>
             </SubSection>
-            <SubSection title="2.5 Payment Data (via Stripe)">
-              <p>Billing name, address, card last 4 digits, transaction history. Full card details are never stored by VSME OS — Stripe is PCI DSS Level 1 certified. <strong>Legal basis:</strong> Contract — necessary to process subscription payments.</p>
-            </SubSection>
-            <SubSection title="2.6 Technical Data">
+            <SubSection title="2.5 Technical Data">
               <p>Browser type, device type, IP address (90 days, security only), anonymised page analytics. <strong>Legal basis:</strong> Legitimate interest (security and service improvement).</p>
             </SubSection>
           </Section>
@@ -95,11 +100,11 @@ export default function PrivacyPage() {
                 </thead>
                 <tbody>
                   {[
-                    { s: 'Clerk',    p: 'Authentication',    d: 'Name, email, tokens',          l: 'EU/USA (SCCs)' },
-                    { s: 'Supabase', p: 'Database & storage', d: 'All assessment data & files',  l: 'EU (Frankfurt)' },
-                    { s: 'Resend',   p: 'Transactional email', d: 'Email, invite content',        l: 'EU/USA (SCCs)' },
-                    { s: 'Stripe',   p: 'Payments',          d: 'Billing name, address, history', l: 'EU/USA (SCCs)' },
-                    { s: 'Vercel',   p: 'App hosting',       d: 'Request logs',                  l: 'EU (Frankfurt)' },
+                    { s: 'Clerk',     p: 'Authentication',     d: 'Name, email, tokens',                                            l: 'EU/USA (SCCs)' },
+                    { s: 'Supabase',  p: 'Database & storage', d: 'All assessment data & files',                                    l: 'EU (Frankfurt)' },
+                    { s: 'Resend',    p: 'Transactional email', d: 'Email, invite content',                                          l: 'EU/USA (SCCs)' },
+                    { s: 'Anthropic', p: 'AI intelligence (VESQ3)', d: 'Anonymised emissions data: industry, country, scope totals, activity inputs', l: 'USA (SCCs)' },
+                    { s: 'Vercel',    p: 'App hosting',        d: 'Request logs',                                                   l: 'EU (Frankfurt)' },
                   ].map(({ s, p, d, l }) => (
                     <tr key={s} className="border-b border-gray-50 last:border-0">
                       <td className="px-4 py-3 font-medium text-gray-900">{s}</td>

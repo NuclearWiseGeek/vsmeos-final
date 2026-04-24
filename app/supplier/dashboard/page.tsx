@@ -12,7 +12,7 @@
 // DATA: Single call to getDashboardData() loads everything in parallel.
 //       No waterfalls, no individual useEffects per section.
 //
-// AI BRANDING: All Claude references show as "VERO" (configurable via AI_NAME).
+// AI BRANDING: All Claude references show as "VESQ3" (configurable via AI_NAME).
 //              Change AI_NAME constant to rename across the entire dashboard.
 //
 // BRAND: #0C2918 bg · #C9A84C text · #F5F5F7 page bg · zero emerald/green.
@@ -194,7 +194,7 @@ function BenchmarkCard({
 }: {
   data: Record<string, any> | null;
   industry: string; country: string;
-  intensity: number; onRefresh: () => void; refreshing: boolean;
+  intensity: number; onRefresh: (force: boolean) => void; refreshing: boolean;
 }) {
   const [showDetail, setShowDetail] = useState(false);
 
@@ -234,7 +234,7 @@ function BenchmarkCard({
               {AI_NAME} will analyse your position vs {industry} peers in {country} — country-specific, citing the right national authority.
             </p>
             <button
-              onClick={onRefresh}
+              onClick={() => onRefresh(false)}
               disabled={refreshing}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0C2918] text-[#C9A84C] rounded-xl text-[11px] font-bold hover:bg-[#122F1E] transition-colors disabled:opacity-50"
             >
@@ -298,7 +298,7 @@ function BenchmarkCard({
             )}
 
             <button
-              onClick={onRefresh}
+              onClick={() => onRefresh(true)}
               disabled={refreshing}
               className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 rounded-xl text-[11px] font-bold text-gray-700 hover:border-[#0C2918] hover:text-[#0C2918] transition-colors disabled:opacity-50"
             >
@@ -317,7 +317,7 @@ function BenchmarkCard({
 function RecommendationsCard({
   data, onRefresh, refreshing,
 }: {
-  data: Record<string, any> | null; onRefresh: () => void; refreshing: boolean;
+  data: Record<string, any> | null; onRefresh: (force: boolean) => void; refreshing: boolean;
 }) {
   const DIFF = {
     low:    { label: 'Quick win',  cls: 'bg-[#e8f5ee] text-[#1a7a45]' },
@@ -346,7 +346,7 @@ function RecommendationsCard({
               {AI_NAME} will give you 3 specific, quantified reduction actions based on your actual scope breakdown and country.
             </p>
             <button
-              onClick={onRefresh}
+              onClick={() => onRefresh(false)}
               disabled={refreshing}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0C2918] text-[#C9A84C] rounded-xl text-[11px] font-bold hover:bg-[#122F1E] transition-colors disabled:opacity-50"
             >
@@ -409,7 +409,7 @@ function RecommendationsCard({
             ))}
 
             <button
-              onClick={onRefresh}
+              onClick={() => onRefresh(true)}
               disabled={refreshing}
               className="w-full flex items-center justify-center gap-2 mt-4 py-2.5 border border-gray-200 rounded-xl text-[11px] font-bold text-gray-700 hover:border-[#0C2918] hover:text-[#0C2918] transition-colors disabled:opacity-50"
             >
@@ -442,7 +442,9 @@ export default function SupplierDashboard() {
   }, []);
 
   // ── Intelligence refresh handlers ─────────────────────────────────────────
-  const refreshBenchmark = useCallback(async () => {
+  // force=false → cache-first (free if cached, 1 Claude call if cache miss)
+  // force=true  → always calls Claude (user-initiated paid refresh)
+  const refreshBenchmark = useCallback(async (force: boolean) => {
     if (!data?.profile || refreshingBm) return;
     setRefreshingBm(true);
 
@@ -450,16 +452,21 @@ export default function SupplierDashboard() {
     if (!latest) { setRefreshingBm(false); return; }
 
     const intensity = latest.emissions_totals?.intensity || 0;
+    const cf        = getCountryFactors(data.profile.country || 'France');
 
     try {
       const res = await fetch('/api/intelligence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode:          'benchmark',
-          industry:      data.profile.industry || 'Other',
-          country:       data.profile.country  || 'France',
-          yourIntensity: intensity,
+          mode:              'benchmark',
+          industry:          data.profile.industry || 'Other',
+          country:           data.profile.country  || 'France',
+          year:              latest.year,
+          yourIntensity:     intensity,
+          gridFactor:        cf.electricityGrid,
+          primaryCalculator: cf.primaryCalculator,
+          force,
         }),
       });
       if (res.ok) {
@@ -471,7 +478,7 @@ export default function SupplierDashboard() {
     setRefreshingBm(false);
   }, [data, refreshingBm]);
 
-  const refreshRecommendations = useCallback(async () => {
+  const refreshRecommendations = useCallback(async (force: boolean) => {
     if (!data?.profile || refreshingRec) return;
     setRefreshingRec(true);
 
@@ -506,6 +513,7 @@ export default function SupplierDashboard() {
           activityData:           latest.activity_data || {},
           gridFactor:             cf.electricityGrid,
           primaryCalculator:      cf.primaryCalculator,
+          force,
         }),
       });
       if (res.ok) {
@@ -643,7 +651,7 @@ export default function SupplierDashboard() {
           <p className="text-[14px] font-bold text-[#0C2918] mb-1">No submitted report yet</p>
           <p className="text-[12px] text-gray-500 mb-4">Complete your first GHG declaration to unlock your full dashboard.</p>
           <Link
-            href="/supplier"
+            href="/supplier?new=true"
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0C2918] text-[#C9A84C] rounded-xl text-[12px] font-bold hover:bg-[#122F1E] transition-colors"
           >
             Start your first declaration <ArrowRight size={13} />
@@ -738,7 +746,7 @@ export default function SupplierDashboard() {
               <div className="text-center py-4">
                 <p className="text-[11px] text-gray-400 mb-3">No declarations yet</p>
                 <Link
-                  href="/supplier"
+                  href="/supplier?new=true"
                   className="inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-2 bg-[#0C2918] text-[#C9A84C] rounded-lg"
                 >
                   Start first report

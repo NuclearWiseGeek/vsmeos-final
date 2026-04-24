@@ -1,16 +1,12 @@
 'use client';
 
-// Prevents all pages in /buyer/dashboard/* from being statically prerendered.
-// These pages use Clerk auth (UserButton, usePathname with auth) and live
-// Supabase data — they must always render at request time.
-export const dynamic = 'force-dynamic';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Users, Settings, LogOut, Menu, X } from 'lucide-react';
 import VsmeLogo from '@/components/VsmeLogo';
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, SignOutButton } from "@clerk/nextjs";
 
 export default function BuyerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -59,10 +55,12 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
           <NavLinks />
         </nav>
         <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-500 hover:text-red-600 transition-colors cursor-pointer">
-            <LogOut size={16} />
-            <span>Sign Out</span>
-          </div>
+          <SignOutButton redirectUrl="/">
+            <button className="flex items-center gap-3 px-3 py-2 text-sm text-gray-500 hover:text-red-600 transition-colors cursor-pointer w-full">
+              <LogOut size={16} />
+              <span>Sign Out</span>
+            </button>
+          </SignOutButton>
         </div>
       </aside>
 
@@ -92,10 +90,12 @@ export default function BuyerLayout({ children }: { children: React.ReactNode })
               <NavLinks />
             </nav>
             <div className="p-4 border-t border-gray-200">
-              <div className="flex items-center gap-3 px-3 py-2 text-sm text-gray-500">
-                <LogOut size={16} />
-                <span>Sign Out</span>
-              </div>
+              <SignOutButton redirectUrl="/">
+                <button className="flex items-center gap-3 px-3 py-2 text-sm text-gray-500 hover:text-red-600 transition-colors cursor-pointer w-full">
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
+              </SignOutButton>
             </div>
           </aside>
         </div>

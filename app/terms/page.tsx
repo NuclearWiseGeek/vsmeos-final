@@ -26,7 +26,7 @@ import Link from 'next/link';
 import SharedNav from '@/components/SharedNav';
 import { ArrowLeft, FileText } from 'lucide-react';
 
-const LAST_UPDATED  = '22 March 2026';
+const LAST_UPDATED  = '21 April 2026';
 const CONTACT_EMAIL = 'legal@vsmeos.fr';
 // NOTE: Update to 'VSME OS SAS' + add SIRET once incorporation is complete
 const COMPANY_NAME  = 'VSME OS';
@@ -45,6 +45,7 @@ export default function TermsPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-3">
             Terms of Service
           </h1>
+          <p className="text-xs text-gray-400 mb-4">Last updated: {LAST_UPDATED}</p>
           <p className="text-gray-500 text-lg leading-relaxed">
             Please read these terms carefully before using VSME OS. By creating an account
             or using the service, you agree to be bound by these terms.
@@ -69,6 +70,12 @@ export default function TermsPage() {
             </p>
             <p>
               If you do not agree to these Terms, you may not access or use the Service.
+            </p>
+            <p className="text-xs text-gray-500 italic mt-3">
+              Note: {COMPANY_NAME} is currently pre-incorporation. These Terms will be amended
+              to reference the registered legal entity (with SIRET number) immediately following
+              incorporation, with reasonable advance notice to active users. All obligations in
+              these Terms remain binding in the interim.
             </p>
           </Section>
 
@@ -132,63 +139,24 @@ export default function TermsPage() {
             </SubSection>
           </Section>
 
-          {/* 4. Subscription & Payment */}
-          <Section title="4. Subscription and Payment">
-            <SubSection title="4.1 Plans">
-              <p>
-                VSME OS offers the following subscription tiers (prices subject to change
-                with 30 days' notice to existing subscribers):
-              </p>
-              <div className="mt-3 rounded-xl border border-gray-100 overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      {['Plan', 'Price', 'What\'s Included'].map(h => (
-                        <th key={h} className="text-left px-4 py-2.5 text-xs font-bold text-gray-500 border-b border-gray-100">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { plan: 'Single Report',  price: '€199 one-time', includes: '1 PDF carbon declaration, 1 reporting year, all scopes' },
-                      { plan: 'Annual (Solo)',  price: '€349 / year',   includes: 'Unlimited reports, all years, 1 user' },
-                      { plan: 'Team',           price: '€799 / year',   includes: 'Unlimited reports, all years, up to 5 users' },
-                      { plan: 'Buyer Portal',   price: 'Free',          includes: 'Supplier invitations, dashboard, status tracking' },
-                    ].map(({ plan, price, includes }) => (
-                      <tr key={plan} className="border-b border-gray-50 last:border-0">
-                        <td className="px-4 py-3 font-medium">{plan}</td>
-                        <td className="px-4 py-3 text-gray-600">{price}</td>
-                        <td className="px-4 py-3 text-gray-500 text-xs">{includes}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </SubSection>
-            <SubSection title="4.2 Billing">
-              <p>
-                Payments are processed by <strong>Stripe</strong>, a PCI DSS Level 1 certified
-                payment processor. Annual subscriptions are billed in advance and auto-renew
-                unless cancelled at least 48 hours before the renewal date. All prices are
-                exclusive of VAT, which will be added where applicable under EU VAT rules.
-              </p>
-            </SubSection>
-            <SubSection title="4.3 Refunds">
-              <p>
-                Single Report purchases are non-refundable once the PDF has been generated and
-                downloaded. Annual subscriptions may be cancelled within 14 days of purchase for
-                a full refund under EU consumer protection law (right of withdrawal), provided
-                no report has been generated. After 14 days or after report generation,
-                subscriptions are non-refundable.
-              </p>
-            </SubSection>
-            <SubSection title="4.4 Late Payment">
-              <p>
-                Failed payments will result in suspension of PDF generation capabilities.
-                Access to previously generated reports and saved data is maintained for
-                30 days after payment failure to allow account recovery.
-              </p>
-            </SubSection>
+          {/* 4. Subscription & Payment — inactive until Phase 2 launches */}
+          <Section title="4. Pricing and Payment (Not Currently Active)">
+            <p>
+              The Service is currently offered free of charge. Paid subscription plans —
+              including billing, refunds, and payment processing — will be introduced in a
+              future release of VSME OS.
+            </p>
+            <p>
+              When paid plans launch, users will be notified by email and in-app notice
+              at least 30 days in advance, and these Terms will be amended to include the
+              applicable pricing, billing terms, and consumer protection rights under EU
+              and French law (including the 14-day right of withdrawal for annual
+              subscriptions).
+            </p>
+            <p>
+              Until paid plans are introduced, no clauses in this Section 4 apply, and no
+              payment obligations arise from your use of the Service.
+            </p>
           </Section>
 
           {/* 5. IP */}
@@ -270,10 +238,11 @@ export default function TermsPage() {
           <Section title="8. Termination">
             <SubSection title="8.1 By You">
               <p>
-                You may cancel your subscription at any time from the account settings page.
-                Cancellation takes effect at the end of the current billing period. Your data
-                is retained for 90 days after cancellation, during which you may request
-                export of your assessment data and reports.
+                You may close your account at any time from the account settings page.
+                Your data is retained for 90 days after closure, during which you may
+                request export of your assessment data and reports. If paid subscription
+                plans are active at the time of closure, cancellation takes effect at the
+                end of the current billing period in accordance with Section 4.
               </p>
             </SubSection>
             <SubSection title="8.2 By VSME OS">

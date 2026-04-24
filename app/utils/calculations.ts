@@ -10,7 +10,7 @@
 //   - When adding a new country to the database
 //
 // DATA SOURCES:
-//   - Scope 1 Fuels:        ADEME Base Carbone 2024 (full lifecycle, incl. upstream)
+//   - Scope 1 Fuels:        ADEME Base Carbone V23.6 (July 2025, full lifecycle incl. upstream)
 //   - Scope 1 Refrigerants: IPCC AR5 GWP100 (legally required standard)
 //   - Scope 2 Electricity:  IEA 2025 / EMBER 2024 (country-specific) / EPA eGRID2023 (USA)
 //   - Scope 2 Thermal:      Euroheat & Power 2023 / IEA
@@ -19,8 +19,11 @@
 //                           factor recovery. Updated June 2025. Previous 2024 factors were materially overstated.
 //   - Scope 3 Hotels:       Cornell/Greenview CHSB 2024 (conservative global estimate)
 //
-// LAST UPDATED: March 2026 — EPA eGRID2023 applied (US: 0.386→0.352, verified from Table 6). IEA 2025 world fallback applied (0.494→0.464).
-//                DEFRA 2025 applied (June 2025). Next update due Q2 2026 when DEFRA 2026 is released.
+// LAST UPDATED: April 2026 — Full audit against DEFRA 2025, ADEME Base Carbone V23.6 (July 2025),
+//                UBA 2024, REE/EMBER 2024, EPA eGRID2023 (Jan 2025), IEA 2025 provisional 2024.
+//                Notable 2026 audit changes: Spain grid 0.181→0.108, Sweden grid 0.013→0.041 (location-based),
+//                Remote working 2.84→2.67, IEA world fallback 0.464→0.445.
+//                Next review due Q2 2026 when DEFRA 2026 is released.
 // =============================================================================
 
 // =============================================================================
@@ -73,7 +76,7 @@ export interface CountryFactors {
 // =============================================================================
 // SECTION 2: UNIVERSAL SCOPE 1 FACTORS
 // Fuel chemistry is the same worldwide — these do NOT change by country.
-// Source: ADEME Base Carbone 2024 (full lifecycle / well-to-wheel methodology)
+// Source: ADEME Base Carbone V23.6 (July 2025, full lifecycle / well-to-wheel methodology)
 // NOTE: These factors include BOTH combustion AND upstream (extraction, transport,
 // processing) emissions. This is ADEME's methodology and is more complete than
 // DEFRA combustion-only Scope 1 factors (e.g. DEFRA nat gas combustion = 0.183
@@ -82,11 +85,11 @@ export interface CountryFactors {
 // =============================================================================
 
 const SCOPE1_FACTORS: Record<string, EmissionFactor> = {
-  natural_gas:  { key: "natural_gas",  value: 0.244,  unit: "kgCO2e/kWh", source: "ADEME Base Carbone 2024 (full lifecycle incl. upstream)", id: "GAS-NAT"   },
-  heating_oil:  { key: "heating_oil",  value: 3.2,    unit: "kgCO2e/L",   source: "ADEME Base Carbone 2024 (full lifecycle incl. upstream)", id: "OIL-HEAT"  },
-  propane:      { key: "propane",      value: 1.51,   unit: "kgCO2e/L",   source: "ADEME Base Carbone 2024 (full lifecycle incl. upstream)", id: "LPG-PROP"  },
-  diesel:       { key: "diesel",       value: 3.16,   unit: "kgCO2e/L",   source: "ADEME Base Carbone 2024 (full lifecycle incl. upstream)", id: "FUEL-DSL"  },
-  petrol:       { key: "petrol",       value: 2.80,   unit: "kgCO2e/L",   source: "ADEME Base Carbone 2024 (full lifecycle incl. upstream)", id: "FUEL-PET"  },
+  natural_gas:  { key: "natural_gas",  value: 0.244,  unit: "kgCO2e/kWh", source: "ADEME Base Carbone V23.6 (2025, full lifecycle incl. upstream)", id: "GAS-NAT"   },
+  heating_oil:  { key: "heating_oil",  value: 3.2,    unit: "kgCO2e/L",   source: "ADEME Base Carbone V23.6 (2025, full lifecycle incl. upstream)", id: "OIL-HEAT"  },
+  propane:      { key: "propane",      value: 1.51,   unit: "kgCO2e/L",   source: "ADEME Base Carbone V23.6 (2025, full lifecycle incl. upstream)", id: "LPG-PROP"  },
+  diesel:       { key: "diesel",       value: 3.16,   unit: "kgCO2e/L",   source: "ADEME Base Carbone V23.6 (2025, full lifecycle incl. upstream)", id: "FUEL-DSL"  },
+  petrol:       { key: "petrol",       value: 2.80,   unit: "kgCO2e/L",   source: "ADEME Base Carbone V23.6 (2025, full lifecycle incl. upstream)", id: "FUEL-PET"  },
   // Refrigerants: IPCC AR5 GWP100 — do NOT change to AR6 yet (not legally required)
   ref_R410A:    { key: "ref_R410A",    value: 2088,   unit: "kgCO2e/kg",  source: "IPCC AR5 GWP100 / EU F-Gas Reg.", id: "REF-R410A" },
   ref_R32:      { key: "ref_R32",      value: 675,    unit: "kgCO2e/kg",  source: "IPCC AR5 GWP100 / EU F-Gas Reg.", id: "REF-R32"   },
@@ -123,7 +126,7 @@ const SCOPE3_UNIVERSAL_FACTORS: Record<string, EmissionFactor> = {
 
 export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
   // EUROPE
-  "France":         { electricityGrid: 0.052, districtHeating: 0.110, districtCooling: 0.015, railTravel: 0.006, primaryCalculator: "ADEME Base Carbone 2024",                          methodologyNote: "Quantified using ADEME Base Carbone v2024. France's nuclear-dominated grid produces among the lowest electricity emissions in Europe (RTE 2023)." },
+  "France":         { electricityGrid: 0.052, districtHeating: 0.110, districtCooling: 0.015, railTravel: 0.006, primaryCalculator: "ADEME Base Carbone V23.6 (2025)",                        methodologyNote: "Quantified using ADEME Base Carbone V23.6 (July 2025). France's nuclear-dominated grid produces among the lowest electricity emissions in Europe (RTE 2024)." },
   "Germany":        { electricityGrid: 0.364, districtHeating: 0.145, districtCooling: 0.109, railTravel: 0.023, primaryCalculator: "Umweltbundesamt (UBA) 2024 / IEA",                  methodologyNote: "Quantified using UBA Germany emission factors. Grid intensity reflects ongoing coal phase-out transition." },
   "United Kingdom": { electricityGrid: 0.196, districtHeating: 0.142, districtCooling: 0.059, railTravel: 0.036, primaryCalculator: "DEFRA 2025 / National Grid ESO",                   methodologyNote: "Quantified using DEFRA 2025 UK Government GHG Conversion Factors (generation 0.177 + T&D 0.019 = 0.196 combined). 14.5% reduction from 2024 driven by reduced natural gas use and increased renewables." },
   "Spain":          { electricityGrid: 0.108, districtHeating: 0.085, districtCooling: 0.031, railTravel: 0.015, primaryCalculator: "Red Eléctrica (REE) / EMBER 2024",                     methodologyNote: "Quantified using Red Eléctrica de España (REE) 2024 generation data and EMBER 2024. Spain's grid reached a historic low in 2024: 76.8% of electricity generated was emission-free, driven by record solar and wind additions." },
@@ -157,7 +160,7 @@ export const COUNTRY_FACTORS: Record<string, CountryFactors> = {
   "Iceland":        { electricityGrid: 0.003, districtHeating: 0.015, districtCooling: 0.001, railTravel: 0.002, primaryCalculator: "Orkustofnun (OS) / IEA 2023",                      methodologyNote: "Quantified using Orkustofnun Iceland. Grid is almost entirely geothermal and hydro — one of the world's cleanest." },
 
   // NORTH AMERICA
-  "United States":  { electricityGrid: 0.352, districtHeating: 0.190, districtCooling: 0.110, railTravel: 0.103, primaryCalculator: "EPA eGRID2023 (Jan 2025, AR5 GWP)",                               methodologyNote: "Quantified using US EPA eGRID2023 national average emission factors for the US electrical grid (released January 2025, year 2023 data). US Average 771.5 lbCO2/MWh + CH4/N2O. Updated from eGRID2022 (0.386)." },
+  "United States":  { electricityGrid: 0.350, districtHeating: 0.190, districtCooling: 0.110, railTravel: 0.103, primaryCalculator: "EPA eGRID2023 (Jan 2025, AR5 GWP)",                               methodologyNote: "Quantified using US EPA eGRID2023 national average total output emission rate (released January 2025, revised June 2025, year 2023 data). US national rate 770.9 lbCO2e/MWh ≈ 0.350 kgCO2e/kWh (CO2 + CH4 + N2O via AR5 GWP100). Updated from eGRID2022 (0.386)." },
   "Canada":         { electricityGrid: 0.130, districtHeating: 0.110, districtCooling: 0.037, railTravel: 0.033, primaryCalculator: "Environment & Climate Change Canada (ECCC) 2023",  methodologyNote: "Quantified using ECCC 2023 National Inventory Report factors. Canada's grid benefits from significant hydro power." },
   "Mexico":         { electricityGrid: 0.454, districtHeating: 0.180, districtCooling: 0.130, railTravel: 0.075, primaryCalculator: "SEMARNAT Mexico / IEA 2023",                       methodologyNote: "Quantified using SEMARNAT Mexico and IEA 2023 emission factors." },
 

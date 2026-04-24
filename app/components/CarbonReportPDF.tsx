@@ -13,7 +13,7 @@
 // KEY DESIGN PRINCIPLE — DYNAMIC BY COUNTRY:
 //   The report cites the correct national emission factor database based on the
 //   supplier's country. A UK supplier's report says "DEFRA 2025". A French
-//   supplier's report says "ADEME Base Carbone 2024". This is what makes the
+//   supplier's report says "ADEME Base Carbone V23.6". This is what makes the
 //   report audit-ready and credible to international procurement teams.
 //
 // WHEN TO MODIFY:
@@ -665,7 +665,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>Emission Factor Sources</Text>
           <View style={[styles.complianceBlock, { marginTop: 4 }]}>
-            <Text>Scope 1 (Fuels): ADEME Base Carbone 2024 (full lifecycle) · Scope 1 (Refrigerants): IPCC AR5 GWP100</Text>
+            <Text>Scope 1 (Fuels): ADEME Base Carbone V23.6 (2025, full lifecycle) · Scope 1 (Refrigerants): IPCC AR5 GWP100</Text>
             {/* Scope 2 — only show factors for sources the supplier actually used */}
             {[
               parseFloat(activityData?.electricity_grid || '0') > 0 && `Grid Electricity: ${countryFactors.electricityGrid} kgCO₂e/kWh`,
@@ -683,7 +683,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               </Text>
             )}
             <Text>Scope 3 (Travel): DEFRA 2025 — Flight factors include Radiative Forcing ×1.9 (IPCC, GHG Protocol)</Text>
-            <Text>Scope 3 (Commuting/WFH): DEFRA 2024 / ADEME Base Carbone 2024 · Hotels: Cornell/Greenview CHSB 2024</Text>
+            <Text>Scope 3 (Commuting/WFH): DEFRA 2025 · Hotels: Cornell/Greenview CHSB 2024</Text>
           </View>
         </View>
 

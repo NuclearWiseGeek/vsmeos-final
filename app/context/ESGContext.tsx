@@ -231,9 +231,22 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
   }, [userId]); // Re-run if the user changes (e.g. after sign-in)
 
   // =============================================================================
-  // SECTION 6: SAVE DATA TO SUPABASE
-  // Called by: AutoSave (every 30s), Save buttons on scope pages, results page.
-  // Uses upsert (insert + update in one) so it works for both new and existing records.
+  // SECTION 6: SAVE COMPANY PROFILE TO SUPABASE
+  // Called by: supplier/page.tsx on "Save & Continue" from the profile form.
+  //
+  // IMPORTANT — DOES NOT WRITE TO `assessments`.
+  // The assessments table is the authoritative source of truth for a supplier's
+  // report and its `status` field ('draft' | 'sent' | 'started' | 'submitted').
+  // Only two things are allowed to touch `assessments`:
+  //   1. AutoSave.tsx         — writes activity_data + emissions_totals,
+  //                             never writes `status`, guarded by hasRealData.
+  //   2. Explicit user actions — supplier/hub sets 'started',
+  //                              supplier/results sets 'submitted'.
+  //
+  // Historical bug: this function used to upsert `assessments` with
+  // status: 'draft'. Because onConflict was (user_id, year), it silently
+  // reverted previously submitted reports to draft every time a supplier
+  // edited their profile. Removed April 2026.
   // =============================================================================
 
   const saveToSupabase = useCallback(async () => {
@@ -266,21 +279,6 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
 
       if (profileError) throw profileError;
 
-      // Save/update assessment data
-      // onConflict: 'user_id, year' means: if this user already has a record
-      // for this year, UPDATE it rather than creating a duplicate
-      const { error: assessmentError } = await supabase
-        .from('assessments')
-        .upsert({
-          user_id:       userId,
-          year:          parseInt(companyData.year) || new Date().getFullYear(),
-          activity_data: activityData,
-          status:        'draft',
-          updated_at:    new Date().toISOString(),
-        }, { onConflict: 'user_id, year' });
-
-      if (assessmentError) throw assessmentError;
-
       // Record the successful save time (shown as "Last saved 2 min ago" in UI)
       setLastSaved(new Date());
 
@@ -291,7 +289,7 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsSaving(false);
     }
-  }, [userId, companyData, activityData, isSaving, getToken]);
+  }, [userId, companyData, isSaving, getToken]);
 
   // =============================================================================
   // SECTION 7: HELPER FUNCTIONS

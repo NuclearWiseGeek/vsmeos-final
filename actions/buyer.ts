@@ -251,8 +251,10 @@ export async function getSupplierEmissions() {
   if (!assessments || assessments.length === 0) return [];
 
   // Step 2: Fetch submitted supplier invites for this buyer to get names/revenue.
-  // We match by position — each submitted assessment maps to a submitted invite.
-  // This works correctly as long as one supplier = one invite per buyer (current model).
+  // MATCHING STRATEGY: Both assessments and invites are sorted by updated_at DESC.
+  // This works because results/page.tsx updates BOTH records (assessment + invite)
+  // with the same timestamp during a single submission flow, so their order is
+  // always aligned. Each supplier has exactly one invite per buyer (current model).
   const { data: submittedInvites } = await supabase
     .from('supplier_invites')
     .select('supplier_email, supplier_name, country, industry, revenue, currency')
@@ -262,7 +264,7 @@ export async function getSupplierEmissions() {
 
   const inviteList = submittedInvites || [];
 
-  // Step 3: Attach invite metadata to each assessment by position.
+  // Step 3: Attach invite metadata to each assessment by aligned position.
   return assessments.map((assessment, index) => ({
     ...assessment,
     supplier_invites: inviteList[index] ? [inviteList[index]] : [{
@@ -298,24 +300,18 @@ export async function getCSVExportData() {
 
   if (!invites) return [];
 
-  // Get submitted emissions data
+  // Get submitted emissions data — sorted by updated_at DESC to align with invites
   const { data: emissions } = await supabase
     .from('assessments')
     .select('user_id, emissions_totals, updated_at')
     .eq('buyer_id', userId)
-    .eq('status', 'submitted');
+    .eq('status', 'submitted')
+    .order('updated_at', { ascending: false });
 
-  // Build a map of emissions by user_id for fast lookup
-  const emissionsMap = new Map(
-    (emissions || []).map(e => [e.user_id, e])
-  );
-
-  // Fetch submitted assessments separately (no FK join available).
-  // Match emissions to invites using submitted status — both sets belong to this buyer.
-  const submittedEmissions = (emissions || []);
-
-  // Build emissions map by position — for CSV we just need totals per invite row.
-  // Since we can't join user_id → email, we map submitted emissions to submitted invites.
+  // MATCHING STRATEGY: Both submitted assessments and submitted invites are sorted
+  // by updated_at DESC. results/page.tsx updates both records with the same timestamp
+  // during submission, so their order is always aligned (1 invite per supplier per buyer).
+  const submittedEmissions = emissions || [];
   const submittedInvites = invites.filter(i => i.status === 'submitted');
   const emissionsForSubmitted = new Map<string, any>();
   submittedInvites.forEach((inv, index) => {

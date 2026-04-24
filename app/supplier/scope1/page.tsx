@@ -94,7 +94,7 @@ export default function Scope1() {
           CARD 1: STATIONARY COMBUSTION
           Fuel burned in fixed equipment: boilers, furnaces, generators,
           kitchen equipment, industrial processes.
-          Source: DEFRA 2024 / ADEME Base Carbone 2024
+          Source: DEFRA 2025 / ADEME Base Carbone V23.6 (2025)
           ================================================================ */}
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 mb-6 sm:mb-8">
 
@@ -115,7 +115,7 @@ export default function Scope1() {
           <NumberInput
             label="Natural Gas"
             unit="kWh"
-            helpText={`How to find this number: Check your gas utility bills for FY ${companyData.year}. Your supplier (e.g. Engie, EDF, British Gas) will show consumption in kWh or m³ on each bill. Add up all bills across the year. 💡 If your bills show m³ instead of kWh: multiply m³ × 10.55 to convert to kWh. Include all sites and buildings your company is responsible for. The emission factor is 0.244 kgCO₂e/kWh (ADEME Base Carbone 2024, full lifecycle incl. upstream).`}
+            helpText={`How to find this number: Check your gas utility bills for FY ${companyData.year}. Your supplier (e.g. Engie, EDF, British Gas) will show consumption in kWh or m³ on each bill. Add up all bills across the year. 💡 If your bills show m³ instead of kWh: multiply m³ × 10.55 to convert to kWh. Include all sites and buildings your company is responsible for. The emission factor is 0.244 kgCO₂e/kWh (ADEME Base Carbone V23.6, 2025, full lifecycle incl. upstream).`}
             value={activityData['natural_gas'] || 0}
             onChange={(v) => updateActivity('natural_gas', v)}
           />
@@ -124,7 +124,7 @@ export default function Scope1() {
           <NumberInput
             label="Heating Oil"
             unit="Litres"
-            helpText={`How to find this number: Check your heating oil delivery receipts or invoices for FY ${companyData.year}. Heating oil (also called fuel oil, fioul domestique, or gasoil de chauffage) is typically delivered by truck to a tank on your premises. Each delivery invoice shows litres delivered — add them all up. 💡 Don't confuse this with diesel for vehicles — heating oil goes in a fixed tank for boilers only. Emission factor: 3.2 kgCO₂e/litre (ADEME Base Carbone 2024, full lifecycle).`}
+            helpText={`How to find this number: Check your heating oil delivery receipts or invoices for FY ${companyData.year}. Heating oil (also called fuel oil, fioul domestique, or gasoil de chauffage) is typically delivered by truck to a tank on your premises. Each delivery invoice shows litres delivered — add them all up. 💡 Don't confuse this with diesel for vehicles — heating oil goes in a fixed tank for boilers only. Emission factor: 3.2 kgCO₂e/litre (ADEME Base Carbone V23.6, 2025, full lifecycle).`}
             value={activityData['heating_oil'] || 0}
             onChange={(v) => updateActivity('heating_oil', v)}
           />
@@ -133,7 +133,7 @@ export default function Scope1() {
           <NumberInput
             label="Propane / LPG"
             unit="Litres"
-            helpText={`How to find this number: Check your LPG delivery receipts for FY ${companyData.year}. Propane/LPG (liquefied petroleum gas) comes in bottles or a fixed tank and is used for heating, cooking, forklifts, or industrial burners. Your supplier (e.g. Primagaz, Butagaz, Calor) will invoice per litre or per kg. 💡 If billed in kg: multiply kg × 1.96 to convert to litres. Emission factor: 1.51 kgCO₂e/litre (ADEME Base Carbone 2024, full lifecycle).`}
+            helpText={`How to find this number: Check your LPG delivery receipts for FY ${companyData.year}. Propane/LPG (liquefied petroleum gas) comes in bottles or a fixed tank and is used for heating, cooking, forklifts, or industrial burners. Your supplier (e.g. Primagaz, Butagaz, Calor) will invoice per litre or per kg. 💡 If billed in kg: multiply kg × 1.96 to convert to litres. Emission factor: 1.51 kgCO₂e/litre (ADEME Base Carbone V23.6, 2025, full lifecycle).`}
             value={activityData['propane'] || 0}
             onChange={(v) => updateActivity('propane', v)}
           />
@@ -177,7 +177,7 @@ export default function Scope1() {
           <NumberInput
             label="Diesel Fuel"
             unit="Litres"
-            helpText={`How to find this number: Add up all diesel fuel purchases for company-owned vehicles during FY ${companyData.year}. Sources: fuel card statements (e.g. Total, Shell, BP fleet cards), petrol station receipts, or your fleet management system. Include diesel for cars, vans, trucks, forklifts, and generators. 💡 Most fleet fuel cards give you a monthly report with total litres — check your finance system or ask your fleet manager. Emission factor: 3.16 kgCO₂e/litre (ADEME Base Carbone 2024, full lifecycle).`}
+            helpText={`How to find this number: Add up all diesel fuel purchases for company-owned vehicles during FY ${companyData.year}. Sources: fuel card statements (e.g. Total, Shell, BP fleet cards), petrol station receipts, or your fleet management system. Include diesel for cars, vans, trucks, forklifts, and generators. 💡 Most fleet fuel cards give you a monthly report with total litres — check your finance system or ask your fleet manager. Emission factor: 3.16 kgCO₂e/litre (ADEME Base Carbone V23.6, 2025, full lifecycle).`}
             value={activityData['diesel'] || 0}
             onChange={(v) => updateActivity('diesel', v)}
           />
@@ -186,7 +186,7 @@ export default function Scope1() {
           <NumberInput
             label="Petrol / Gasoline"
             unit="Litres"
-            helpText={`How to find this number: Add up all petrol/gasoline purchases for company-owned vehicles during FY ${companyData.year}. Check fuel card statements, petrol receipts, or your fleet management system. 💡 If you use a fuel card (Total, Shell, BP, etc.), log into the online portal — they provide monthly and annual consumption reports per vehicle. Emission factor: 2.80 kgCO₂e/litre (ADEME Base Carbone 2024, full lifecycle).`}
+            helpText={`How to find this number: Add up all petrol/gasoline purchases for company-owned vehicles during FY ${companyData.year}. Check fuel card statements, petrol receipts, or your fleet management system. 💡 If you use a fuel card (Total, Shell, BP, etc.), log into the online portal — they provide monthly and annual consumption reports per vehicle. Emission factor: 2.80 kgCO₂e/litre (ADEME Base Carbone V23.6, 2025, full lifecycle).`}
             value={activityData['petrol'] || 0}
             onChange={(v) => updateActivity('petrol', v)}
           />

@@ -147,17 +147,37 @@ function Legend() {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function EmissionsPanel({ emissionsData }: EmissionsPanelProps) {
-  const allRows = emissionsData.map(normaliseRow);
+  const allRows = React.useMemo(
+    () => emissionsData.map(normaliseRow),
+    [emissionsData]
+  );
 
-  // Derive the set of available years from the data
-  const availableYears = Array.from(
-    new Set(allRows.map(r => r.year).filter(Boolean))
-  ).sort((a, b) => b - a) as number[];
+  // Derive the set of available years from the data (memoised by year values)
+  const availableYears = React.useMemo(
+    () =>
+      Array.from(new Set(allRows.map(r => r.year).filter(Boolean)))
+        .sort((a, b) => (b as number) - (a as number)) as number[],
+    [allRows]
+  );
 
   // Default to the most recent year present in data
   const [selectedYear, setSelectedYear] = useState<number | null>(
     availableYears[0] ?? null
   );
+
+  // Re-sync when the available years change (e.g. real-time Supabase update
+  // brings in a new year, or the currently-selected year disappears from data).
+  // Depend on the stringified year list so React fires only when year values
+  // actually change — not on every parent re-render.
+  const yearsKey = availableYears.join(',');
+  useEffect(() => {
+    if (selectedYear === null && availableYears.length > 0) {
+      setSelectedYear(availableYears[0]);
+    } else if (selectedYear !== null && !availableYears.includes(selectedYear)) {
+      setSelectedYear(availableYears[0] ?? null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [yearsKey]);
 
   // Filter rows to the selected year (or all if no year data)
   const rows = selectedYear !== null
