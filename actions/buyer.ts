@@ -1,7 +1,7 @@
 'use server';
 
 import { createSupabaseClient } from '@/utils/supabase'; 
-import { auth, currentUser } from '@clerk/nextjs/server'; 
+import { auth, currentUser, clerkClient } from '@clerk/nextjs/server'; 
 import { Resend } from 'resend';
 
 // Lazy-initialize Resend so the constructor is never called at build time.
@@ -11,6 +11,52 @@ function getResend(): Resend {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error('RESEND_API_KEY is not set');
   return new Resend(key);
+}
+
+// ---------------------------------------------------------
+// Helper: Resolve supplier Clerk userIds → emails (parallel Clerk lookup).
+//
+// Why this exists:
+//   assessments.user_id is a Clerk userId. supplier_invites.supplier_email
+//   is the actual email address. These two tables have no direct join key
+//   because the email lives in Clerk, not Supabase. To reliably match an
+//   assessment to its invite, we must ask Clerk "what's this user's email?".
+//
+// Why not match by updated_at sort order (the old approach):
+//   Any buyer action that updates an invite (editing country, revenue, etc.)
+//   shifts that invite's updated_at to now, breaking the position alignment
+//   with the assessments sort. The bug shows up as suppliers being labelled
+//   "Supplier 1 / Supplier 2" when their real names are in supplier_invites.
+//
+// Cost:
+//   ~100–150ms per dashboard load, independent of supplier count (Promise.all
+//   runs all Clerk calls in parallel). Errors on individual lookups fall
+//   through silently — the caller gets a partial map rather than a crash.
+//
+// Future optimisation:
+//   Storing supplier_email directly on the assessments row at submission
+//   time would eliminate the Clerk round-trip entirely. Deferred — requires
+//   a schema change + write-path update in supplier/results/page.tsx.
+// ---------------------------------------------------------
+async function resolveSupplierEmails(userIds: string[]): Promise<Map<string, string>> {
+  const unique = Array.from(new Set(userIds.filter(Boolean)));
+  const map = new Map<string, string>();
+  if (unique.length === 0) return map;
+
+  try {
+    const clerk = await clerkClient();
+    const users = await Promise.all(
+      unique.map(id => clerk.users.getUser(id).catch(() => null))
+    );
+    users.forEach((user, i) => {
+      const email = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
+      if (email) map.set(unique[i], email);
+    });
+  } catch (err) {
+    console.error('[resolveSupplierEmails] Clerk error:', err);
+    // Return whatever we resolved so far — caller falls back to "Unknown Supplier".
+  }
+  return map;
 }
 
 // ---------------------------------------------------------
@@ -225,6 +271,11 @@ export async function updateSupplier(id: string, name: string, email: string) {
 // 7. Get Supplier Emissions (Phase 3.1)
 //    Fetches emissions_totals from submitted assessments where
 //    buyer_id = current buyer. Uses buyers_read_supplier_assessments RLS policy.
+//
+//    Matches each assessment to its invite by email: assessment.user_id is
+//    resolved to the supplier's email via Clerk, then looked up in the
+//    supplier_invites table (buyer_id + supplier_email). This is correct
+//    regardless of how or when invites are edited.
 // ---------------------------------------------------------
 export async function getSupplierEmissions() {
   const { userId, getToken } = await auth();
@@ -236,7 +287,6 @@ export async function getSupplierEmissions() {
   const supabase = createSupabaseClient(token);
 
   // Step 1: Fetch submitted assessments for this buyer.
-  // No FK join — assessments and supplier_invites are not related by FK in Supabase.
   const { data: assessments, error } = await supabase
     .from('assessments')
     .select('user_id, year, status, emissions_totals, updated_at')
@@ -250,32 +300,47 @@ export async function getSupplierEmissions() {
   }
   if (!assessments || assessments.length === 0) return [];
 
-  // Step 2: Fetch submitted supplier invites for this buyer to get names/revenue.
-  // MATCHING STRATEGY: Both assessments and invites are sorted by updated_at DESC.
-  // This works because results/page.tsx updates BOTH records (assessment + invite)
-  // with the same timestamp during a single submission flow, so their order is
-  // always aligned. Each supplier has exactly one invite per buyer (current model).
-  const { data: submittedInvites } = await supabase
+  // Step 2: Fetch ALL supplier invites for this buyer (any status).
+  // We match invites by email, so status doesn't matter for the lookup —
+  // even a 'started' invite can be associated with a submitted assessment
+  // (e.g. the user submitted but the invite update raced).
+  const { data: inviteRows } = await supabase
     .from('supplier_invites')
     .select('supplier_email, supplier_name, country, industry, revenue, currency')
-    .eq('buyer_id', userId)
-    .eq('status', 'submitted')
-    .order('updated_at', { ascending: false });
+    .eq('buyer_id', userId);
 
-  const inviteList = submittedInvites || [];
+  // Build email → invite map (lowercased for case-insensitive matching).
+  const invitesByEmail = new Map<string, any>();
+  (inviteRows || []).forEach(inv => {
+    const email = inv.supplier_email?.toLowerCase();
+    if (email) invitesByEmail.set(email, inv);
+  });
 
-  // Step 3: Attach invite metadata to each assessment by aligned position.
-  return assessments.map((assessment, index) => ({
-    ...assessment,
-    supplier_invites: inviteList[index] ? [inviteList[index]] : [{
-      supplier_name: 'Supplier ' + (index + 1),
-      supplier_email: '',
-      country: '',
-      industry: '',
-      revenue: 0,
-      currency: '',
-    }],
-  }));
+  // Step 3: Resolve each supplier's Clerk userId → email (parallel).
+  const emailMap = await resolveSupplierEmails(assessments.map(a => a.user_id));
+
+  // Step 4: Attach the correct invite metadata to each assessment.
+  // If Clerk lookup failed or the supplier signed up with an email that
+  // doesn't match any invite, we fall back to a minimal placeholder — this
+  // is rare and far preferable to the old "Supplier 1 / Supplier 2" labels.
+  return assessments.map(assessment => {
+    const email  = emailMap.get(assessment.user_id) || '';
+    const invite = email ? invitesByEmail.get(email) : null;
+
+    return {
+      ...assessment,
+      supplier_invites: [
+        invite || {
+          supplier_name:  email || 'Unknown Supplier',
+          supplier_email: email,
+          country:        '',
+          industry:       '',
+          revenue:        0,
+          currency:       '',
+        },
+      ],
+    };
+  });
 }
 
 // ---------------------------------------------------------
@@ -300,29 +365,35 @@ export async function getCSVExportData() {
 
   if (!invites) return [];
 
-  // Get submitted emissions data — sorted by updated_at DESC to align with invites
+  // Get submitted emissions data (any order — we join by email, not position)
   const { data: emissions } = await supabase
     .from('assessments')
     .select('user_id, emissions_totals, updated_at')
     .eq('buyer_id', userId)
-    .eq('status', 'submitted')
-    .order('updated_at', { ascending: false });
+    .eq('status', 'submitted');
 
-  // MATCHING STRATEGY: Both submitted assessments and submitted invites are sorted
-  // by updated_at DESC. results/page.tsx updates both records with the same timestamp
-  // during submission, so their order is always aligned (1 invite per supplier per buyer).
   const submittedEmissions = emissions || [];
-  const submittedInvites = invites.filter(i => i.status === 'submitted');
-  const emissionsForSubmitted = new Map<string, any>();
-  submittedInvites.forEach((inv, index) => {
-    if (submittedEmissions[index]) {
-      emissionsForSubmitted.set(inv.supplier_email, submittedEmissions[index]);
+
+  // Resolve each assessment's Clerk userId → email, then build an
+  // email → emissions row map. If a supplier submitted multiple years,
+  // we keep the most recent submission.
+  const emailMap = await resolveSupplierEmails(submittedEmissions.map(e => e.user_id));
+
+  const emissionsByEmail = new Map<string, any>();
+  submittedEmissions.forEach(em => {
+    const email = emailMap.get(em.user_id);
+    if (!email) return;
+    const existing = emissionsByEmail.get(email);
+    // Keep the newer submission if the same email has multiple assessments
+    if (!existing || new Date(em.updated_at) > new Date(existing.updated_at)) {
+      emissionsByEmail.set(email, em);
     }
   });
 
   return invites.map(invite => {
-    const emRow = emissionsForSubmitted.get(invite.supplier_email);
-    const totals = emRow?.emissions_totals || null;
+    const lookupKey = invite.supplier_email?.toLowerCase();
+    const emRow     = lookupKey ? emissionsByEmail.get(lookupKey) : null;
+    const totals    = emRow?.emissions_totals || null;
     return {
       supplier_name:  invite.supplier_name,
       supplier_email: invite.supplier_email,
