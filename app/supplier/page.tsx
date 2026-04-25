@@ -29,7 +29,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Bell, Loader2, Search, Lock, ChevronDown } from 'lucide-react';
+import { ArrowRight, Bell, Loader2, Search, Lock, ChevronDown, Calendar, Building2, Link as LinkIcon } from 'lucide-react';
 import { useESG } from '@/context/ESGContext';
 import { getPendingInvite, updateCompanyProfile } from '@/actions/supplier';
 import { getSupportedCountries } from '@/utils/calculations';
@@ -266,6 +266,34 @@ export default function SupplierProfilePage() {
       setDisplayRevenue(companyData.revenue.toLocaleString('en-US'));
     }
   }, [companyData.revenue]);
+
+  // ─── Auto-fill reporting period from financial year ────────────────────
+  // When the year is known (either from buyer invite ?year=, ESG load, or
+  // default), pre-fill reporting period as 1 Jan – 31 Dec of that year.
+  // This respects your Q2 answer: "default to the year the buyer picked".
+  //
+  // We only overwrite if BOTH dates are currently empty — i.e. first load.
+  // If the supplier has manually customised one or both dates (e.g. their
+  // fiscal year is Apr–Mar), we leave them alone.
+  const dateRefAuto = useRef(false);
+  useEffect(() => {
+    if (dateRefAuto.current) return;                        // already auto-filled once
+    if (!companyData.year) return;                          // wait for year to load
+    const yr = parseInt(companyData.year);
+    if (isNaN(yr) || yr < 1900 || yr > 2100) return;        // ignore garbage
+    if (companyData.reportingPeriodStart || companyData.reportingPeriodEnd) {
+      dateRefAuto.current = true;                           // dates already set — never auto-sync
+      return;
+    }
+    // Both dates empty → safe to auto-fill with calendar year
+    setCompanyData((prev: any) => ({
+      ...prev,
+      reportingPeriodStart: `${yr}-01-01`,
+      reportingPeriodEnd:   `${yr}-12-31`,
+    }));
+    dateRefAuto.current = true;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyData.year, companyData.reportingPeriodStart, companyData.reportingPeriodEnd]);
 
   // ─── Revenue input handlers ──────────────────────────────────────────────
   // We format with commas in the display but store the raw number in state
@@ -511,7 +539,113 @@ export default function SupplierProfilePage() {
 
           </div>
 
-          {/* ── 4. ANNUAL REVENUE ────────────────────────────────────── */}
+          {/* ── 4. REPORTING PERIOD (Category A audit) ──────────────── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* Reporting period — start */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                <Calendar size={12} className="text-gray-400" />
+                Reporting Period — Start
+              </label>
+              <p className="text-xs text-gray-400">
+                First day of the period your emissions data covers. Defaults to
+                1 January of your reporting year — change if your fiscal year differs.
+              </p>
+              <input
+                type="date"
+                value={companyData.reportingPeriodStart || ''}
+                onChange={(e) => setCompanyData({ ...companyData, reportingPeriodStart: e.target.value })}
+                className="w-full p-4 bg-white border border-gray-200 rounded-lg font-medium text-gray-900 focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all"
+              />
+            </div>
+
+            {/* Reporting period — end */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                <Calendar size={12} className="text-gray-400" />
+                Reporting Period — End
+              </label>
+              <p className="text-xs text-gray-400">
+                Last day of the period. Must be at least one day after the start date.
+              </p>
+              <input
+                type="date"
+                value={companyData.reportingPeriodEnd || ''}
+                onChange={(e) => setCompanyData({ ...companyData, reportingPeriodEnd: e.target.value })}
+                min={companyData.reportingPeriodStart || undefined}
+                className="w-full p-4 bg-white border border-gray-200 rounded-lg font-medium text-gray-900 focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all"
+              />
+              {/* Show warning if dates are inverted (browser won't always catch it) */}
+              {companyData.reportingPeriodStart && companyData.reportingPeriodEnd &&
+                companyData.reportingPeriodEnd < companyData.reportingPeriodStart && (
+                <p className="text-xs text-amber-600 font-medium">
+                  ⚠ End date must be after the start date
+                </p>
+              )}
+            </div>
+
+          </div>
+
+          {/* ── 5. CONSOLIDATION APPROACH (Category A audit) ──────── */}
+          <div className="space-y-3">
+            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
+              <Building2 size={12} className="text-gray-400" />
+              Organisational Boundary (GHG Protocol)
+            </label>
+            <p className="text-xs text-gray-400">
+              How you consolidate emissions from subsidiaries, joint ventures and facilities.
+              Per GHG Protocol Corporate Standard Chapter 3. Most SMEs choose Operational Control.
+            </p>
+            <div className="space-y-2">
+              {[
+                {
+                  value: 'operational',
+                  title: 'Operational control',
+                  desc:  'Account for 100% of emissions from operations you fully control. Most common for SMEs.',
+                },
+                {
+                  value: 'financial',
+                  title: 'Financial control',
+                  desc:  'Account for 100% of emissions from operations where you direct financial policy. Common for holding companies.',
+                },
+                {
+                  value: 'equity',
+                  title: 'Equity share',
+                  desc:  'Account for emissions in proportion to your ownership stake. Common for JV-heavy businesses.',
+                },
+              ].map(({ value, title, desc }) => {
+                const selected = (companyData.consolidationApproach || 'operational') === value;
+                return (
+                  <label
+                    key={value}
+                    className={`block p-3.5 rounded-lg border cursor-pointer transition-all ${
+                      selected
+                        ? 'bg-[#0C2918]/5 border-[#0C2918]/40 ring-1 ring-[#0C2918]/10'
+                        : 'bg-white border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="consolidationApproach"
+                        value={value}
+                        checked={selected}
+                        onChange={() => setCompanyData({ ...companyData, consolidationApproach: value as 'operational' | 'financial' | 'equity' })}
+                        className="mt-1 accent-[#0C2918] cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <p className={`text-sm font-bold ${selected ? 'text-[#0C2918]' : 'text-gray-900'}`}>{title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── 6. ANNUAL REVENUE ────────────────────────────────────── */}
           <div className="space-y-2">
             <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">
               Annual Revenue ({companyData.currency || 'EUR'})
@@ -533,6 +667,27 @@ export default function SupplierProfilePage() {
                 className="w-full p-4 pl-8 bg-white border border-gray-200 rounded-lg font-medium text-gray-900 focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all placeholder-gray-300"
               />
             </div>
+          </div>
+
+          {/* ── 7. FINANCIAL REPORT LINK (Category A audit — OPTIONAL) ── */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center gap-2">
+              <LinkIcon size={12} className="text-gray-400" />
+              Link to Annual Financial Report
+              <span className="ml-1 text-[10px] font-normal text-gray-400 normal-case tracking-normal">(optional)</span>
+            </label>
+            <p className="text-xs text-gray-400">
+              Public URL to your latest filed accounts (e.g. Companies House, INPI, investor page).
+              Provides the audit trail for your revenue figure used in intensity calculations.
+              Leave blank if not publicly available.
+            </p>
+            <input
+              type="url"
+              value={companyData.financialReportUrl || ''}
+              onChange={(e) => setCompanyData({ ...companyData, financialReportUrl: e.target.value })}
+              placeholder="https://..."
+              className="w-full p-4 bg-white border border-gray-200 rounded-lg font-medium text-gray-900 focus:ring-2 focus:ring-black/5 focus:border-black outline-none transition-all placeholder-gray-300"
+            />
           </div>
 
         </div>

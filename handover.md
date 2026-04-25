@@ -1,6 +1,6 @@
 # VSME OS — Complete Handover Document
 
-**Updated: April 18, 2026**
+**Updated: April 23, 2026** (Phase A+B audit + Case 3 supplier name fix + Category A PDF audit complete)
 Upload this file to Claude Project Knowledge for Phase 5.
 
 ---
@@ -15,7 +15,7 @@ Upload this file to Claude Project Knowledge for Phase 5.
 | **GitHub** | vsmeos-final (private) — NuclearWiseGeeks account ONLY |
 | **Tech Stack** | Next.js 16.2.2 (Turbopack) · TypeScript 5 · Tailwind CSS v4 · Clerk v6 · Supabase (Frankfurt EU) · Vercel · React-PDF v4 · pako@1.0.11 · Resend v6 · React 19.2.3 · Chart.js v4 · Framer Motion v12 · Inter (next/font/google) |
 | **Email** | Titan Mail via Hostinger. hello@vsmeos.fr active. DKIM verified. Resend domain VERIFIED. |
-| **Stage** | Pre-revenue. Phases 1+3+4 complete + post-launch bug fixes + emission factor audit. **Phase 5 is next.** |
+| **Stage** | Pre-revenue. Phases 1+3+4 complete + post-launch bug fixes + emission factor audit + April 2026 audit sprints (Phase A+B + Case 3 fix + Category A PDF audit). **Phase 5 is next.** |
 | **AI Engine** | VESQ3 (Claude Sonnet `claude-sonnet-4-20250514`) — branding name for all AI features |
 
 ---
@@ -147,6 +147,62 @@ All factors verified against latest published national databases:
 - `app/layout.tsx` — Inter variable font via `next/font/google`. Self-hosted by Next.js, zero layout shift.
 - `app/globals.css` — `-webkit-font-smoothing: antialiased`, `font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01"` (SF Pro-matching alternate letterforms), tight tracking on headings.
 
+### Phase 4b — April 2026 Audit Sprints (April 19–23, 2026)
+
+Three separate audit batches landed in this window. All shipped to production.
+
+**4b.1 Phase A+B audit (April 19, 2026)**
+A code-level audit caught 12 issues spanning data-loss, caching, defensibility. All fixed.
+
+- `ESGContext.tsx` — `saveToSupabase()` no longer writes `status: 'draft'` to assessments. Was silently reverting submitted reports back to draft when the supplier edited their profile. Critical data-loss bug.
+- `api/intelligence/route.ts` — Recommendations mode now reads cache first (was calling Claude on every click at ~$0.012/call). Added `force: true` flag for explicit refresh. Year normalisation at top so cache keys are deterministic.
+- `supplier/dashboard/page.tsx` — Refresh handlers now send `year` and `force: true`. Generate vs Refresh buttons have distinct behaviour. Stale "VERO" comment fixed to "VESQ3".
+- `CarbonReportPDF.tsx` — Footer attributions corrected: was citing "DEFRA 2024 / ADEME 2024" when code uses DEFRA 2025 / ADEME V23.6.
+- `calculations.ts` — All Scope 1 source strings updated `"ADEME Base Carbone 2024"` → `"ADEME Base Carbone V23.6 (2025)"`. France `primaryCalculator` updated to V23.6.
+- `app/page.tsx` (landing) — Germany FAQ corrected from "UBA 2023 / 0.380" to "UBA 2024 / 0.364".
+- `methodology/page.tsx` — 9 stale ADEME 2024 references updated to V23.6. Employee Commuting attribution corrected from "DEFRA 2025 / ADEME 2024" to "DEFRA 2025". Factor Update Policy table now correctly attributes remote working to DEFRA.
+- `privacy/page.tsx` — Anthropic added to sub-processor table (GDPR Article 28 disclosure for VESQ3 calls). Stripe removed (payments not built yet). `LAST_UPDATED` now rendered. Pre-incorporation note added to §1.
+- `terms/page.tsx` — §4 rewritten to "Pricing and Payment (Not Currently Active)". €199/€349/€799 tier prices removed. §8.1 cancellation clause rewritten.
+- `EmissionsPanel.tsx` — `useEffect` now syncs `selectedYear` when `availableYears` changes. Year filter no longer goes stale on real-time data.
+- US EPA eGRID2023 factor 0.352 → **0.350** (matches EPA's exact 770.9 lbCO₂e/MWh published value: 770.9 × 0.4536 / 1000 = 0.3497 ≈ 0.350).
+- Vercel env vars: 4 Clerk redirect vars updated from `/supplier` → `/onboarding` so role detection works correctly. Hostinger forwarders set up: `privacy@`, `legal@`, `methodology@`, `compliance@`, `contact@` → `hello@vsmeos.fr`.
+
+**4b.2 Case 3 supplier name drift fix (April 21, 2026)**
+
+- `actions/buyer.ts` — `getSupplierEmissions()` and `getCSVExportData()` rewritten to match assessments to invites by **email** (resolved via Clerk `clerkClient.users.getUser()`) instead of array position. Added shared helper `resolveSupplierEmails(userIds)` that runs Clerk lookups in parallel.
+- Symptom that triggered the fix: editing supplier invite metadata after submission caused supplier name on buyer dashboard to revert to "Supplier 1". Position-match logic was unreliable whenever invite `updated_at` changed.
+- Latency cost: ~100–150ms per buyer dashboard load (parallel Clerk lookups). Worth it for permanent correctness.
+- Fallback: when Clerk can't resolve a userId (rare — supplier signed up with different email than the invite was sent to), shows "Unknown Supplier" instead of misleading "Supplier 1".
+
+**4b.3 Category A PDF audit (April 23, 2026)**
+
+User feedback after first pitch dry-run revealed missing GHG Protocol disclosure fields. All fixed in one batch.
+
+SQL migration:
+```sql
+ALTER TABLE profiles
+  ADD COLUMN reporting_period_start  date,
+  ADD COLUMN reporting_period_end    date,
+  ADD COLUMN consolidation_approach  text DEFAULT 'operational',
+  ADD COLUMN financial_report_url    text;
+ALTER TABLE profiles
+  ADD CONSTRAINT profiles_consolidation_approach_check
+  CHECK (consolidation_approach IS NULL OR consolidation_approach IN ('operational', 'financial', 'equity'));
+```
+
+Code changes:
+- `ESGContext.tsx` — `CompanyData` interface + load + save extended with the 4 new fields.
+- `supplier/page.tsx` — Profile form gained 3 new sections: reporting period (two date pickers, auto-fills as 1 Jan–31 Dec of selected year), consolidation approach (3 radio buttons with GHG Protocol explanations, defaults to Operational), financial report URL (optional).
+- `CarbonReportPDF.tsx` — Reporting period replaces "Financial Year" in the profile card. Consolidation label is dynamic (operational/financial/equity). Scope 2 explicitly labelled "Location-Based" everywhere. Scope 3 boundary dynamically describes only the categories the supplier actually entered (Cat 6 alone, Cat 7 alone, both, or none — never claims data that wasn't provided). Disclaimer wording: "activity data" → "primary and secondary data including consumption where available". Optional financial report URL renders as "Revenue audit trail" line. Email `contact@` → `hello@`.
+- `actions/dashboard.ts` — `DashboardData.profile` TS type extended with 4 new optional/nullable fields. Profile SELECT query now fetches the new columns.
+- `app/supplier/dashboard/page.tsx` — `company` object passed to `DashboardPdfButton` now spreads all 4 new fields. Carbon intensity KpiCard had duplicate unit display ("kg/€M" prop was redundant with the "kgCO₂e per €1M revenue" subtitle) — removed.
+- `EmissionsPanel.tsx` — Bar chart label was showing kg-values with a "t" suffix (e.g. 260,541 kg labelled as "t" — three orders of magnitude off). Now correctly divides by 1000 and labels as "tCO₂e". Scope 2 label "Energy" → "Location-Based". Scope 3 label "Value chain" → "Cat. 6 & 7 — Travel & Commuting". Footer source list updated to V23.6.
+
+**Updated emission factor table (post-Phase 4b — supersedes the April 18 table above)**
+- US grid: ~~0.352~~ → **0.350** kgCO₂e/kWh (EPA eGRID2023 exact figure)
+- All ADEME source strings now read "V23.6 (2025)" instead of "2024"
+- All other factors unchanged from April 18 audit
+
 ---
 
 ## 2. Phase Status — Complete Picture
@@ -158,10 +214,11 @@ All factors verified against latest published national databases:
 | 3 | Platform | ✅ Complete | Buyer data aggregation, custom emails, role separation |
 | 4 | Supplier Experience | ✅ Complete | Vault, YoY, VESQ3 intelligence, targets, supplier dashboard |
 | 4.x | Post-Launch Fixes | ✅ Complete | Build fixes, cache bug, font, emission audit, year fields, year filter |
+| 4b | April 2026 Audit Sprints | ✅ Complete | Phase A+B audit, Case 3 supplier name fix, Category A PDF audit (reporting period, boundary, financial link, GHGP-explicit Scope 3, dynamic disclaimer, Scope 2 Location-Based labelling) |
 | **5** | **AI + Intelligence** | 🔄 **NEXT** | Speed + trust — OCR doc processing, VESQ3 chat, Carbon Passport, Buyer Portfolio AI |
-| 6 | Trust & Verification Score | 📋 Planned | The moat — supplier trust score, data quality rating, verification tiers |
+| 6 | Trust & Verification Score | 📋 Planned | The moat — supplier trust score, data quality rating, verification tiers, and Scope 2 dual reporting (Location-Based + Market-Based per GHG Protocol Scope 2 Guidance 2015) |
 | 7 | Deadline Urgency Engine | 📋 Planned | Organic growth — CSRD deadline calendar, automated buyer + supplier reminders |
-| 8 | Supplier Vault + Benchmarks + Passport | 📋 Planned | Network effects begin — Carbon Passport public page, proprietary benchmark data from submissions |
+| 8 | Supplier Vault + Benchmarks + Passport | 📋 Planned | Network effects begin — Carbon Passport public page, proprietary benchmark data from submissions, and SBTi-validated near-term & net-zero target tracking (separate Scope 1+2 / Scope 3 / long-term targets, baseline year, validation status) |
 | 9 | Buyer Collaboration Tools | 📋 Planned | LTV multiplier — multi-user buyer accounts, supplier grouping, engagement workflow |
 | 10 | Auditor Portal | 📋 Planned | Third-party verification — verifier portal, assured reports, ISO 14064-3 alignment |
 | 11 | White Label + Reseller | 📋 Planned | Enterprise revenue — white-label for accounting firms, ESG consultants, industry bodies |
@@ -188,6 +245,11 @@ website text
 role text  -- 'buyer' or 'supplier'
 targets jsonb  -- { reductionPct, targetYear, baselineYear, baselineKg, setAt }
 updated_at timestamptz
+-- Phase 4b Category A audit columns (April 23, 2026):
+reporting_period_start  date         -- ISO YYYY-MM-DD, dd/mm/yyyy in UI
+reporting_period_end    date         -- must be > start
+consolidation_approach  text default 'operational'  -- 'operational' | 'financial' | 'equity' (CHECK constraint)
+financial_report_url    text         -- optional URL to publicly-filed accounts
 ```
 
 ### assessments
@@ -513,6 +575,11 @@ Font: Inter (variable font, next/font/google). Apple-style rendering via globals
 18. All supplier sign-in redirects go to `/supplier/dashboard` not `/supplier`
 19. Never call `new Resend()` at module level — use lazy `getResend()` inside the function
 20. PDF is fully dynamic — corrections to calculations.ts automatically flow into new PDFs
+21. **Reporting period dates** are ISO `YYYY-MM-DD` strings in `profiles.reporting_period_start/end`. Empty string `''` must NOT be written to a `date` column — use `null` (Postgres rejects empty strings as 22007). The save path in `ESGContext.tsx` already does this with `|| null`.
+22. **Consolidation approach** is constrained at the DB level — only `'operational'`, `'financial'`, `'equity'`, or `null` will be accepted. The form radio always sets one of these.
+23. **Scope 2 is currently always Location-Based** in PDF + dashboard. When Phase 6 adds Market-Based dual reporting, `CarbonReportPDF.tsx` constant `scope2Approach` will be replaced with a per-assessment value.
+24. **PDF Scope 3 boundary text is dynamic** — the `scope3IncludedText` constant in `CarbonReportPDF.tsx` inspects `activityData` and only claims categories the supplier actually entered. Never hardcode "Cat 6 and Cat 7" in PDF copy — let the helper compute it.
+25. **Supplier name on buyer dashboard** comes from `supplier_invites.supplier_name` joined to assessments via Clerk-resolved email (`actions/buyer.ts` `resolveSupplierEmails`). NEVER match by array position — that broke historically and produced "Supplier 1 / Supplier 2" labels.
 
 ### Legal Rules
 - "audit-ready" not "audit-standard"
@@ -570,6 +637,59 @@ Identifies highest-risk suppliers and recommends engagement priority.
 Files to create:
 - `app/components/buyer/PortfolioIntelligence.tsx`
 - `app/api/portfolio-intelligence/route.ts`
+
+---
+
+## 12.5 Future Phase Blueprints — Phase 6 & Phase 8 Implementation Notes
+
+When you start Phase 6 or Phase 8, the technical groundwork below is already mapped out so you don't re-design from scratch. These were scoped during the April 23 user feedback review and intentionally placed in the phases where they fit best.
+
+### Phase 6: Scope 2 Location-Based + Market-Based Dual Reporting
+
+**Why this is needed:** GHG Protocol Scope 2 Guidance (2015 amendment) requires dual reporting whenever a company has purchased renewable energy contracts (RECs, GOs, PPAs, green tariffs). Currently we only support Location-Based. Most CSRD-aligned auditors will now reject Scope 2 figures that don't specify the approach.
+
+**Scope of work (~4–6 days):**
+- New profile field: "Did you purchase renewable energy contracts in this period?"
+- If yes: input fields for REC/GO/PPA quantities (kWh) + supplier name + retirement company name
+- Calculation change in `calculations.ts`: subtract market-based contracts from grid electricity, apply residual mix factor
+- Schema additions:
+  ```sql
+  ALTER TABLE assessments ADD COLUMN scope2_approach text DEFAULT 'location_based';
+  -- 'location_based' | 'market_based' | 'dual' (both reported)
+  ALTER TABLE assessments ADD COLUMN renewable_energy jsonb;
+  -- { rec_kwh, go_kwh, ppa_kwh, residual_mix_factor, contract_holder, evidence_files: [] }
+  ```
+- PDF reporting: show both LB and MB figures side by side when dual mode active
+- Evidence vault: accept REC/GO certificates as evidence documents
+- Disclaimer: when this lands, remove the "Market-Based Scope 2 reporting are excluded" line from `CarbonReportPDF.tsx`
+- Hardcoded `scope2Approach = 'Location-Based'` in PDF becomes a per-assessment field read
+
+### Phase 8: Near-Term & Net-Zero Targets (SBTi-aligned)
+
+**Why this is needed:** Carbon Passport public page should show whether a supplier has science-based targets. Buyers increasingly screen suppliers based on target ambition. Currently `profiles.targets` jsonb only supports a single reduction target.
+
+**Scope of work (~1–2 days):**
+- Toggle on supplier dashboard: "Have you set near-term / net-zero targets?"
+- If yes:
+  - Scope 1+2 near-term target (% reduction, target year)
+  - Scope 3 near-term target (% reduction, target year)
+  - Long-term / net-zero target year
+  - Baseline year for all of the above
+  - SBTi validation status: not pursued / committed / validated
+- New jsonb shape (no schema migration needed — extend existing `profiles.targets`):
+  ```ts
+  targets: {
+    scope12_near_term: { reductionPct, targetYear, baselineYear, baselineKg },
+    scope3_near_term:  { reductionPct, targetYear, baselineYear, baselineKg },
+    long_term:         { type: 'net_zero' | 'carbon_neutral', targetYear },
+    sbti_validation_status: 'committed' | 'validated' | 'not_pursued',
+    sbti_validation_date:   date | null,
+  }
+  ```
+- `TargetSetter.tsx` UX rework — move from single slider to multi-target form
+- PDF gains a "Targets & Commitments" appendix block (Page 5 or as inline block on Page 1)
+- Carbon Passport public page renders these prominently — main "is this supplier serious?" signal
+- Legal note: SBTi validation status is a **claim**, not a fact we can verify. PDF + passport must say "Company states they are SBTi-validated" not "SBTi-validated" to avoid liability if claim is false.
 
 ---
 

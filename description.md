@@ -1,5 +1,5 @@
 VSME OS — Project Description
-Last updated: April 18, 2026
+Last updated: April 23, 2026
 
 What It Is
 VSME OS is a B2B SaaS platform that solves the CSRD Scope 3 data collection problem for supply chains. Large companies (buyers) must report their suppliers' carbon emissions under the EU Corporate Sustainability Reporting Directive. Suppliers — typically SMEs — have no tool to produce that data. VSME OS is the bridge.
@@ -44,7 +44,7 @@ Page 2 — Detailed activity breakdown: every emission source with quantity, emi
 Page 3 — Declaration of Conformity: evidence documentation list, official attestation signed by the authorised signatory
 Page 4 — Methodology and audit trail: exact emission factor sources by country, boundary exclusions, disclaimers
 
-The report is fully dynamic by country — a UK supplier's report cites DEFRA 2025, a French supplier's cites ADEME Base Carbone 2024, a German supplier's cites UBA 2024, and so on across 69 countries.
+The report is fully dynamic by country — a UK supplier's report cites DEFRA 2025, a French supplier's cites ADEME Base Carbone V23.6 (2025), a German supplier's cites UBA 2024, and so on across 69 countries.
 VESQ3 AI Intelligence
 VESQ3 is VSME OS's AI engine (Claude Sonnet, branded as VESQ3):
 

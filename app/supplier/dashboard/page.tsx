@@ -642,7 +642,6 @@ export default function SupplierDashboard() {
           <KpiCard
             label="Carbon intensity"
             value={fmtK(intensity)}
-            unit="kg/€M"
             delta={intensity > 0 ? 'kgCO₂e per €1M revenue' : 'Add revenue to see'}
           />
         </div>
@@ -709,6 +708,13 @@ export default function SupplierDashboard() {
                 currency: profile?.currency || 'EUR',
                 signer:   profile?.signer   || '',
                 year:     a.year,
+                // ── Category A audit fields ──
+                // Map DB snake_case → PDF camelCase so CarbonReportPDF can
+                // render reporting period, boundary, and financial link.
+                reportingPeriodStart:  profile?.reporting_period_start  || '',
+                reportingPeriodEnd:    profile?.reporting_period_end    || '',
+                consolidationApproach: profile?.consolidation_approach  || 'operational',
+                financialReportUrl:    profile?.financial_report_url    || '',
               };
 
               return (

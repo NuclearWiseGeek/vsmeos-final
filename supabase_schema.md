@@ -1,5 +1,5 @@
 # VSME OS — Supabase Database Schema
-# Last updated: April 23, 2026
+# Last updated: April 23, 2026 (Category A audit migration)
 # Region: Frankfurt (EU) — eu-central-1
 #
 # This file documents every table, column, type, default, and constraint
@@ -58,9 +58,14 @@ One row per user (supplier or buyer). Stores company info + role.
 | `currency`        | text          | `'EUR'::text`                        |     | EUR, USD, GBP, etc. |
 | `role`            | text          | NULL                                 |     | `'supplier'` or `'buyer'` |
 | `targets`         | jsonb         | NULL                                 |     | `{ baselineKg, baselineYear, reductionPct, targetYear }` |
+| `reporting_period_start` | date  | NULL                                 |     | **Category A audit** — ISO date, dd/mm/yyyy in UI |
+| `reporting_period_end`   | date  | NULL                                 |     | **Category A audit** — must be > start |
+| `consolidation_approach` | text  | `'operational'::text`                |     | **Category A audit** — `'operational'` / `'financial'` / `'equity'` (CHECK constraint) |
+| `financial_report_url`   | text  | NULL                                 |     | **Category A audit** — Optional URL for revenue audit trail |
 
 **Constraints:**
 - PK on `id` — upserted with `onConflict: 'id'`
+- CHECK on `consolidation_approach` — must be NULL or one of `'operational'`, `'financial'`, `'equity'` (enforces GHG Protocol Chapter 3 vocabulary)
 
 **RLS Policies:**
 - `users_own_profile` — `USING (id = auth.jwt() ->> 'sub')`
@@ -136,9 +141,58 @@ Per-buyer email template customisation.
 |---|---|---|---|
 | `AutoSave.tsx` upsert | assessments | user_id, year, activity_data, emissions_totals, evidence_links, updated_at (NEVER status) | `createSupabaseClient(token)` |
 | `results/page.tsx` save | assessments | + status='submitted', + buyer_id | `createSupabaseClient(token)` |
-| `supplier/page.tsx` profile | profiles | company_name, industry, country, revenue, currency, year, signer | `createSupabaseClient(token)` |
+| `supplier/page.tsx` profile | profiles | company_name, industry, country, revenue, currency, year, signer, **reporting_period_start**, **reporting_period_end**, **consolidation_approach**, **financial_report_url** | `createSupabaseClient(token)` |
 | `buyer/dashboard` role | profiles | id, role='buyer' | `createSupabaseClient(token)` |
 | `actions/buyer.ts` invites | supplier_invites | all columns | `createSupabaseClient(token)` |
+| `actions/dashboard.ts` profile fetch | profiles | all of above + the 4 Category A fields | `createSupabaseClient(token)` |
 | `api/intelligence` cache | intelligence_cache | cache_key, mode, result, created_by | `adminSupabase()` |
 | `actions/dashboard.ts` cache read | intelligence_cache | cache_key, mode, result | `adminSupabase()` |
 | `buyer/settings` | buyer_settings | buyer_id, invite_email_subject, invite_email_body | `createSupabaseClient(token)` |
+| `CarbonReportPDF.tsx` render | profiles (via props) | reporting_period_start/end, consolidation_approach, financial_report_url | n/a (read-only render) |
+
+---
+
+## Migration History
+
+| Date | Migration | Tables affected |
+|---|---|---|
+| April 23, 2026 | **Category A audit** — added Reporting Period (start + end), Consolidation Approach, Financial Report URL to support GHG Protocol disclosure requirements in PDF. SQL: `ALTER TABLE profiles ADD COLUMN ... reporting_period_start date, reporting_period_end date, consolidation_approach text DEFAULT 'operational', financial_report_url text` + CHECK constraint on consolidation_approach. | `profiles` |
+
+> **When you run a migration, append a row here.** This is how anyone debugging "why is column X missing in dev?" finds out they need to run a particular ALTER TABLE.
+
+---
+
+## Future Schema Changes — Tracked but Not Yet Implemented
+
+These are documented here so future contributors don't accidentally re-design them from scratch when the time comes.
+
+### Phase 6 — Scope 2 Dual Reporting (Location-Based + Market-Based)
+
+**Why:** GHG Protocol Scope 2 Guidance (2015 amendment) requires dual reporting whenever a company has purchased renewable energy contracts (RECs, GOs, PPAs, green tariffs). Currently we only support Location-Based.
+
+**Schema changes likely needed:**
+```sql
+ALTER TABLE assessments ADD COLUMN scope2_approach text DEFAULT 'location_based';
+-- 'location_based' | 'market_based' | 'dual' (both reported)
+ALTER TABLE assessments ADD COLUMN renewable_energy jsonb;
+-- { rec_kwh, go_kwh, ppa_kwh, residual_mix_factor, evidence_files: [] }
+```
+
+The PDF disclaimer already references "Market-Based Scope 2 reporting" as out of scope — when the feature lands, that disclaimer line will be removed.
+
+### Phase 8 — Near-Term & Net-Zero Targets
+
+**Why:** Carbon Passport public page should show whether a supplier has science-based targets. Currently the `profiles.targets` jsonb is a single reduction target — needs to support separate Scope 1+2, Scope 3, and net-zero targets, plus SBTi validation status.
+
+**Schema changes likely needed:** extend `profiles.targets` jsonb structure (no schema migration needed — jsonb is flexible):
+```ts
+targets: {
+  scope12_near_term: { reductionPct, targetYear, baselineYear, baselineKg },
+  scope3_near_term:  { reductionPct, targetYear, baselineYear, baselineKg },
+  long_term:         { type: 'net_zero' | 'carbon_neutral', targetYear },
+  sbti_validation_status: 'committed' | 'validated' | 'not_pursued',
+  sbti_validation_date:   date | null,
+}
+```
+
+The dashboard `TargetSetter.tsx` will need a UX rework to capture these. The PDF will gain a "Targets & Commitments" appendix block.

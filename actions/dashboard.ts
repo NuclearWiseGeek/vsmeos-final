@@ -42,6 +42,12 @@ export interface DashboardData {
     signer:         string;
     role:           string;
     targets:        any | null;
+    // Category A audit fields (added April 2026) — optional/nullable so
+    // legacy profiles created before the migration still type-check.
+    reporting_period_start?:  string | null;
+    reporting_period_end?:    string | null;
+    consolidation_approach?:  string | null;
+    financial_report_url?:    string | null;
   } | null;
   assessments: Array<{
     id:               number;
@@ -83,7 +89,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const [profileRes, assessmentsRes, invitesRes] = await Promise.all([
     supabase
       .from('profiles')
-      .select('company_name, country, industry, revenue, currency, signer, role, targets')
+      .select('company_name, country, industry, revenue, currency, signer, role, targets, reporting_period_start, reporting_period_end, consolidation_approach, financial_report_url')
       .eq('id', userId)
       .maybeSingle(),
 

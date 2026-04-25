@@ -13,8 +13,16 @@
 //
 // WHEN TO MODIFY THIS FILE:
 //   - When adding a new input field (add its key to activityData defaults)
-//   - When adding a new company profile field (add to CompanyData interface)
-//   - When changing the Supabase table structure
+//   - When adding a new company profile field (add to CompanyData interface,
+//     INITIAL_COMPANY_DATA, load block in Section 5, save block in Section 6)
+//   - When changing the Supabase table structure (remember to update the SQL
+//     migration too — see supabase_schema.md)
+//
+// CATEGORY A AUDIT FIELDS (April 2026):
+//   reportingPeriodStart/End, consolidationApproach, financialReportUrl
+//   → stored on `profiles` (ALTER TABLE ran 23 Apr 2026)
+//   → rendered on Page 1 of PDF + methodology footer
+//   → all optional, safe defaults for legacy profiles
 //
 // DEPENDENCIES:
 //   - Clerk (useUser, useAuth) — for user identity and Supabase auth token
@@ -44,6 +52,15 @@ interface CompanyData {
   currency: string;     // Reporting currency (EUR, USD, GBP, etc.)
   year: string;         // Financial year being reported (e.g. "2024")
   signer: string;       // Name of the person signing/attesting the report
+
+  // ── Category A audit fields (April 2026) ──────────────────────────────────
+  // These appear in the PDF title block and methodology footer. All optional —
+  // the form provides sensible defaults, and the PDF renders "Not specified"
+  // for legacy reports that don't have them.
+  reportingPeriodStart?: string;   // ISO YYYY-MM-DD (HTML5 date input native format)
+  reportingPeriodEnd?:   string;   // ISO YYYY-MM-DD
+  consolidationApproach?: 'operational' | 'financial' | 'equity';
+  financialReportUrl?:   string;   // Optional link to publicly-filed accounts
 }
 
 /**
@@ -89,6 +106,14 @@ const INITIAL_COMPANY_DATA: CompanyData = {
   currency: 'EUR',
   year: new Date().getFullYear().toString(),
   signer: '',
+
+  // ── Category A audit defaults ──
+  // Dates start empty; the profile form pre-fills them based on the selected
+  // reporting year (or the year from a buyer invite ?year=XXXX param).
+  reportingPeriodStart:  '',
+  reportingPeriodEnd:    '',
+  consolidationApproach: 'operational',
+  financialReportUrl:    '',
 };
 
 // All known activity keys initialised to 0.
@@ -194,6 +219,15 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
             currency: profileData.currency      || prev.currency,
             year:     profileData.year?.toString() || prev.year,
             signer:   profileData.signer        || prev.signer,
+
+            // ── Category A audit fields ──
+            // Supabase returns `date` columns as ISO 'YYYY-MM-DD' strings,
+            // which matches HTML5 <input type="date"> value format exactly.
+            // Nullish coalescing to '' keeps inputs controlled components.
+            reportingPeriodStart:  profileData.reporting_period_start ?? '',
+            reportingPeriodEnd:    profileData.reporting_period_end   ?? '',
+            consolidationApproach: profileData.consolidation_approach ?? 'operational',
+            financialReportUrl:    profileData.financial_report_url   ?? '',
           }));
         }
 
@@ -274,6 +308,17 @@ export function ESGProvider({ children }: { children: React.ReactNode }) {
           currency:     companyData.currency || 'EUR',
           year:         parseInt(companyData.year) || new Date().getFullYear(),
           signer:       companyData.signer   || '',
+
+          // ── Category A audit fields ──
+          // Coerce empty strings to null — `date` columns reject '' ("invalid
+          // input syntax for type date"), and `text` columns are cleaner with
+          // null than empty string. consolidation_approach always has a value
+          // (form radio always selects one).
+          reporting_period_start: companyData.reportingPeriodStart  || null,
+          reporting_period_end:   companyData.reportingPeriodEnd    || null,
+          consolidation_approach: companyData.consolidationApproach || 'operational',
+          financial_report_url:   companyData.financialReportUrl    || null,
+
           updated_at:   new Date().toISOString(),
         }, { onConflict: 'id' });
 

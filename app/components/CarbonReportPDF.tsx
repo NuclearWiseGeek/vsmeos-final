@@ -282,6 +282,52 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
   const primarySource = countryFactors.primaryCalculator;
   const methodologyNote = countryFactors.methodologyNote;
 
+  // ─── Category A audit helpers ──────────────────────────────────────────
+  // Reporting period: formatted "01 January 2024 – 31 December 2024"
+  // If dates aren't set (legacy report), fall back to "FY {year}" which is
+  // what users saw before these fields existed.
+  const fmtDateLong = (iso: string | undefined | null): string => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+  };
+  const periodStart = fmtDateLong(company?.reportingPeriodStart);
+  const periodEnd   = fmtDateLong(company?.reportingPeriodEnd);
+  const reportingPeriodLabel = (periodStart && periodEnd)
+    ? `${periodStart} — ${periodEnd}`
+    : `FY ${st(company?.year)} (calendar year — not specified)`;
+
+  // Consolidation approach label — always has a value thanks to DB default.
+  const boundaryMap: Record<string, string> = {
+    operational: 'Operational Control',
+    financial:   'Financial Control',
+    equity:      'Equity Share',
+  };
+  const consolidationLabel = boundaryMap[company?.consolidationApproach || 'operational'] || 'Operational Control';
+
+  // Financial report URL — only shown if provided.
+  const financialUrl = company?.financialReportUrl || '';
+
+  // Which Scope 3 categories have actual non-zero data? Drives the dynamic
+  // disclaimer (bullet 3) — so we only claim Cat 6 / Cat 7 / etc if the
+  // supplier actually entered something non-zero in those activities.
+  const cat6Keys = ['grey_fleet', 'rail_travel', 'flight_short_haul', 'flight_long_haul', 'hotel_nights'];
+  const cat7Keys = ['employee_commuting', 'remote_working'];
+  const hasCat6 = cat6Keys.some(k => parseFloat(activityData?.[k] || '0') > 0);
+  const hasCat7 = cat7Keys.some(k => parseFloat(activityData?.[k] || '0') > 0);
+  // Build the Scope 3 included-categories sentence honestly.
+  const scope3Included: string[] = [];
+  if (hasCat6) scope3Included.push('Category 6 (Business Travel)');
+  if (hasCat7) scope3Included.push('Category 7 (Employee Commuting & Remote Working)');
+  const scope3IncludedText = scope3Included.length > 0
+    ? scope3Included.join(' and ')
+    : 'no Scope 3 categories (none provided in this report)';
+
+  // Scope 2 approach — currently always Location-Based. When Market-Based
+  // support lands (Phase 6), read this from the company profile.
+  const scope2Approach = 'Location-Based';
+
   // ─── Emission totals ─────────────────────────────────────────────────────
   const totalKg = parseFloat(totals?.total) || 0;
   const totalTonnes = totalKg / 1000;
@@ -349,8 +395,8 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
             <Text style={styles.profileValue}>{st(company?.name)}</Text>
           </View>
           <View style={styles.profileItem}>
-            <Text style={styles.profileLabel}>Financial Year</Text>
-            <Text style={styles.profileValue}>FY {st(company?.year)}</Text>
+            <Text style={styles.profileLabel}>Reporting Period</Text>
+            <Text style={styles.profileValue}>{reportingPeriodLabel}</Text>
           </View>
           <View style={styles.profileItem}>
             <Text style={styles.profileLabel}>Country of Operations</Text>
@@ -380,8 +426,16 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
           <Text>• Aligned with ISO 14064-1:2018 — Specification for quantification of GHG emissions</Text>
           <Text>• Commission Recommendation (EU) 2025/1710 of 30 July 2025 — voluntary sustainability reporting standard for SMEs</Text>
           <Text>• CSRD ESRS E1 — Climate change disclosure requirements</Text>
-          <Text style={{ marginTop: 4 }}>Consolidation approach: Operational Control · Scope 3 boundary: Categories 6 (Business Travel) and 7 (Employee Commuting)</Text>
+          <Text style={{ marginTop: 4 }}>
+            Consolidation approach: {consolidationLabel} · Scope 2 approach: {scope2Approach} · Scope 3 boundary: {scope3IncludedText}
+          </Text>
           <Text>Base year: FY {st(company?.year)} (first reporting period — to be used as reference for year-on-year comparison)</Text>
+          {/* Optional financial report link — shown only if supplier provided one */}
+          {financialUrl ? (
+            <Text style={{ marginTop: 4 }}>
+              <Text style={styles.bold}>Revenue audit trail: </Text>{financialUrl}
+            </Text>
+          ) : null}
           {/* DYNAMIC: the methodology note is specific to this supplier's country */}
           <Text style={{ marginTop: 4, color: '#71717a' }}>{methodologyNote}</Text>
         </View>
@@ -405,8 +459,8 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
 
           {[
             { label: 'Scope 1', desc: 'Direct Emissions — Stationary & Mobile Combustion, Fugitive Refrigerants', kg: scope1Kg },
-            { label: 'Scope 2', desc: 'Indirect Emissions — Purchased Electricity, District Heat & Cooling',      kg: scope2Kg },
-            { label: 'Scope 3', desc: 'Value Chain — Business Travel & Employee Commuting',                       kg: scope3Kg },
+            { label: 'Scope 2', desc: `Indirect Emissions (${scope2Approach}) — Purchased Electricity, District Heat & Cooling`, kg: scope2Kg },
+            { label: 'Scope 3', desc: `Value Chain — ${scope3IncludedText}`,                                      kg: scope3Kg },
           ].map((row, i) => (
             <View key={row.label} style={{
               flexDirection: 'row',
@@ -727,8 +781,9 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               <Text style={styles.bulletPoint}>1.</Text>
               <Text>
                 <Text style={styles.bold}>Methodology: </Text>
-                Emission calculations are based on supplier-provided activity data and the emission factor
-                database specified above. VSME OS does not independently verify input data accuracy.
+                Emission calculations combine supplier-provided primary and secondary data — including
+                activity consumption where available (e.g. kWh of electricity, litres of fuel) — with the
+                emission factor database specified above. VSME OS does not independently verify input data accuracy.
               </Text>
             </View>
             <View style={styles.bulletRow}>
@@ -743,10 +798,10 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               <Text style={styles.bulletPoint}>3.</Text>
               <Text>
                 <Text style={styles.bold}>Scope Boundary: </Text>
-                This report covers Scope 1 (direct), Scope 2 (purchased energy), and
-                Scope 3 Categories 6 (business travel) and 7 (employee commuting &amp; remote working).
+                This report covers Scope 1 (direct), Scope 2 ({scope2Approach} — purchased energy), and
+                Scope 3 limited to {scope3IncludedText}.
                 Upstream supply chain (Scope 3 Cat. 1–5), downstream categories (Cat. 8–15),
-                and purchased goods &amp; services are excluded from this boundary.
+                purchased goods &amp; services, and Market-Based Scope 2 reporting are excluded from this boundary.
               </Text>
             </View>
             <View style={styles.bulletRow}>
@@ -762,7 +817,7 @@ export default function CarbonReportPDF({ company, totals, breakdown, activityDa
               <Text>
                 <Text style={styles.bold}>Verification Enquiries: </Text>
                 For questions about this report, contact{' '}
-                <Text style={styles.bold}>contact@vsmeos.fr</Text> or visit{' '}
+                <Text style={styles.bold}>hello@vsmeos.fr</Text> or visit{' '}
                 <Text style={styles.bold}>vsmeos.fr/methodology</Text>.
               </Text>
             </View>

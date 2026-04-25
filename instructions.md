@@ -30,9 +30,14 @@ employee_count (text)
 website (text)
 role (text) — 'buyer' or 'supplier'
 targets (jsonb) — { reductionPct, targetYear, baselineYear, baselineKg, setAt }
+reporting_period_start (date, nullable) — Phase 4b.3 / Category A
+reporting_period_end (date, nullable) — Phase 4b.3 / Category A
+consolidation_approach (text, default 'operational') — Phase 4b.3 / Category A; CHECK constraint enforces 'operational' | 'financial' | 'equity'
+financial_report_url (text, nullable) — Phase 4b.3 / Category A
 updated_at (timestamptz)
 ```
 ⚠️ Revenue + currency live here ONLY — NEVER in assessments.
+⚠️ The 4 Phase 4b.3 columns require the migration SQL in `handover.md` §1 (Phase 4b.3 section). If they're missing in dev, run that ALTER TABLE.
 
 ### `assessments`
 One row per supplier per year.
@@ -229,7 +234,7 @@ git push --force origin main
 7. Status values exactly: `draft` → `sent` → `started` → `submitted`
 8. Supplier invite matching uses email address not company name
 9. Commit author must be NuclearWiseGeeks
-10. Emission factors correct as of April 18, 2026 — cite source when updating
+10. Emission factors correct as of April 23, 2026 — cite source when updating. Most recent change: US grid 0.352 → 0.350 (EPA eGRID2023 exact).
 11. Never put ESGProvider or AutoSave in app/layout.tsx
 12. RLS policies must use `auth.jwt() ->> 'sub'` not `auth.uid()`
 13. emissions_totals ALWAYS saved with: scope1Total, scope2Total, scope3Total, grandTotal
@@ -239,6 +244,11 @@ git push --force origin main
 17. All supplier sign-in redirects go to `/supplier/dashboard` not `/supplier`
 18. Never call `new Resend()` at module level — use lazy `getResend()` function
 19. File by file — always deliver one file at a time using `present_files` tool
+20. Date and URL columns: when saving from the UI, coerce empty strings to `null` before upsert. Postgres `date` columns reject `''` with error 22007 ("invalid input syntax for type date"). Pattern: `value || null`.
+21. `consolidation_approach` accepts only `'operational'`, `'financial'`, `'equity'` — DB enforces this via CHECK constraint. If you add a new approach, update both the CHECK constraint and the `boundaryMap` in `CarbonReportPDF.tsx`.
+22. When adding a new field to the supplier company profile, update FOUR places in this order: (a) `ESGContext.tsx` interface + INITIAL_COMPANY_DATA + load mapping + save mapping, (b) `app/supplier/page.tsx` form input, (c) `app/components/CarbonReportPDF.tsx` render block, (d) `actions/dashboard.ts` TypeScript profile interface + SELECT column list. Skipping any one breaks data flow silently.
+23. Bar chart / KPI labels: emissions are stored in **kilograms** in `emissions_totals`. When displaying as tonnes, ALWAYS divide by 1000. Unit label is `tCO₂e`, never just `t`. (Historical bug: April 2026 had a 1000× display error on the buyer dashboard bar chart.)
+24. Scope 2 reporting is currently Location-Based only. Every Scope 2 figure displayed in PDF or UI must be labelled "Location-Based" so it's auditor-defensible. Market-Based dual reporting is planned for Phase 6.
 
 ### Legal Rules
 - "audit-ready" not "audit-standard"

@@ -113,7 +113,9 @@ function EmissionsBarChart({ rows }: { rows: ReturnType<typeof normaliseRow>[] }
 
       ctx.fillStyle = '#111827';
       ctx.font      = '600 12px system-ui, sans-serif';
-      ctx.fillText(`${fmt(row.total)} t`, labelW + chartW + 8, y + barH / 2 + 4);
+      // CRITICAL: row.total is in kg — must divide by 1000 to display in tonnes.
+      // Unit is tCO₂e (tonnes of CO₂ equivalent) — never just "t".
+      ctx.fillText(`${fmt(row.total / 1000)} tCO₂e`, labelW + chartW + 8, y + barH / 2 + 4);
     });
   }, [rows]);
 
@@ -132,9 +134,9 @@ function Legend() {
   return (
     <div className="flex items-center gap-5 text-xs text-gray-500 flex-wrap">
       {[
-        { label: 'Scope 1 (Direct)',      colour: '#0C2918' },
-        { label: 'Scope 2 (Energy)',      colour: '#1A5C3A' },
-        { label: 'Scope 3 (Value chain)', colour: '#C9A84C' },
+        { label: 'Scope 1 (Direct)',                              colour: '#0C2918' },
+        { label: 'Scope 2 (Location-Based)',                      colour: '#1A5C3A' },
+        { label: 'Scope 3 (Cat. 6 & 7 — Travel & Commuting)',     colour: '#C9A84C' },
       ].map(({ label, colour }) => (
         <div key={label} className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: colour }} />
@@ -306,7 +308,7 @@ export default function EmissionsPanel({ emissionsData }: EmissionsPanelProps) {
       {/* Footer */}
       <div className="px-8 py-4 border-t border-gray-100 bg-gray-50">
         <p className="text-[10px] text-gray-400">
-          All figures in tCO₂e · GHG Protocol aligned · Sources: DEFRA 2025, ADEME 2024, IEA 2025
+          All figures in tCO₂e · GHG Protocol aligned · Sources: DEFRA 2025, ADEME Base Carbone V23.6 (2025), IEA 2025
           {availableYears.length > 1 && selectedYear && (
             <> · Showing FY {selectedYear} only — use year buttons above to switch or view all</>
           )}
